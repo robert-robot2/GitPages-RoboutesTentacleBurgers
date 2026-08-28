@@ -1,6 +1,13 @@
 # ==========================================================
 # NOVA ADEPTUS — ChatBotAdeptus.py
 # ==========================================================
+
+ #   <!-- Loads Pyodide (Python in the browser) from CDN
+  #  <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>-->
+   # <!-- Your JS helper that bridges Blazor to Python
+    #<script src="/iPython/pyodideHelper.js"></script>-->
+    #<!-- Wasm Interop and Authentication-->
+
 import random
 import datetime
 
