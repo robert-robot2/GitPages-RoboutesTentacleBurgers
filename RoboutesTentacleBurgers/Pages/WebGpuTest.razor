@@ -1,0 +1,113 @@
+﻿@page "/WebGpuTest"
+
+<canvas id="gpuCanvas" width="600" height="400" style="width:100%; display:block;"></canvas>
+<p id="status" style="font-size:13px; text-align:center;"></p>
+
+<script>
+    async function initWebGPU() {
+      const status = document.getElementById('status');
+      const canvas = document.getElementById('gpuCanvas');
+
+      if (!navigator.gpu) {
+        status.textContent = 'WebGPU not supported. Try Chrome 113+.';
+        return;
+      }
+
+      const adapter = await navigator.gpu.requestAdapter();
+      if (!adapter) { status.textContent = 'No adapter found.'; return; }
+
+      const device = await adapter.requestDevice();
+      const context = canvas.getContext('webgpu');
+      const format = navigator.gpu.getPreferredCanvasFormat();
+      context.configure({ device, format, alphaMode: 'premultiplied' });
+
+      const shaderCode = `
+        @@group(0) @@binding(0) var<uniform> time: f32;
+
+        struct VertexOut {
+          @@builtin(position) position: vec4f,
+          @@location(0) color: vec4f,
+        }
+
+        @@vertex
+        fn vs_main(@@builtin(vertex_index) idx: u32) -> VertexOut {
+          var pos = array<vec2f, 3>(
+            vec2f( 0.0,  0.6),
+            vec2f(-0.6, -0.5),
+            vec2f( 0.6, -0.5),
+          );
+          var colors = array<vec4f, 3>(
+            vec4f(1.0, 0.3, 0.4, 1.0),
+            vec4f(0.3, 0.6, 1.0, 1.0),
+            vec4f(0.3, 1.0, 0.6, 1.0),
+          );
+          let angle = time;
+          let c = cos(angle);
+          let s = sin(angle);
+          let p = pos[idx];
+          let rotated = vec2f(p.x * c - p.y * s, p.x * s + p.y * c);
+          var out: VertexOut;
+          out.position = vec4f(rotated, 0.0, 1.0);
+          out.color = colors[idx];
+          return out;
+        }
+
+        @@fragment
+        fn fs_main(in: VertexOut) -> @@location(0) vec4f {
+          return in.color;
+        }
+      `;
+
+      const shaderModule = device.createShaderModule({ code: shaderCode });
+
+      const timeBuffer = device.createBuffer({
+        size: 4,
+        usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
+      });
+
+      const bindGroupLayout = device.createBindGroupLayout({
+        entries: [{ binding: 0, visibility: GPUShaderStage.VERTEX, buffer: { type: 'uniform' } }],
+      });
+
+      const bindGroup = device.createBindGroup({
+        layout: bindGroupLayout,
+        entries: [{ binding: 0, resource: { buffer: timeBuffer } }],
+      });
+
+      const pipeline = device.createRenderPipeline({
+        layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
+        vertex: { module: shaderModule, entryPoint: 'vs_main' },
+        fragment: { module: shaderModule, entryPoint: 'fs_main', targets: [{ format }] },
+        primitive: { topology: 'triangle-list' },
+      });
+
+      status.textContent = 'WebGPU active!';
+
+      let start = null;
+      function frame(ts) {
+        if (!start) start = ts;
+        const t = (ts - start) / 1000;
+        device.queue.writeBuffer(timeBuffer, 0, new Float32Array([t]));
+        const encoder = device.createCommandEncoder();
+        const pass = encoder.beginRenderPass({
+          colorAttachments: [{
+            view: context.getCurrentTexture().createView(),
+            clearValue: { r: 0.06, g: 0.06, b: 0.07, a: 1 },
+            loadOp: 'clear',
+            storeOp: 'store',
+          }],
+        });
+        pass.setPipeline(pipeline);
+        pass.setBindGroup(0, bindGroup);
+        pass.draw(3);
+        pass.end();
+        device.queue.submit([encoder.finish()]);
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    }
+
+    initWebGPU().catch(err => {
+      document.getElementById('status').textContent = 'Error: ' + err.message;
+    });
+</script>

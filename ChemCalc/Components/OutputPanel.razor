@@ -1,0 +1,50 @@
+@using ChemCalc.Data
+@using ChemCalc.ChemEngine
+
+@* Left panel - displays selected element details and current molecule *@
+
+<div class="output-panel">
+    <div class="output-header">Output</div>
+
+    @if (SelectedElement != null)
+    {
+        <div class="element-detail-card">
+            <div class="element-detail-symbol">@SelectedElement.Symbol</div>
+            <div class="element-detail-name">@SelectedElement.Name</div>
+            <div class="element-detail-info">
+                <div class="detail-row">
+                    <span class="detail-label">Atomic Number:</span>
+                    <span class="detail-value">@SelectedElement.AtomicNumber</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Atomic Mass:</span>
+                    <span class="detail-value">@SelectedElement.GetFormattedMass()</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">Type:</span>
+                    <span class="detail-value">@ElementTypeHelper.GetDisplayName(SelectedElement.ElementType)</span>
+                </div>
+                <div class="detail-row">
+                    <span class="detail-label">State:</span>
+                    <span class="detail-value">@SelectedElement.GetStateSymbol()</span>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="output-placeholder">
+            <p>Click an element to see its properties</p>
+        </div>
+    }
+
+ 
+</div>
+
+@code {
+    [Parameter]
+    public Element SelectedElement { get; set; }
+
+    [Parameter]
+    public MoleculeBuilder CurrentMolecule { get; set; }
+}

@@ -1,0 +1,252 @@
+@using WarCraftLibrary
+@inject WarGameService Game
+
+@if (IsVisible)
+{
+    <div class="tech-tree-window">
+        <div class="tech-tree-header">
+            <h2>?? Technology Tree - @(Game.PlayerFaction?.Race == RaceType.Human ? "Human" : "Orc")</h2>
+            <button class="tech-tree-close" @onclick="Close">?</button>
+        </div>
+
+        <div class="tech-tree-content">
+            @if (Game.PlayerFaction != null)
+            {
+                <!-- TIER 0: STARTING BUILDINGS -->
+                <div class="tech-tier">
+                    <h3 class="tier-title">?? Starting Buildings</h3>
+                    <div class="tech-row">
+                        <div class="tech-node @(HasBuilding<TownHall>() || HasBuilding<Castle>() ? "built" : "unbuilt")">
+                            <div class="node-icon">???</div>
+                            <div class="node-name">@(Game.PlayerFaction.Race == RaceType.Human ? "Town Hall" : "Stronghold")</div>
+                            <div class="node-trains">Trains: Peasant/Peon</div>
+                        </div>
+
+                        <div class="tech-arrow">?</div>
+
+                        <div class="tech-node @(HasBuilding<Farm>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">@(Game.PlayerFaction.Race == RaceType.Human ? "Farm" : "Pig Farm")</div>
+                            <div class="node-trains">+5 Population</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 1: BASIC MILITARY & ECONOMY -->
+                <div class="tech-tier">
+                    <h3 class="tier-title">?? Tier 1: Military & Economy</h3>
+                    <div class="tech-row">
+                        <div class="tech-node @(HasBuilding<Barracks>() ? "built" : "unbuilt")">
+                            <div class="node-icon">???</div>
+                            <div class="node-name">Barracks</div>
+                            <div class="node-trains">Trains:</div>
+                            <div class="unit-list">
+                                <div class="unit-item @(HasUnit<Footman>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Footman" : "Grunt")</div>
+                                <div class="unit-item @(HasUnit<Brigand>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Brigand" : "Ogre") (Req: Blacksmith)</div>
+                            </div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<LumberMill>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">Lumber Mill</div>
+                            <div class="node-trains">Upgrades: Ranged Damage/Armor</div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<ArcheryRange>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">Archery Range</div>
+                            <div class="node-trains">Trains:</div>
+                            <div class="unit-list">
+                                <div class="unit-item @(HasUnit<Archer>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Archer" : "Troll Axe")</div>
+                            </div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<Blacksmith>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">Blacksmith</div>
+                            <div class="node-trains">Upgrades: Melee Damage/Armor</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 1.5: MAGIC & MOUNTS -->
+                <div class="tech-tier">
+                    <h3 class="tier-title">? Tier 1.5: Magic & Cavalry</h3>
+                    <div class="tech-row">
+                        <div class="tech-node @(HasBuilding<Church>() || HasBuilding<CultistHut>() ? "built" : "unbuilt")">
+                            <div class="node-icon">?</div>
+                            <div class="node-name">@(Game.PlayerFaction.Race == RaceType.Human ? "Church" : "Cultist Hut")</div>
+                            <div class="node-trains">Trains:</div>
+                            <div class="unit-list">
+                                <div class="unit-item @(HasUnit<Priest>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Priest (Heal)" : "Cultist (Bloodlust)")</div>
+                            </div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<Stables>() || HasBuilding<Pen>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">@(Game.PlayerFaction.Race == RaceType.Human ? "Stables" : "Pen")</div>
+                            <div class="node-trains">Trains:</div>
+                            <div class="unit-list">
+                                <div class="unit-item @(HasUnit<Horse>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Horse" : "Wolf")</div>
+                            </div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<WoodTower>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">Wood Tower</div>
+                            <div class="node-trains">Defense: 6 dmg, 150 range</div>
+                        </div>
+
+                        <div class="tech-node @(HasBuilding<WoodenWall>() ? "built" : "unbuilt")">
+                            <div class="node-icon">??</div>
+                            <div class="node-name">Wooden Wall</div>
+                            <div class="node-trains">50 HP barrier</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CASTLE UPGRADE REQUIREMENT -->
+                <div class="tech-tier upgrade-requirement">
+                    <h3 class="tier-title">?? Castle Upgrade Requirements</h3>
+                    <div class="requirement-box">
+                        <div class="requirement-item @(HasBuilding<Barracks>() ? "met" : "unmet")">
+                            @(HasBuilding<Barracks>() ? "?" : "?") Barracks
+                        </div>
+                        <div class="requirement-item @(HasBuilding<ArcheryRange>() ? "met" : "unmet")">
+                            @(HasBuilding<ArcheryRange>() ? "?" : "?") Archery Range
+                        </div>
+                        <div class="requirement-item @((HasBuilding<Church>() || HasBuilding<CultistHut>()) ? "met" : "unmet")">
+                            @((HasBuilding<Church>() || HasBuilding<CultistHut>()) ? "?" : "?") @(Game.PlayerFaction.Race == RaceType.Human ? "Church" : "Cultist Hut")
+                        </div>
+                        <div class="requirement-arrow">??</div>
+                        <div class="requirement-item @(HasBuilding<Castle>() ? "met" : "unmet")">
+                            @(HasBuilding<Castle>() ? "? CASTLE BUILT" : "? Upgrade to Castle (2000g, 1000w)")
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TIER 2: CASTLE UNLOCKS -->
+                @if (HasBuilding<Castle>())
+                {
+                    <div class="tech-tier">
+                        <h3 class="tier-title">?? Tier 2: Castle Buildings (Requires Castle)</h3>
+                        <div class="tech-row">
+                            <div class="tech-node @(HasBuilding<KnightsHold>() || HasBuilding<RaiderLair>() ? "built" : "unbuilt")">
+                                <div class="node-icon">??</div>
+                                <div class="node-name">@(Game.PlayerFaction.Race == RaceType.Human ? "Knights Hold" : "Raider Lair")</div>
+                                <div class="node-trains">Research:</div>
+                                <div class="unit-list">
+                                    <div class="unit-item @(Game.PlayerFaction.HasMountedCombatUpgrade || Game.PlayerFaction.HasMountedWarfareUpgrade ? "trained" : "")">
+                                        • @(Game.PlayerFaction.Race == RaceType.Human ? "Mounted Combat" : "Mounted Warfare")
+                                    </div>
+                                </div>
+                                <div class="node-trains">Enables Mounting:</div>
+                                <div class="unit-list">
+                                    <div class="unit-item @(HasUnit<Knight>() ? "trained" : "")">• @(Game.PlayerFaction.Race == RaceType.Human ? "Knight" : "Raider") (Footman + Horse)</div>
+                                </div>
+                            </div>
+
+                            <div class="tech-node @(HasBuilding<StoneTower>() ? "built" : "unbuilt")">
+                                <div class="node-icon">??</div>
+                                <div class="node-name">Stone Tower</div>
+                                <div class="node-trains">Defense: 10 dmg, 150 range</div>
+                            </div>
+
+                            <div class="tech-node @(HasBuilding<StoneWall>() ? "built" : "unbuilt")">
+                                <div class="node-icon">??</div>
+                                <div class="node-name">Stone Wall</div>
+                                <div class="node-trains">150 HP barrier</div>
+                            </div>
+
+                            <div class="tech-node built">
+                                <div class="node-icon">???</div>
+                                <div class="node-name">Additional Town Halls</div>
+                                <div class="node-trains">Build expansion bases</div>
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <!-- UPGRADES SECTION -->
+                <div class="tech-tier">
+                    <h3 class="tier-title">?? Current Upgrades</h3>
+                    <div class="upgrade-status-grid">
+                        <div class="upgrade-status-card">
+                            <div class="upgrade-icon">??</div>
+                            <div class="upgrade-name">Melee Damage</div>
+                            <div class="upgrade-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @((Game.PlayerFaction.MeleeDamageLevel * 33.33))%"></div>
+                                </div>
+                                <span class="progress-text">Level @Game.PlayerFaction.MeleeDamageLevel/3</span>
+                            </div>
+                        </div>
+
+                        <div class="upgrade-status-card">
+                            <div class="upgrade-icon">???</div>
+                            <div class="upgrade-name">Melee Armor</div>
+                            <div class="upgrade-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @((Game.PlayerFaction.MeleeArmorLevel * 33.33))%"></div>
+                                </div>
+                                <span class="progress-text">Level @Game.PlayerFaction.MeleeArmorLevel/3</span>
+                            </div>
+                        </div>
+
+                        <div class="upgrade-status-card">
+                            <div class="upgrade-icon">??</div>
+                            <div class="upgrade-name">Ranged Damage</div>
+                            <div class="upgrade-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @((Game.PlayerFaction.RangedDamageLevel * 33.33))%"></div>
+                                </div>
+                                <span class="progress-text">Level @Game.PlayerFaction.RangedDamageLevel/3</span>
+                            </div>
+                        </div>
+
+                        <div class="upgrade-status-card">
+                            <div class="upgrade-icon">???</div>
+                            <div class="upgrade-name">Ranged Armor</div>
+                            <div class="upgrade-progress">
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: @((Game.PlayerFaction.RangedArmorLevel * 33.33))%"></div>
+                                </div>
+                                <span class="progress-text">Level @Game.PlayerFaction.RangedArmorLevel/3</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    public bool IsVisible { get; set; } = false;
+
+    public void Toggle()
+    {
+        IsVisible = !IsVisible;
+        StateHasChanged();
+    }
+
+    public void Close()
+    {
+        IsVisible = false;
+        StateHasChanged();
+    }
+
+    private bool HasBuilding<T>() where T : WarBuilding
+    {
+        return WarRegistry.Buildings
+            .OfType<T>()
+            .Any(b => b.Race == Game.PlayerFaction?.Race && b.IsConstructed);
+    }
+
+    private bool HasUnit<T>() where T : WarUnit
+    {
+        return WarRegistry.Units
+            .OfType<T>()
+            .Any(u => u.Race == Game.PlayerFaction?.Race);
+    }
+}

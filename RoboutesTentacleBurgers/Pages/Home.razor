@@ -1,0 +1,205 @@
+﻿@page "/"
+
+@implements IDisposable
+
+<PageTitle>Home</PageTitle>
+
+<div class="desktop-only">
+
+
+    
+    @using SpectralXGLX
+
+  
+
+<SpectralXCanvas @ref="EngineComponent"
+                     CanvasClass="Home-Viewport"
+                     ContainerId="Home-Container">
+
+      
+
+         
+
+ </SpectralXCanvas>
+
+</div>
+
+<div class="mobile-only DiabloBlueGlow">
+  
+    
+    <div class="DiabloBlueGlow" style="font-size:150%">Home</div>
+    <div class="DiabloBlueGlow" style="font-size:125%">Welcome to the Tavern of the Rising Sun!</div>
+    <div class="DiabloBlueGlow" style="font-size:125%">Where you nightmares are dreams and your dreams are nightmares!</div>
+    <div class="DiabloBlueGlow" style="font-size:125%">Webgl2 Disabled on Mobile Most of mobile doesnt work correctly on for page viewing until fixed!</div>
+    <div class="DiabloBlueGlow" style="font-size:125%">Webgl2 Does not display correctly on phones only tablets as well</div>
+
+    @*
+    <div class="lavalamp-wrapper">
+        <LavaLampDyn />
+    </div>
+    *@
+    <div class="DiabloRedGlow" style="font-size:125%">
+        <strong>Adult Content Warning:</strong><br />
+        This project contains mature themes and occasional strong language inspired by classic Diablo-style games.<br />
+        It is intended for adults (18+).<br />
+        <br />
+        Note: This is a test build. Formal age verification is not currently implemented.
+    </div>
+
+    <div class="DiabloRedGlow" style="font-size:125%">
+        Contextual Warning: No real-life references are present aside from city names and country names.
+    </div>
+
+    <div class="DiabloRedGlow" style="font-size:125%">
+        Fictional Warning For Games: All representations are virtual recreations of physical reality set in a fiction timeline, not to be interpreted as intending harm to any human, but more oft to inspire mirth.
+    </div>
+
+    <div class="DiabloRedGlow" style="font-size:125%">
+        Photosensitivity Warning: Flashing lights, Flicker Effects, FPS Vertigo
+    </div>
+    <div class="DiabloRedGlow" style="font-size:125%">
+        Physiological Warning: Moderation
+    </div>
+    <div class="DiabloRedGlow" style="font-size:125%">
+        Psychological Warning: Virtual Psychosis, Dementia, Schizophrenia, Intense Horror Themes,
+        Disturbing Imagery, Emotional Volatility, Cognitive Distortion, Paranoia, Hallucinatory Illusions,
+        Unreliable Reality, Dreamlike Disorientation, Existential Dread, Oppressive Atmosphere,
+        Arcane Corruption, Eldritch Whispers, Infernal Influence, Shadow-Born Entities,
+        Cosmic Uncertainty, Moral Ambiguity, Unethical Choices, Manipulation, Deceit,
+        Unreliable Narrators, Psychological Pressure, Dark Humor, Volatile Language,
+        Unsettling Ambience, Surreal Logic, Reality Fracture, Mind-Bending Paradox,
+        Forbidden Knowledge, Esoteric Symbols, Occult Undertones,
+        and every other thematic element capable of evoking extreme psychological tension.
+    </div>
+
+
+    <div class="DiabloRedGlow" style="font-size:125%">
+        If there are any issues with the site, please refer to Privacy for contact information.
+    </div>
+
+    <div class="DiabloYellow" style="font-size:125%">
+        You must clear your web cache when new updates are released.
+    </div>
+
+    <div class="DiabloYellow" style="font-size:125%">
+        If the server is inaccessible while patches are publishing, please check back later.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">💎 Desktop / Laptop PC only for Games. Some mobile games work on certain phones....play at your own risk... Mobile for page view.</div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 C# object-oriented programming. In development: Spectral GL C# backend CPU rasterizer
+        (Spectral GL GPU C++ frontend to be implemented) WebGL2 GPU Backend with CLR / WASM runtime NetCore 10.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum CPU: Pentium I — must finish tick logic under 16 ms (solid 60 FPS)
+        or 8 ms (120 FPS potential).
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum GPU: Nvidia Riva TNT, onboard Intel GPU, or any device supporting WebGPU
+        (Intel UHD integrated qualifies).
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum Browser: Latest Chrome, Edge, or Firefox with WebAssembly / WebGPU support.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum OS: Windows 3.1, Linux, any OS that can handle browser capabilities.
+        DOS OS loads.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum Network: Interweeb or Waifu required.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Minimum Civilization Requirement: Electricity. Maybe chair. Snack recommended.
+    </div>
+
+    <div class="DiabloBlueGlow" style="font-size:125%">
+        💎 Performance law crystallized: Objects update at sovereign cadence,
+        capped at 60 FPS, scalable to 120 FPS.
+    </div>
+
+
+    <img src="/iAssets/Roboute001.png" alt="Icon" width="128" height="128">
+
+    <div class="DiabloBlueGlow" style="font-size:125%">Alpharius Says you must consume this heal potion before you travel Human! Click it! Do it now!</div>
+
+    <div class="heal-container">
+        <img src="/iAssets/healpot01.png" alt="Health Potion" class="heal-potion" @onclick="TriggerHeal">
+        <span class="heal-text" style="opacity:@healOpacity">@healMessage</span>
+    </div>
+
+
+
+</div>
+
+
+
+
+@code {
+    private string healMessage = "";
+    private double healOpacity = 0;
+    private System.Timers.Timer? fadeTimer;
+        private double glowPhase = 0;
+    private System.Timers.Timer? glowTimer;
+
+    protected override void OnInitialized()
+    {
+        glowTimer = new System.Timers.Timer(16); // ~60 FPS
+        glowTimer.Elapsed += (_, __) => InvokeAsync(() =>
+        {
+            glowPhase += 0.05;
+            if (glowPhase > Math.PI * 2)
+                glowPhase = 0;
+
+            StateHasChanged();
+        });
+        glowTimer.Start();
+    }
+
+    private string GetGlowStyle()
+    {
+        // Oscillate between 0 and 1
+        double t = (Math.Sin(glowPhase) + 1) / 2;
+
+        // Interpolate glow radius
+        int glowA = (int)(10 + t * 10);  // 10 → 20
+        int glowB = (int)(20 + t * 10);  // 20 → 30
+        int glowC = (int)(30 + t * 10);  // 30 → 40
+
+        // Interpolate color
+        string colorA = "#e60073";
+        string colorB = "#ff4da6";
+
+        // Pick color based on t
+        string glowColor = t < 0.5 ? colorA : colorB;
+
+        return $"text-shadow: 0 0 {glowA}px #fff, 0 0 {glowB}px #fff, 0 0 {glowC}px {glowColor};";
+    }
+
+
+    private void TriggerHeal()
+    {
+        healMessage = "+5 HP";
+        healOpacity = 1;
+
+        fadeTimer?.Dispose();
+        fadeTimer = new System.Timers.Timer(1500);
+        fadeTimer.Elapsed += (_, __) => InvokeAsync(() =>
+        {
+            healOpacity = 0;
+            StateHasChanged();
+        });
+        fadeTimer.AutoReset = false;
+        fadeTimer.Start();
+
+    }
+
+   
+}
+

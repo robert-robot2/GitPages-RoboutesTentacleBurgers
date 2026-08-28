@@ -1,0 +1,89 @@
+﻿@page "/BloodWyrmProtocol"
+
+<PageTitle>Blood Wyrm Protocol</PageTitle>
+<div class="DiabloBlueGlow" style="font-size:150%">BloodWyrmProtocol</div>
+
+
+@inject NavigationManager NavManager
+@using SpectralXGLX
+@using SpectralXGLX.BWP.BWPMenu;
+
+
+
+<SpectralXCanvas @ref="EngineComponent"
+                 CanvasClass="SpectralX-Viewport"
+                 ContainerId="SpectralX-Container">
+
+
+
+    @if (EngineComponent?.BWPMenuVisible == true &&
+     EngineComponent?.Engine != null &&
+     SpectralXGLX.SpectralXComponent.SpectralXEngine.SceneID.IsBWPScene(EngineComponent.Engine.ActiveScene))
+    {
+         @if (_showCharSelect)
+        {
+            <SpectralBWPCharMenu OnCharacterSelected="HandleCharSelected"
+                                 OnStart="HandleCharStart"
+                                 OnRMainMenu="HandleCharSelectBack" />
+        }
+        else if (_showControls)
+        {
+
+            <SpectralBWPControls OnRMainMenu="HandleControlsBack" />
+        }
+        else if (_showOptions)
+        {
+
+            <SpectralBWPOptions OnRMainMenu="HandleOptionsBack" />
+        }
+        else
+        {
+            <SpectralBWPMainM OnSinglePlayer="HandleSinglePlayer"
+                              OnOptions="HandleBWPOptions"
+                              OnControls="HandleBWPControls"
+                              OnQuit="HandleBWPQuit" />
+        }
+
+
+
+    }
+
+    @if (EngineComponent?.BWPHUDVisible == true &&
+        EngineComponent?.Engine?.ActiveCharacter != null)
+    {
+        <SpectralCharHUD ActiveCharacter="EngineComponent.Engine.ActiveCharacter" />
+    }
+
+
+    @if (EngineComponent?.BWPInventoryVisible == true &&
+     EngineComponent?.Engine?.ActiveCharacter != null)
+    {
+        <SpectralInventory ActiveCharacter="EngineComponent.Engine.ActiveCharacter"
+                           Level="_spectralLevel"
+                           OnClose="() => EngineComponent!.ToggleBWPInventory()" />
+    }
+
+
+
+   
+
+</SpectralXCanvas>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

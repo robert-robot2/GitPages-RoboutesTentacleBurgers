@@ -1,0 +1,1195 @@
+﻿@page "/SnowPiercer2"
+
+
+
+@using System.Timers
+@using Microsoft.AspNetCore.Components.Forms
+@implements IDisposable
+
+<PageTitle>SnowPiercer40K!</PageTitle>
+
+<div class="game-container">
+    <h1 class="game-title">🚂 SnowPiercer40K! 💀</h1>
+
+    @if (gameState == GameState.Menu)
+    {
+        <div class="menu-panel">
+          
+            <!-- HIGH SCORES DISPLAY -->
+            <div style="background: rgba(0,0,0,0.8); padding: 20px; border-radius: 10px; margin-bottom: 20px; border: 2px solid #ffd700;">
+                <h2 style="color: #ffd700; text-align: center; font-size: 32px; margin-bottom: 20px;">🏆 TOP COMMANDERS 🏆</h2>
+                @if (highScores.Count > 0)
+                {
+                    <div style="font-family: 'Courier New', monospace; color: #0f0;">
+                        <div style="display: grid; grid-template-columns: 50px 80px 120px 80px 80px 150px; gap: 10px; padding: 10px; border-bottom: 2px solid #ffd700; margin-bottom: 10px;">
+                            <div style="color: #ffd700; font-weight: bold;">RANK</div>
+                            <div style="color: #ffd700; font-weight: bold;">NAME</div>
+                            <div style="color: #ffd700; font-weight: bold;">SCORE</div>
+                            <div style="color: #ffd700; font-weight: bold;">LEVEL</div>
+                            <div style="color: #ffd700; font-weight: bold;">KILLS</div>
+                            <div style="color: #ffd700; font-weight: bold;">DATE</div>
+                        </div>
+                        @for (int i = 0; i < highScores.Count; i++)
+                        {
+                            var hs = highScores[i];
+                            var rankColor = i == 0 ? "#FFD700" : i == 1 ? "#C0C0C0" : i == 2 ? "#CD7F32" : "#0f0";
+                            <div style="display: grid; grid-template-columns: 50px 80px 120px 80px 80px 150px; gap: 10px; padding: 8px; background: rgba(255,255,255,0.05); margin-bottom: 5px; border-radius: 5px;">
+                                <div style="color: @rankColor; font-weight: bold; font-size: 20px;">@(i + 1).</div>
+                                <div style="color: @rankColor; font-weight: bold; font-size: 18px;">@hs.Initials</div>
+                                <div style="color: #fff; font-size: 16px;">@hs.Score.ToString("N0")</div>
+                                <div style="color: #4ecdc4;">@hs.Level</div>
+                                <div style="color: #ff6b6b;">@hs.Kills</div>
+                                <div style="color: #aaa; font-size: 12px;">@hs.Date.ToString("MM/dd/yy")</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <p style="text-align: center; color: #666; font-style: italic; font-size: 18px;">No high scores yet. Be the first!</p>
+                }
+            </div>
+
+          
+
+            <div class="menu-center">
+                <p class="menu-text">Blast enemies, earn XP, upgrade your Death Train!</p>
+                <button class="start-button" @onclick="StartGame">FOR THE EMPEROR!</button>
+            </div>
+        </div>
+    }
+
+    @if (gameState == GameState.Playing)
+    {
+        <div class="game-ui">
+            <div class="stats-bar">
+                <span>
+                    Engine HP: <b class="stat-score">@(trainCars.FirstOrDefault(c => c.Type == "engine")?.Hp ?? 0) / @carTypes["engine"].MaxHp</b>
+                    <span style="color: #0f0; font-size: 12px;">♥ +@EngineRegenAmount/2s</span>
+                </span>
+                <span>💀 Pixelized: <b class="stat-score">@totalKills</b></span>
+                <span>Score: <b class="stat-score">@score</b></span>
+                <span>Level: <b class="stat-level">@level</b></span>
+                <span>XP: <b class="stat-xp">@xp/@xpNeeded</b></span>
+                <span>Throttle: <b class="stat-speed">@((throttle * 100).ToString("F0"))%</b></span> 
+                @if (isBuffActive)
+                {
+                    <span style="color: #FFD700; font-weight: bold; animation: pulse 0.5s infinite;">
+                        🐻 BUFF ACTIVE: @((buffExpiresAt - DateTime.Now).TotalSeconds.ToString("F1"))s
+                    </span>
+                }
+                <!-- ADD THESE TWO -->
+                <span>🌅 Time: <b class="stat-score">@lightCycle.GetTimeOfDayString()</b></span>
+                <span>@lightCycle.GetPhase()</span>
+                <span>🌦️ Weather: <b class="stat-score">@weatherCycle.GetWeatherName()</b></span>
+            </div>
+
+
+            @* ADD THIS RIGHT AFTER YOUR STATS BAR TO DEBUG ANIMATIONS: 
+            <span>👁️ Visible: <b class="stat-score">@visibleEnemyCount</b></span>
+            <span>🚫 Culled: <b class="stat-score">@culledEnemyCount</b></span>
+            <div style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.5); color: #0f0; font-family: monospace; font-size: 12px;">
+                <div><b>🎬 ANIMATION DEBUG:</b></div>
+                <div>Total Animations Loaded: @animations.Count</div>
+                @foreach (var anim in animations.Take(5))
+                {
+                    <div>
+                        @anim.Key: Frame @anim.Value.CurrentFrame/@(anim.Value.FrameCount - 1)
+                        (Width: @anim.Value.TotalWidth)
+                    </div>
+                }
+                @if (animations.ContainsKey("engine_move"))
+                {
+                    var engineAnim = animations["engine_move"];
+                    <div style="color: yellow;">
+                        ⚡ Engine: Frame @engineAnim.CurrentFrame -
+                        Offset: @(-engineAnim.CurrentFrame * engineAnim.FrameWidth)px
+                    </div>
+                }
+                else
+                {
+                    <div style="color: red;">❌ engine_move animation NOT FOUND!</div>
+                }
+            </div>
+            *@
+
+
+            <div style="margin: 10px 0;">
+                <label>
+                    Throttle Control:
+                    <input type="range" min="0" max="100" value="@(throttle * 100)"
+                           @oninput="@((ChangeEventArgs e) => throttle = double.Parse(e.Value.ToString()) / 100.0)"
+                           style="width: 200px;" />
+                </label>
+            </div>
+
+
+            <!-- ADD THIS SECTION -->
+            <div style="margin: 10px 0; display: flex; gap: 20px; align-items: center;">
+                <button @onclick="() => lightCycle.TogglePause()"
+                        style="padding: 5px 15px; cursor: pointer;">
+                    @(lightCycle.IsPaused ? "▶️ Resume Day/Night" : "⏸️ Pause Day/Night")
+                </button>
+
+                <label>
+                    Day/Night Cycle Speed: <b>@lightCycle.CycleDurationMinutes min</b>
+                    <input type="range" min="2" max="1440" value="@lightCycle.CycleDurationMinutes"
+                           @oninput="@((ChangeEventArgs e) => lightCycle.CycleDurationMinutes = int.Parse(e.Value.ToString()))"
+                           style="width: 300px;" />
+                    <span style="font-size: 12px; color: #aaa;">
+                        (2 min = fast, 1440 min = real-time 24hrs)
+                    </span>
+                </label>
+            </div>
+
+            <!-- Weather & Fog Controls -->
+            <div style="margin: 10px 0; display: flex; gap: 20px; align-items: center;">
+                <button @onclick="() => weatherCycle.IsWeatherEnabled = !weatherCycle.IsWeatherEnabled"
+                        style="padding: 5px 15px; cursor: pointer;">
+                    @(weatherCycle.IsWeatherEnabled ? "🌧️ Disable Weather" : "☀️ Enable Weather")
+                </button>
+
+                <button @onclick="() => weatherCycle.IsFogEnabled = !weatherCycle.IsFogEnabled"
+                        style="padding: 5px 15px; cursor: pointer;">
+                    @(weatherCycle.IsFogEnabled ? "🌫️ Disable Fog" : "✨ Enable Fog")
+                </button>
+
+                <label>
+                    Fog Opacity:
+                    <input type="range" min="0" max="100" value="@(weatherCycle.FogOpacity * 100)"
+                           @oninput="@((ChangeEventArgs e) => weatherCycle.FogOpacity = double.Parse(e.Value.ToString()) / 100.0)"
+                           style="width: 150px;" />
+                    <b>@((weatherCycle.FogOpacity * 100).ToString("F0"))%</b>
+                </label>
+            </div>
+
+
+            @*Draw 5 canvas layers here outside of the svg viewport to lay all of whtas inside svg on top*@
+
+            <div style="position: relative; width: 1600px; height: 800px;" class="game-board">
+
+                <canvas @ref="backgroundCanvasRef"
+                        width="1600"
+                        height="800"
+                        style="position: absolute; left: 0; top: 0; z-index: 1; pointer-events: none; image-rendering: pixelated;">
+                </canvas>
+            <svg width="1600" height="800" class="game-board" xmlns="http://www.w3.org/2000/svg"
+                 style="position: relative; z-index: 1;"
+                 @onmousedown="HandleMouseDown"
+                 @onmousemove="HandleMouseMove"
+                 @onmouseup="HandleMouseUp"
+                 @onmouseleave="HandleMouseUp"
+                 @oncontextmenu="@((Microsoft.AspNetCore.Components.Web.MouseEventArgs e) => { })"
+                 @oncontextmenu:preventDefault="true">
+
+                 @*defs for svg layers, Canvas Layer 1!!!! Background to be move outside*@
+
+                @* Background *@
+
+
+                @*
+                <defs>
+                    @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetEnvironmentImageKey())))
+                    {
+                        <pattern id="bgPattern" x="@(-(scrollOffset * 0.1) + viewportOffsetX)" y="0" width="3200" height="800" patternUnits="userSpaceOnUse">
+                            <image width="3200" height="800" href="@images[GetEnvironmentImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    }
+                </defs>
+
+
+
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetEnvironmentImageKey())))
+                {
+                    <rect width="3200" height="800" fill="url(#bgPattern)" />
+                }
+                else
+                {
+                    <rect width="3200" height="800" fill="@GetEnvironmentColor()" />
+                }
+                *@
+
+                @*defs for svg layers Canvas Layer 3 4 5!!!! Background to be move outside*@
+
+                @* Foliage Layer 1 Pattern *@
+@if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer1ImageKey())))
+{
+    <pattern id="foliageLayer1Pattern" x="@(-(scrollOffset * 0.2) % 800)" y="15" width="800" height="30" patternUnits="userSpaceOnUse">
+        <image width="800" height="30" href="@images[GetFoliageLayer1ImageKey()]" preserveAspectRatio="none" />
+    </pattern>
+}
+
+@* Foliage Layer 2 Pattern *@
+@if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer2ImageKey())))
+{
+    <pattern id="foliageLayer2Pattern" x="@(-(scrollOffset * 0.3) % 800)" y="100" width="800" height="300" patternUnits="userSpaceOnUse">
+        <image width="800" height="300" href="@images[GetFoliageLayer2ImageKey()]" preserveAspectRatio="none" />
+    </pattern>
+}
+
+@* Foliage Layer 3 Pattern *@
+@if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer3ImageKey())))
+{
+    <pattern id="foliageLayer3Pattern" x="@(-(scrollOffset * 0.4) % 800)" y="0" width="800" height="80" patternUnits="userSpaceOnUse">
+        <image width="800" height="80" href="@images[GetFoliageLayer3ImageKey()]" preserveAspectRatio="none" />
+    </pattern>
+}
+        
+             
+        
+                @* Weather Particles *@
+                @foreach (var particle in weatherCycle.ActiveParticles)
+                {
+                    @if (particle.IsPixel)
+                    {
+                        @if (particle.Width == particle.Height)
+                        {
+                            <circle cx="@particle.X" cy="@particle.Y" r="@(particle.Width / 2)"
+                                    fill="@particle.PixelColor" opacity="@particle.Opacity" />
+                        }
+                        else
+                        {
+                            <rect x="@particle.X" y="@particle.Y"
+                                  width="@particle.Width" height="@particle.Height"
+                                  fill="@particle.PixelColor" opacity="@particle.Opacity" />
+                        }
+                    }
+                    else if (!string.IsNullOrEmpty(particle.ImagePath))
+                    {
+                        <image x="@particle.X" y="@particle.Y"
+                               width="@particle.Width" height="@particle.Height"
+                               href="@particle.ImagePath" opacity="@particle.Opacity" />
+                    }
+                }
+
+              
+                @* ===== DEFINE ALL PATTERNS IN DEFS FIRST ===== *@
+                <defs>
+                    @* Ground Pattern *@
+                    @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetGroundImageKey())))
+                    {
+                        <pattern id="groundPattern" x="@(-(scrollOffset * 0.4) % 200)" y="0" width="200" height="100" patternUnits="userSpaceOnUse">
+                            <image width="200" height="100" href="@images[GetGroundImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    }
+
+                    @* Ballast Pattern *@
+                    @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetBallastImageKey())))
+                    {
+                        <pattern id="ballastPattern" x="@(-(scrollOffset * 0.8) % 100)" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+                            <image width="100" height="20" href="@images[GetBallastImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    }
+
+                    @* Rail Pattern *@
+                    @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetRailsImageKey())))
+                    {
+                        <pattern id="railPattern" x="@(-(scrollOffset * 0.7) % 200)" y="0" width="200" height="3" patternUnits="userSpaceOnUse">
+                            <image width="200" height="3" href="@images[GetRailsImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    }
+                </defs>
+                @*To be made new Canvas Layer 2 3 4 5!!!! Background to be move outside*@
+
+                @* ===== GROUND LAYER ===== *@
+                           
+                @* Texture overlay *@
+                @*
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetGroundImageKey())))
+                {
+
+                    <rect y="700" width="3200" height="100" fill="url(#groundPattern)" />
+                }
+                else
+                {
+                    
+                  <rect y="700" width="3200" height="100" fill="#3a3a4e" />
+                }
+                *@
+
+
+              
+                @* ===== FOLIAGE LAYER 2 (Distant - Behind Train) ===== *@
+                @*
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer2ImageKey())))
+                {
+                    <rect y="400" width="3200" height="300" fill="url(#foliageLayer2Pattern)" opacity="0.9" />
+                }
+                else
+                {
+                    <rect y="400" width="3200" height="300" fill="blue" opacity="0.3" />
+                }
+                *@
+           
+
+
+                @* ===== FOLIAGE LAYER 1 (Mid-distance - Behind Train) ===== *@
+                @*
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer1ImageKey())))
+                {
+                    <rect y="675" width="3200" height="30" fill="url(#foliageLayer1Pattern)" opacity="1.0" />
+                }
+                else
+                {
+                    <rect y="675" width="3200" height="30" fill="red" opacity="0.3" />
+                }
+                *@
+
+
+
+                @* ===== BALLAST LAYER (gravel) ===== *@
+                @* Fallback first *@
+                <rect y="710" width="3200" height="20" fill="#555" opacity="0.3" />
+                @* Texture overlay *@
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetBallastImageKey())))
+                {
+                    <defs>
+                        <pattern id="ballastPattern" x="@(-(scrollOffset * 0.8) % 100)" y="0" width="100" height="20" patternUnits="userSpaceOnUse">
+                            <image width="100" height="20" href="@images[GetBallastImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    </defs>
+                    <rect y="710" width="3200" height="20" fill="url(#ballastPattern)" />
+                }
+
+             
+                @* ===== WOODEN TIES ===== *@
+       
+
+
+@for (int i = -50; i < 1650; i += 30)
+                {
+                    double angleRadians = Math.Atan2(20, 20); // rise=20, run=20
+                    double angleDegrees = angleRadians * (180.0 / Math.PI); // ~45 degrees
+    int x = (i + (int)(scrollOffset * 0.9) + (int)viewportOffsetX) % 1600;
+    
+    @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetTiesImageKey())))
+    {
+        @* Textured tie with calculated angle *@
+        <g transform="translate(@(x + 10), 720) rotate(@angleDegrees) translate(-15, -3)">
+            <image x="0" y="0" 
+                   width="30" 
+                   height="6" 
+                   href="@images[GetTiesImageKey()]" 
+                   preserveAspectRatio="none" />
+        </g>
+    }
+    else
+    {
+        @* Fallback diagonal line *@
+        <line x1="@x" y1="710" x2="@(x + 20)" y2="730" 
+              stroke="#8B4513" stroke-width="6" />
+    }
+}
+
+
+
+                @* ===== RAILS ===== *@
+                @* Fallback first *@
+                <line x1="0" y1="715" x2="3200" y2="715" stroke="#666" stroke-width="3" />
+                <line x1="0" y1="725" x2="3200" y2="725" stroke="#666" stroke-width="3" />
+                @* Texture overlay *@
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetRailsImageKey())))
+                {
+                    <defs>
+                        <pattern id="railPattern" x="@(-(scrollOffset * 3) % 200)" y="0" width="200" height="3" patternUnits="userSpaceOnUse">
+                            <image width="200" height="3" href="@images[GetRailsImageKey()]" preserveAspectRatio="none" />
+                        </pattern>
+                    </defs>
+                    <rect x="0" y="715" width="3200" height="3" fill="url(#railPattern)" />
+                    <rect x="0" y="725" width="3200" height="3" fill="url(#railPattern)" />
+                }
+
+
+           
+
+
+
+                  @* Train Cars *@
+@for (int idx = 0; idx < trainCars.Count; idx++)
+{
+    var carInstance = trainCars[idx];
+                    int x = (int)(50 + idx * 192 + viewportOffsetX);  // 192 = car width, no gap // Change 150 to 256 (or your preferred spacing)
+    int y = 660;
+    var carColor = GetCarColor(carInstance.Type);
+
+                    @* HP Bar for each car *@
+                    <rect x="@x" y="@(y - 10)" width="84" height="6" fill="#f00" />
+                    <rect x="@x"
+                          y="@(y - 10)"
+                          width="@(84 * carInstance.Hp / carTypes[carInstance.Type].MaxHp)"
+                          height="6"
+                         fill="@(carInstance.Type == "rhinoarmor" ? "#8B4513" :
+        carInstance.Type == "engine" ? "#0000FF" :
+        carInstance.Type == "chinaku" ? "#00FF00" :
+        carInstance.Type == "medic" ? "#FF0000" :
+        carInstance.Type == "resource" ? "#8B4513" :
+        carInstance.Type == "elephant" ? "#8B4513" :
+        carInstance.Type == "cannon" ? "#ff6b6b" :
+        carInstance.Type == "missile" ? "#ffd700" :
+        carInstance.Type == "turret" ? "#4ecdc4" :
+        carInstance.Type == "drone" ? "#a78bfa" :
+        carInstance.Type == "flame" ? "#FAC28B" :
+        carInstance.Type == "aajavelin" ? "#1E90FF" :
+        carInstance.Type == "gatlin" ? "#4ecdc4" :
+        carInstance.Type == "aaflak" ? "#FF4500" :
+        carInstance.Type == "flare" ? "#8B4513" :
+        carInstance.Type == "grenade" ? "#8B4513" :
+        carInstance.Type == "clustergrenade" ? "#8B4513" :
+        carInstance.Type == "china" ? "#FF4500" :
+        carInstance.Type == "shaman" ? "#9D4EDD" :
+        carInstance.Type == "cocainebear" ? "#8B4513" :
+        carInstance.Type == "caboose" ? "#8B4513" :
+        "#FFFFFF")"
+ />
+                                          // default white
+
+
+
+                    @if (!string.IsNullOrEmpty(images.GetValueOrDefault($"train{char.ToUpper(carInstance.Type[0])}{carInstance.Type.Substring(1)}")))
+                    {
+                        @* Determine animation state - attacking or moving *@
+                        var animState = IsCarAttacking(idx) ? "attack" : "move";
+                        var animKey = GetAnimationKey(carInstance.Type, animState);
+
+                        @* Use attack image if attacking, otherwise use move image *@
+                        var imageKey = animState == "attack" && !string.IsNullOrEmpty(images.GetValueOrDefault($"train{char.ToUpper(carInstance.Type[0])}{carInstance.Type.Substring(1)}Attack"))
+                        ? $"train{char.ToUpper(carInstance.Type[0])}{carInstance.Type.Substring(1)}Attack"
+                        : $"train{char.ToUpper(carInstance.Type[0])}{carInstance.Type.Substring(1)}";
+
+                        @if (animations.ContainsKey(animKey))
+                        {
+                            @* Animated sprite sheet *@
+                            var anim = animations[animKey];
+                            <svg x="@x" y="@y" width="@anim.FrameWidth" height="@anim.FrameHeight"
+                                 viewBox="0 0 @anim.FrameWidth @anim.FrameHeight"
+                                 overflow="hidden">
+                                <image x="@(-anim.CurrentFrame * anim.FrameWidth)" y="0"
+                                       width="@anim.TotalWidth" height="@anim.FrameHeight"
+                                       href="@images[imageKey]"
+                                       preserveAspectRatio="xMidYMid slice" style="z-index:5"/>
+                            </svg>
+                        }
+                        else
+                        {
+                            @* Regular static image (fallback) *@
+                            <image x="@x" y="@y" width="192" height="64"
+                                   href="@images[imageKey]" />
+                        }
+                    }
+                    else
+                    {
+                        @* Fallback colored rectangles *@
+                        <rect x="@x" y="@y" width="192" height="64" fill="@carColor" stroke="#000" stroke-width="2" />
+                        <circle cx="@(x + 38)" cy="@(y + 64)" r="15" fill="#333" />
+                        <circle cx="@(x + 154)" cy="@(y + 64)" r="15" fill="#333" />
+
+                        @if (carInstance.Type != "engine")
+                        {
+                            <g>
+                                <text x="@(x + 96)" y="@(y + 35)" fill="#fff" font-size="16"
+                                      font-family="Arial" text-anchor="middle">@carInstance.Type.ToUpper()</text>
+                            </g>
+                        }
+                    }
+
+
+/*
+                    @* Debug weapon range *@
+@if (carInstance.Type != "engine" && carInstance.Type != "caboose" && carInstance.Type != "resource" && carTypes.ContainsKey(carInstance.Type))
+{
+    var carInfo = carTypes[carInstance.Type];
+    int carCenterX = x + 96;  // 96 is half of 192
+    int carCenterY = 660 + 32;  // 660 is car Y, +32 is half height
+    int targetX = carCenterX + carInfo.FireRangeX;
+    int targetY = carCenterY + carInfo.FireRangeY;
+
+    @* Line to target point *@
+    <line x1="@carCenterX" y1="@carCenterY"
+          x2="@targetX" y2="@targetY"
+          stroke="@carColor"
+          stroke-width="1"
+          opacity="0.3"
+          stroke-dasharray="5,5" />
+
+    @* 🆕 CHECK IF WEAPON USES RECTANGULAR OR CIRCULAR DETECTION *@
+    @if (carInfo.DetectionBoxX.HasValue && carInfo.DetectionBoxY.HasValue)
+    {
+        @* RECTANGULAR DETECTION BOX (for AA Flak, etc.) *@
+        int boxWidth = carInfo.DetectionBoxX.Value;
+        int boxHeight = carInfo.DetectionBoxY.Value;
+        int boxX = targetX - (boxWidth / 2);
+        int boxY = targetY - (boxHeight / 2);
+
+        <rect x="@boxX" y="@boxY"
+              width="@boxWidth" height="@boxHeight"
+              fill="none"
+              stroke="@carColor"
+              stroke-width="2"
+              opacity="0.3"
+              stroke-dasharray="10,5" />
+
+        @* Corner markers for better visibility *@
+        <circle cx="@boxX" cy="@boxY" r="3" fill="@carColor" opacity="0.5" />
+        <circle cx="@(boxX + boxWidth)" cy="@boxY" r="3" fill="@carColor" opacity="0.5" />
+        <circle cx="@boxX" cy="@(boxY + boxHeight)" r="3" fill="@carColor" opacity="0.5" />
+        <circle cx="@(boxX + boxWidth)" cy="@(boxY + boxHeight)" r="3" fill="@carColor" opacity="0.5" />
+    }
+    else
+    {
+        @* CIRCULAR DETECTION (all other weapons) *@
+        <circle cx="@targetX" cy="@targetY"
+                r="@carInfo.FireRadius"
+                fill="none"
+                stroke="@carColor"
+                stroke-width="2"
+                opacity="0.3"
+                stroke-dasharray="10,5" />
+    }
+
+    @* Target center dot (always show) *@
+    <circle cx="@targetX" cy="@targetY"
+            r="5"
+            fill="@carColor"
+            opacity="0.7" />
+}
+*/
+                    
+}
+                @foreach (var enemy in enemies.Where(e => IsEnemyVisible(e)))
+                {
+                    var type = enemyTypes[enemy.Type];
+                    int enemyX = (int)(enemy.X + viewportOffsetX);
+
+                    // CHECK IF THIS IS A BOSS
+                    bool isBoss = enemy.MaxHp >= enemyTypes[enemy.Type].Hp * 9;
+
+                    // SCALE BASED ON HP MULTIPLIER, BUT CAP IT
+                    int scale = 1;
+                    if (isBoss)
+                    {
+                        // Calculate scale from HP (HP multiplier of 10 = scale 3, 50 = scale 8, etc)
+                        double hpMultiplier = enemy.MaxHp / (double)enemyTypes[enemy.Type].Hp;
+                        double rawScale = 2 + (hpMultiplier / 10.0); // Starts at ~3 for 10x HP
+
+                        // Cap scale so enemy doesn't exceed viewport
+                        // Viewport height is 800, ground is at 700
+                        // Largest enemy (tree) is ~50 pixels tall normally
+                        // So max scale = 700 / 50 = 14 (leaves some room)
+                        int maxScale = 10; // Conservative cap
+                        scale = (int)Math.Min(rawScale, maxScale);
+                    }
+
+                    @* Check for animation *@
+                    var animKey = GetEnemyAnimationKey(enemy);
+
+                    @if (animations.ContainsKey(animKey))
+                    {
+                        @* Render animated enemy sprite *@
+                        var anim = animations[animKey];
+                        <svg x="@enemyX" y="@enemy.Y" width="@(anim.FrameWidth* scale)" height="@(anim.FrameHeight* scale)"
+                             viewBox="0 0 @anim.FrameWidth @anim.FrameHeight"
+                             overflow="hidden"
+                             opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)">
+                            <image x="@(-anim.CurrentFrame * anim.FrameWidth)" y="0"
+                                   width="@anim.TotalWidth" height="@anim.FrameHeight"
+                                   href="@images[$"enemy{char.ToUpper(enemy.Type[0])}{enemy.Type.Substring(1)}"]"
+                                   preserveAspectRatio="xMidYMid slice" />
+                        </svg>
+
+                        @* HP Bar for animated sprites *@
+                        <rect x="@enemyX" y="@(enemy.Y - 10)" width="@(anim.FrameWidth* scale)" height="@(4 * scale)" fill="#f00" />
+                        <rect x="@enemyX" y="@(enemy.Y - 10)" width="@(anim.FrameWidth* scale * enemy.Hp / enemy.MaxHp)" height="@(4 * scale)" fill="#0f0" />
+                    }
+                    else
+                    {
+                        @* FALLBACK: Existing geometric rendering *@
+                        @if (enemy.Type == "bat")
+                        {
+                            int wingSpan = 30 * scale;
+                            int bodySize = 8 * scale;
+                            <polygon points="@($"{enemyX + 15 * scale},{enemy.Y + 10 * scale} {enemyX},{enemy.Y} {enemyX + 10 * scale},{enemy.Y + 5 * scale} {enemyX + 20 * scale},{enemy.Y + 5 * scale} {enemyX + wingSpan},{enemy.Y}")"
+                                     fill="@type.Color"
+                                     opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                            <circle cx="@(enemyX + 15 * scale)" cy="@(enemy.Y + 15 * scale)" r="@bodySize"
+                                    fill="@type.Color"
+                                    opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                            <rect x="@(enemyX + 12 * scale)" y="@(enemy.Y + 13 * scale)" width="@(2 * scale)" height="@(2 * scale)" fill="#ff0000" />
+                            <rect x="@(enemyX + 17 * scale)" y="@(enemy.Y + 13 * scale)" width="@(2 * scale)" height="@(2 * scale)" fill="#ff0000" />
+                        }
+                        else if (enemy.Type == "tree")
+                        {
+                            <polygon points="@($"{enemyX + 15 * scale},{enemy.Y} {enemyX},{enemy.Y + 30 * scale} {enemyX + 30 * scale},{enemy.Y + 30 * scale}")"
+                                     fill="@type.Color"
+                                     opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                            <rect x="@(enemyX + 12 * scale)" y="@(enemy.Y + 30 * scale)" width="@(6 * scale)" height="@(20 * scale)"
+                                  fill="@type.Color"
+                                  opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                        }
+                        else if (enemy.Type == "rock")
+                        {
+                            <circle cx="@(enemyX + 15 * scale)" cy="@(enemy.Y + 25 * scale)" r="@(15 * scale)"
+                                    fill="@type.Color"
+                                    opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                        }
+                        else
+                        {
+                            <rect x="@enemyX" y="@enemy.Y" width="@(30 * scale)" height="@(40 * scale)"
+                                  fill="@type.Color"
+                                  opacity="@(enemy.MarkedForDeath ? 0.5 : 1.0)" />
+                            <rect x="@(enemyX + 8 * scale)" y="@(enemy.Y + 10 * scale)" width="@(5 * scale)" height="@(5 * scale)" fill="#fff" />
+                            <rect x="@(enemyX + 17 * scale)" y="@(enemy.Y + 10 * scale)" width="@(5 * scale)" height="@(5 * scale)" fill="#fff" />
+                        }
+
+                        @* HP Bar - scaled for bosses (fallback rendering) *@
+                        <rect x="@enemyX" y="@(enemy.Y - 10)" width="@(30 * scale)" height="@(4 * scale)" fill="#f00" />
+                        <rect x="@enemyX" y="@(enemy.Y - 10)" width="@(30 * scale * enemy.Hp / enemy.MaxHp)" height="@(4 * scale)" fill="#0f0" />
+                    }
+                }
+
+
+
+                @* Rotating Weapon Fireballs (China Cart) *@
+                @for (int idx = 0; idx < trainCars.Count; idx++)
+                {
+                    var car = trainCars[idx];
+                    if (car.Type != "china") continue;
+
+                    var carInfo = carTypes[car.Type];
+                    if (!carRotationAngles.ContainsKey(idx)) continue;
+
+                    int carX = (int)(50 + idx * 192 + 96 + viewportOffsetX);
+                    int carY = 660 + 32;
+
+                    double currentAngle = carRotationAngles[idx];
+                    double angleRadians = currentAngle * Math.PI / 180.0;
+
+                    int fireballCount = carInfo.ProjectileCount;
+                    double maxDistance = carInfo.ScatterCount;
+
+                    @for (int f = 0; f < fireballCount; f++)
+                    {
+                        double distanceFromCenter = (maxDistance / (fireballCount - 1)) * f;
+                        double fireballX = carX + Math.Cos(angleRadians) * distanceFromCenter;
+                        double fireballY = carY + Math.Sin(angleRadians) * distanceFromCenter;
+
+                        @* Check if we have fireball animation *@
+                        var fireballAnimKey = "effect_china";
+
+                        @if (animations.ContainsKey(fireballAnimKey))
+                        {
+                            @* Animated fireball *@
+                            var anim = animations[fireballAnimKey];
+                            <svg x="@(fireballX - anim.FrameWidth / 2)" y="@(fireballY - anim.FrameHeight / 2)"
+                                 width="@anim.FrameWidth" height="@anim.FrameHeight"
+                                 viewBox="0 0 @anim.FrameWidth @anim.FrameHeight"
+                                 overflow="hidden">
+                                <image x="@(-anim.CurrentFrame * anim.FrameWidth)" y="0"
+                                       width="@anim.TotalWidth" height="@anim.FrameHeight"
+                                       href="@images["projChina"]"
+                                       preserveAspectRatio="xMidYMid slice" />
+                            </svg>
+                        }
+                        else if (!string.IsNullOrEmpty(images.GetValueOrDefault("projChina")))
+                        {
+                            @* Static fireball image *@
+                            <image x="@(fireballX - carInfo.ProjectileWidth / 2)"
+                                   y="@(fireballY - carInfo.ProjectileHeight / 2)"
+                                   width="@carInfo.ProjectileWidth"
+                                   height="@carInfo.ProjectileHeight"
+                                   href="@images["projChina"]" />
+                        }
+                        else
+                        {
+                            @* Fallback: orange circle *@
+                            <circle cx="@fireballX" cy="@fireballY"
+                                    r="@(carInfo.ProjectileWidth / 2)"
+                                    fill="#FF4500"
+                                    stroke="#FF8C00"
+                                    stroke-width="2" />
+                        }
+                    }
+                }
+         
+
+                @* Effects *@
+                @foreach (var effect in effects.Where(e => IsEffectVisible(e) && e.IsVisible))
+                {
+                    var projKey = $"proj{char.ToUpper(effect.Type[0])}{effect.Type.Substring(1)}";
+                    double effectX = effect.X + viewportOffsetX;
+
+                    @* 🚁 DRONE HP BAR (only for drones with HP) *@
+                    @if (effect.Type == "drone" && effect.MaxHp > 0 && effect.Hp > 0)
+                    {
+                        <rect x="@(effectX - 20)" y="@(effect.Y - 15)" width="40" height="4" fill="#f00" />
+                        <rect x="@(effectX - 20)" y="@(effect.Y - 15)" width="@(40 * effect.Hp / effect.MaxHp)" height="4" fill="#0f0" />
+                    }
+                    @* Check if this projectile has an animation *@
+                    var effectAnimKey = $"effect_{effect.Type}";
+
+                    @if (animations.ContainsKey(effectAnimKey))
+                    {
+                        @* Animated projectile WITH ROTATION *@
+                        var anim = animations[effectAnimKey];
+                        <g transform="translate(@effectX, @effect.Y) rotate(@effect.RotationAngle) translate(@(-anim.FrameWidth / 2), @(-anim.FrameHeight / 2))">
+                            <svg width="@anim.FrameWidth" height="@anim.FrameHeight"
+                                 viewBox="0 0 @anim.FrameWidth @anim.FrameHeight"
+                                 overflow="hidden">
+                                <image x="@(-anim.CurrentFrame * anim.FrameWidth)" y="0"
+                                       width="@anim.TotalWidth" height="@anim.FrameHeight"
+                                       href="@images[projKey]"
+                                       preserveAspectRatio="xMidYMid slice" />
+                            </svg>
+                        </g>
+                    }
+                    else if (!string.IsNullOrEmpty(images.GetValueOrDefault(projKey)))
+                    {
+                        @* Static projectile image WITH ROTATION *@
+                        <image x="@(effectX - effect.Width / 2)" y="@(effect.Y - effect.Height / 2)"
+                               width="@effect.Width" height="@effect.Height"
+                               href="@images[projKey]"
+                               transform="rotate(@effect.RotationAngle, @effectX, @effect.Y)" />
+                    }
+                    else
+                    {
+                        @* Fallback colored circle (no rotation needed for circles) *@
+                        var carColor = GetCarColor(effect.Type);
+                        <circle cx="@effectX" cy="@effect.Y" r="@(effect.Width / 2)" fill="@carColor" />
+                    }
+                }
+
+                @* Enemy Projectiles *@
+                @foreach (var proj in enemyProjectiles.Where(p => p.X + viewportOffsetX > -50 && p.X + viewportOffsetX < 1650))
+                {
+                    double projX = proj.X + viewportOffsetX;
+
+                    // 🆕 CALCULATE ROTATION ANGLE FROM VELOCITY
+                    double rotationAngle = Math.Atan2(proj.VelocityY, proj.VelocityX) * (180.0 / Math.PI);
+
+                    // Check for sprite image
+                    var projKey = $"enemyProj_{proj.Type}";
+
+                    // Check for animation
+                    var animKey = $"enemyEffect_{proj.Type}";
+
+                    @if (animations.ContainsKey(animKey))
+                    {
+                        @* 🆕 ANIMATED SPRITE WITH ROTATION *@
+                        var anim = animations[animKey];
+                        <g transform="translate(@projX, @proj.Y) rotate(@rotationAngle) translate(@(-anim.FrameWidth / 2), @(-anim.FrameHeight / 2))">
+                            <svg width="@anim.FrameWidth" height="@anim.FrameHeight"
+                                 viewBox="0 0 @anim.FrameWidth @anim.FrameHeight"
+                                 overflow="hidden">
+                                <image x="@(-anim.CurrentFrame * anim.FrameWidth)" y="0"
+                                       width="@anim.TotalWidth" height="@anim.FrameHeight"
+                                       href="@images[projKey]"
+                                       preserveAspectRatio="xMidYMid slice" />
+                            </svg>
+                        </g>
+                    }
+                    else if (!string.IsNullOrEmpty(images.GetValueOrDefault(projKey)))
+                    {
+                        @* STATIC SPRITE WITH ROTATION *@
+                        <image x="@(projX - proj.Width / 2)" y="@(proj.Y - proj.Height / 2)"
+                               width="@proj.Width" height="@proj.Height"
+                               href="@images[projKey]"
+                               transform="rotate(@rotationAngle, @projX, @proj.Y)" />
+                    }
+                    else
+                    {
+                        @* FALLBACK: Red circle with direction indicator *@
+                        <circle cx="@projX" cy="@proj.Y" r="@(proj.Width / 2)"
+                                fill="#ff0000" stroke="#ff6666" stroke-width="2"
+                                opacity="0.8" />
+                        @* Direction indicator line *@
+                        <line x1="@projX" y1="@proj.Y"
+                              x2="@(projX + Math.Cos(rotationAngle * Math.PI / 180) * 15)"
+                              y2="@(proj.Y + Math.Sin(rotationAngle * Math.PI / 180) * 15)"
+                              stroke="#ffffff" stroke-width="2" />
+                    }
+                }
+
+
+
+                @* ===== FOLIAGE LAYER 3 (Foreground - In Front of Train) ===== *@
+
+                @*
+                @if (!string.IsNullOrEmpty(images.GetValueOrDefault(GetFoliageLayer3ImageKey())))
+                {
+                    <rect y="720" width="3200" height="80" fill="url(#foliageLayer3Pattern)" opacity=".95" />
+                }
+                else
+                {
+                    <rect y="720" width="3200" height="80" fill="yellow" opacity="0.6" />
+                }
+                *@
+
+                @* Day/Night Overlay *@
+
+                <rect width="1600" height="800" fill="@lightCycle.OverlayColor" pointer-events="none" />
+
+
+
+
+
+          </svg>
+    
+    <!-- NEW: Foreground Canvas (Foliage Layer 3 - in front of train) -->
+    <canvas @ref="foregroundCanvasRef"
+            width="1600"
+            height="800"
+            style="position: absolute; left: 0; top: 0; z-index: 20; pointer-events: none; image-rendering: pixelated;">
+    </canvas>
+    
+
+            
+            </div>
+
+
+
+            @if (weatherCycle.IsFogEnabled)
+            {
+                <div style="@weatherCycle.GetFogStyle()z-index:20"></div>
+            }
+             @*
+            <div class="train-config">
+                <h3>Train Configuration:</h3>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <button @onclick="ToggleDiscardMode"
+                            style="padding: 8px 16px; background: @(isDiscardMode ? "#ff4444" : "#666"); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">
+                        @(isDiscardMode ? "❌ CANCEL DISCARD" : "🗑️ DISCARD CAR")
+                    </button>
+                    @if (isDiscardMode)
+                    {
+                        <span style="color: #ff4444; font-weight: bold;">⚠️ Click a car to destroy it!</span>
+                    }
+                </div>
+                <div class="car-list">
+                    @for (int i = 0; i < trainCars.Count; i++)
+                    {
+                        var index = i;
+                        var carInstance = trainCars[i];
+                        var isProtected = carInstance.Type == "engine" || carInstance.Type == "caboose";
+                        <div class="car-badge"
+                             style="background-color: @GetCarColor(carInstance.Type);
+                                cursor: @(isDiscardMode ? (isProtected ? "not-allowed" : "pointer") : "move");
+                                @(draggedCarIndex == index ? "opacity: 0.5;" : "")
+                                @(dropTargetIndex == index ? "border: 2px solid yellow;" : "")
+                                @(isDiscardMode && !isProtected ? "border: 2px solid red; box-shadow: 0 0 10px red;" : "")
+                                @(isDiscardMode && isProtected ? "opacity: 0.4;" : "")"
+                             draggable="@(!isDiscardMode)"
+                             @onclick="() => HandleCarClick(index)"
+                             @ondragstart="() => HandleCarDragStart(index)"
+                             @ondragover:preventDefault
+                             @ondragover="() => HandleCarDragOver(index)"
+                             @ondrop="() => HandleCarDrop(index)"
+                             @ondragend="HandleCarDragEnd">
+                            @carInstance.Type.ToUpper()
+                            @if (isDiscardMode && !isProtected)
+                            {
+                                <span style="position: absolute; top: -5px; right: -5px; font-size: 20px;">❌</span>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+           *@
+           
+            <div class="train-config">
+                <h3>Train Configuration:</h3>
+                <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                    <button @onclick="ToggleDiscardMode"
+                            style="padding: 8px 16px; background: @(isDiscardMode ? "#ff4444" : "#666"); color: white; border: none; cursor: pointer; border-radius: 4px; font-weight: bold;">
+                        @(isDiscardMode ? "❌ CANCEL DISCARD" : "🗑️ DISCARD CAR")
+                    </button>
+                    @if (isDiscardMode)
+                    {
+                        <span style="color: #ff4444; font-weight: bold;">⚠️ Click a car to destroy it!</span>
+                    }
+                </div>
+
+                <div class="car-list">
+                    @for (int i = 0; i < trainCars.Count; i++)
+                    {
+                        var index = i;
+                        var car = trainCars[i];
+                        var isProtected = car.Type == "engine" || car.Type == "caboose";
+
+                        <div class="car-badge"
+                             style="position: relative;
+                            background-color:@GetCarColor(car.Type);
+                            cursor: @(isDiscardMode ? (isProtected ? "not-allowed" : "pointer") : "move");
+                            @(draggedCarIndex == index ? "opacity: 0.5;" : "")
+                            @(dropTargetIndex == index ? "border: 2px solid yellow;" : "")
+                            @(isDiscardMode && !isProtected ? "border: 2px solid red; box-shadow: 0 0 10px red;" : "")
+                            @(isDiscardMode && isProtected ? "opacity: 0.4;" : "")"
+                             draggable="true"
+                             @ondragstart="() => { if (!isDiscardMode) HandleCarDragStart(index); }"
+                             @ondragover:preventDefault
+                             @ondragover="() => HandleCarDragOver(index)"
+                             @ondrop="() => HandleCarDrop(index)"
+                             @ondragend="HandleCarDragEnd"
+                             @onclick="() => { if (isDiscardMode && !isProtected) HandleCarClick(index); }"
+                             @onclick:stopPropagation>
+
+                            @car.Type.ToUpper()
+
+                            @if (isDiscardMode && !isProtected)
+                            {
+                                <span style="position: absolute; top: -5px; right: -5px; font-size: 20px; pointer-events: none;">❌</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+
+
+
+            </div>
+
+            
+
+
+
+
+
+
+
+
+
+        </div>
+    }
+    @if (gameState == GameState.LevelUp)
+    {
+        <div class="levelup-panel">
+            <h2 class="levelup-title">LEVEL UP!</h2>
+            @if (level % 5 == 0)
+            {
+                <p class="levelup-text" style="color: #ffd700;">⚡ BOSS LEVEL - DOUBLE UPGRADE! (1/2) ⚡</p>
+            }
+            <p class="levelup-text">Choose your upgrade:</p>
+            <div class="upgrade-choices">
+                @foreach (var choice in upgradeChoices)
+                {
+                    <button class="upgrade-button" @onclick="() => HandleUpgrade(choice)"
+                            style="@(choice.IsGlobal ? "border: 2px solid #4a9eff;" : "border: 2px solid #ffd700;")">
+                        <div class="upgrade-name">
+                            @if (choice.IsGlobal)
+                            {
+                                <span style="color: #4a9eff;">🌐 </span>
+                            }
+                            else
+                            {
+                                <span style="color: #ffd700;">⭐ </span>
+                            }
+
+                            @if (choice.Type == "newCar")
+                            {
+                                @($"+{carTypes[choice.Car].Name}")
+                            }
+                            else if (choice.Type == "speed")
+                            {
+                                @("⚡ Speed Boost")
+                            }
+                            else if (choice.StatType == "damage")
+                            {
+                                @("💥 Damage Boost")
+                            }
+                            else if (choice.StatType == "firerate")
+                            {
+                                @("🔥 Fire Rate Boost")
+                            }
+                            else if (choice.StatType == "firerange")
+                            {
+                                @("🎯 Range Boost")
+                            }
+                            else if (choice.StatType == "explosion")
+                            {
+                                @("💣 Explosion Boost")
+                            }
+                            else if (choice.StatType == "projectiles")
+                            {
+                                @("🎯 Extra Projectile")
+                            }
+                            else if (choice.StatType == "scatterCount")
+                            {
+                                @("🌟 Extra Scatter")
+                            }
+                            else if (choice.StatType == "scatterAngle")
+                            {
+                                @("📐 Wider Spread")
+                            }
+                        </div>
+                        <div class="upgrade-desc">@choice.Description</div>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    @if (gameState == GameState.LevelUpSecond)
+    {
+        <div class="levelup-panel">
+            <h2 class="levelup-title">BOSS LEVEL BONUS!</h2>
+            <p class="levelup-text" style="color: #ffd700;">⚡ SECOND UPGRADE! (2/2) ⚡</p>
+            <p class="levelup-text">Choose your second upgrade:</p>
+            <div class="upgrade-choices">
+                @foreach (var choice in upgradeChoicesSecond)
+                {
+                    <button class="upgrade-button" @onclick="() => HandleUpgrade(choice)"
+                            style="@(choice.IsGlobal ? "border: 2px solid #4a9eff;" : "border: 2px solid #ffd700;")">
+                        <div class="upgrade-name">
+                            @if (choice.IsGlobal)
+                            {
+                                <span style="color: #4a9eff;">🌐 </span>
+                            }
+                            else
+                            {
+                                <span style="color: #ffd700;">⭐ </span>
+                            }
+
+                            @if (choice.Type == "newCar")
+                            {
+                                @($"+{carTypes[choice.Car].Name}")
+                            }
+                            else if (choice.Type == "speed")
+                            {
+                                @("⚡ Speed Boost")
+                            }
+                            else if (choice.StatType == "damage")
+                            {
+                                @("💥 Damage Boost")
+                            }
+                            else if (choice.StatType == "firerate")
+                            {
+                                @("🔥 Fire Rate Boost")
+                            }
+                            else if (choice.StatType == "firerange")
+                            {
+                                @("🎯 Range Boost")
+                            }
+                            else if (choice.StatType == "explosion")
+                            {
+                                @("💣 Explosion Boost")
+                            }
+                            else if (choice.StatType == "projectiles")
+                            {
+                                @("🎯 Extra Projectile")
+                            }
+                            else if (choice.StatType == "scatterCount")
+                            {
+                                @("🌟 Extra Scatter")
+                            }
+                            else if (choice.StatType == "scatterAngle")
+                            {
+                                @("📐 Wider Spread")
+                            }
+                        </div>
+                        <div class="upgrade-desc">@choice.Description</div>
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    @if (gameState == GameState.GameOver)
+    {
+        <div class="levelup-panel">
+            <h2 class="levelup-title" style="color: #ff0000;">🔥 TRAIN COOKED! 🔥</h2>
+
+            @if (showInitialsInput)
+            {
+                <div style="background: rgba(255,215,0,0.2); padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid #ffd700;">
+                    <h3 style="color: #ffd700; margin-bottom: 15px;">🏆 NEW HIGH SCORE! 🏆</h3>
+                    <p style="color: #fff; margin-bottom: 15px;">Enter your initials (3 letters):</p>
+                    <input type="text"
+                           @bind="playerInitials"
+                           @bind:event="oninput"
+                           maxlength="3"
+                           placeholder="AAA"
+                           style="width: 150px; padding: 10px; font-size: 32px; text-align: center; text-transform: uppercase; font-family: 'Courier New', monospace; letter-spacing: 10px; background: #000; color: #0f0; border: 2px solid #ffd700; border-radius: 5px;"
+                           @onkeydown="@((KeyboardEventArgs e) => { if (e.Key == "Enter") SubmitHighScore(); })" />
+                    <br />
+                    <button class="start-button" @onclick="SubmitHighScore" style="margin-top: 15px;">
+                        SUBMIT SCORE
+                    </button>
+                </div>
+            }
+
+            <p class="levelup-text">Final Score: @score</p>
+            <p class="levelup-text">Level Reached: @level</p>
+            <p class="levelup-text">💀 Enemies Pixelized: @totalKills</p>
+
+            <button class="start-button" @onclick="@(() => gameState = GameState.Menu)">
+                RETURN TO MENU
+            </button>
+        </div>
+    }
+
+</div>
+
+
+
+                    <script>
+                            window.cachedBackgroundImages = {};
+
+    window.cacheBackgroundImage = async (key, path) => {
+        if (!window.cachedBackgroundImages[key]) {
+            const img = new Image();
+            img.src = path;
+
+            await new Promise((resolve, reject) => {
+                if (img.complete) {
+                    resolve();
+                } else {
+                    img.onload = resolve;
+                    img.onerror = reject;
+                }
+            });
+
+            window.cachedBackgroundImages[key] = img;
+            console.log(`Cached background image: ${key}`);
+        }
+        return window.cachedBackgroundImages[key];
+    };
+
+     window.drawBackgroundLayers = (canvas, layerData, scrollOffset, viewportOffsetX) => {
+        const ctx = canvas.getContext('2d');
+ 
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (const layer of layerData) {
+            const img = window.cachedBackgroundImages[layer.imageKey];
+            if (!img) continue;
+
+            const speed = layer.parallax;
+
+            // World-space scroll (negative = move left)
+            const offset = -(scrollOffset + viewportOffsetX) * speed;
+
+            // Smooth remainder (THIS is what was missing)
+            const remainder = offset % layer.patternWidth;
+
+            // Start one tile left to guarantee coverage
+            let startX = remainder - layer.patternWidth;
+
+            for (
+                let x = startX;
+                x < canvas.width + layer.patternWidth;
+                x += layer.patternWidth
+            ) {
+              ctx.drawImage(
+    img,
+    Math.round(x),  // CHANGE: Round x position
+    layer.y,
+    layer.patternWidth,
+    layer.height
+);
+            }
+        }
+    };
+
+
+
+
+
+                    </script>

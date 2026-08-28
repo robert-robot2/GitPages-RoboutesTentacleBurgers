@@ -1,0 +1,265 @@
+@page "/WarMainMenu"
+
+@using WarCraftLibrary
+@inject NavigationManager NavManager
+
+<PageTitle>WarCraft: Orcs & Humans</PageTitle>
+
+<div class="menu-container">
+    <!-- Background Image -->
+    <div class="menu-background" style="background-image: url('/wc1sprites/ui/WarcraftBG003.png');"></div>
+
+    <!-- MAIN MENU SCREEN -->
+    @if (currentScreen == MenuScreen.Main)
+    {
+        <div class="menu-content">
+            <h1 class="menu-title">WARCRAFT</h1>
+            <h2 class="menu-subtitle">Orcs & Humans</h2>
+
+            <div class="menu-buttons">
+                <button class="menu-button" @onclick="ShowLobby">
+                    Single Player
+                </button>
+                <button class="menu-button" disabled>
+                    Multi Player
+                    <span class="coming-soon menu-button-disabled">Coming Soon</span>
+                </button>
+                <button class="menu-button" @onclick="ShowOptionsMenu">
+                    Options
+                </button>
+                <button class="menu-button" @onclick="QuitGame">
+                    Quit
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- OPTIONS SCREEN -->
+    @if (currentScreen == MenuScreen.OptionsScreen)
+    {
+        <div class="menu-content">
+            <h1 class="menu-title">OPTIONS</h1>
+
+            <div class="DiabloRedGlowMENU">
+                Welcome to Warcraft!<br />
+                For the Alliance!<br />
+                WASD for camera movement up down left right<br />
+                Left Click to Select Units and choose upgrades change stances, Hold drag to Select Multiple Units<br />
+                Right Click to Move Units<br />
+                H to Hide Command Panel<br />
+                T for Tech Tree<br />
+            </div>
+
+            <button class="menu-button menu-button-small" @onclick="BackToMain">
+                Back
+            </button>
+        </div>
+    }
+
+    <!-- LOBBY SCREEN (16 PLAYER SETUP) -->
+    @if (currentScreen == MenuScreen.Lobby)
+    {
+        <div class="lobby-content">
+            <h1 class="lobby-title">SINGLE PLAYER LOBBY</h1>
+
+            <div class="lobby-layout">
+                <!-- LEFT: Player Slots -->
+                <div class="lobby-left">
+                    <div class="player-list-header">
+                        <div class="header-col">Player</div>
+                        <div class="header-col">Civilization</div>
+                        <div class="header-col">Team</div>
+                    </div>
+
+                    <div class="player-list-scroll">
+                        @for (int i = 0; i < 16; i++)
+                        {
+                            int index = i;
+                            var slot = playerSlots[index];
+
+                            <div class="player-slot @(index == 0 ? "player-slot-human" : "")">
+                                <!-- Player Name -->
+                                <div class="slot-name">
+                                    @if (index == 0)
+                                    {
+                                        <input type="text"
+                                               class="player-name-input"
+                                               @bind="playerSlots[0].Name"
+                                               placeholder="Your Name" />
+                                    }
+                                    else
+                                    {
+                                        <span>@slot.Name</span>
+                                    }
+                                </div>
+
+                                <!-- Race Dropdown -->
+                                <div class="slot-race">
+                                    @if (slot.IsActive)
+                                    {
+                                        <select class="lobby-dropdown" @bind="slot.Race">
+                                            <option value="@RaceType.Human">Human</option>
+                                            <option value="@RaceType.Orc">Orc</option>
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <span class="slot-empty">—</span>
+                                    }
+                                </div>
+
+                                <!-- Team Dropdown -->
+                                <div class="slot-team">
+                                    @if (slot.IsActive)
+                                    {
+                                        <select class="lobby-dropdown" @bind="slot.Team">
+                                            <option value="0">FFA</option>
+                                            <option value="1">Team 1</option>
+                                            <option value="2">Team 2</option>
+                                            <option value="3">Team 3</option>
+                                            <option value="4">Team 4</option>
+                                        </select>
+                                    }
+                                    else
+                                    {
+                                        <span class="slot-empty">—</span>
+                                    }
+                                </div>
+
+                                <!-- Add/Remove Button -->
+                                <div class="slot-actions">
+                                    @if (index > 0)
+                                    {
+                                        @if (slot.IsActive)
+                                        {
+                                            <button class="btn-remove" @onclick="() => RemovePlayer(index)">?</button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn-add" @onclick="() => AddPlayer(index)">+</button>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="player-count">
+                        Active Players: @playerSlots.Count(p => p.IsActive) / 16
+                    </div>
+                </div>
+
+                <!-- RIGHT: Game Settings -->
+                <div class="lobby-right">
+                    <h2 class="settings-title">Game Settings</h2>
+
+                    <!-- Map Selection -->
+                    <div class="setting-group">
+                        <label>Choose Map</label>
+                        <select class="lobby-dropdown-large" @bind="selectedMapId">
+                            @foreach (var map in MapLibrary.AvailableMaps)
+                            {
+                                <option value="@map.MapId">@map.MapName</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Map Preview -->
+                    <div class="map-preview">
+                        @if (!string.IsNullOrEmpty(selectedMapId))
+                        {
+                            var map = MapLibrary.GetMap(selectedMapId);
+                            <img src="@map.PreviewPath" alt="@map.MapName" />
+                            <p class="map-description">@map.Description</p>
+                        }
+                    </div>
+
+                    <!-- Team Settings -->
+                    <div class="setting-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" @bind="teamTogether" />
+                            Team Together (spawn near teammates)
+                        </label>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="lobby-actions">
+                        <button class="btn-back" @onclick="BackToMain">Back</button>
+                        <button class="btn-start" @onclick="StartGame">Start Game</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private enum MenuScreen
+    {
+        Main,
+        OptionsScreen,
+        Lobby
+    }
+
+    private MenuScreen currentScreen = MenuScreen.Main;
+
+    // Player slot data
+    private class PlayerSlot
+    {
+        public string Name { get; set; } = "";
+        public RaceType Race { get; set; } = RaceType.Human;
+        public int Team { get; set; } = 0;
+        public bool IsActive { get; set; } = false;
+    }
+
+    private List<PlayerSlot> playerSlots = new();
+    private string selectedMapId = "forest";
+    private bool teamTogether = false;
+
+    protected override void OnInitialized()
+    {
+        // Initialize 16 slots
+        for (int i = 0; i < 16; i++)
+        {
+            playerSlots.Add(new PlayerSlot
+            {
+                Name = i == 0 ? "Player" : $"AI {i}",
+                Race = RaceType.Human,
+                Team = 0,
+                IsActive = i == 0
+            });
+        }
+    }
+
+    // Navigation
+    private void ShowLobby() => currentScreen = MenuScreen.Lobby;
+    private void ShowOptionsMenu() => currentScreen = MenuScreen.OptionsScreen;
+    private void BackToMain() => currentScreen = MenuScreen.Main;
+    private void QuitGame() => NavManager.NavigateTo("/");
+
+    // Player management
+    private void AddPlayer(int index) => playerSlots[index].IsActive = true;
+    private void RemovePlayer(int index) => playerSlots[index].IsActive = false;
+
+    // Start game
+    private void StartGame()
+    {
+        int activeCount = playerSlots.Count(p => p.IsActive);
+        if (activeCount < 2)
+        {
+            Console.WriteLine("? Need at least 2 players!");
+            return;
+        }
+
+        var activePlayers = playerSlots
+            .Select((slot, index) => new { slot, index })
+            .Where(x => x.slot.IsActive)
+            .ToList();
+
+        var playerData = string.Join("|", activePlayers.Select(x =>
+            $"{x.index}:{x.slot.Name}:{x.slot.Race}:{x.slot.Team}"));
+
+        var timestamp = DateTime.Now.Ticks;
+        NavManager.NavigateTo($"/WarMap?map={selectedMapId}&players={Uri.EscapeDataString(playerData)}&teamTogether={teamTogether}&t={timestamp}");
+    }
+}

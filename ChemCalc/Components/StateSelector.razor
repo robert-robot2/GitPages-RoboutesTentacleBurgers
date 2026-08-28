@@ -1,0 +1,78 @@
+@using ChemCalc.ChemEngine
+
+@* State selector buttons: (s), (l), (g), (aq) *@
+
+<div class="state-selector">
+    <div class="state-header">State</div>
+
+    <button class="state-btn @GetActiveClass(MoleculeState.Solid)"
+            @onclick="() => SelectState(MoleculeState.Solid)">
+        (s) Solid
+    </button>
+
+    <button class="state-btn @GetActiveClass(MoleculeState.Liquid)"
+            @onclick="() => SelectState(MoleculeState.Liquid)">
+        (l) Liquid
+    </button>
+
+    <button class="state-btn @GetActiveClass(MoleculeState.Gas)"
+            @onclick="() => SelectState(MoleculeState.Gas)">
+        (g) Gas
+    </button>
+
+    <button class="state-btn @GetActiveClass(MoleculeState.Aqueous)"
+            @onclick="() => SelectState(MoleculeState.Aqueous)">
+        (aq) Aqueous
+    </button>
+
+    <div class="state-info">
+        @if (SelectedState != MoleculeState.Unspecified)
+        {
+            <div class="current-state">
+                Current: @GetStateDisplay(SelectedState)
+            </div>
+        }
+    </div>
+
+    <div class="future-features">
+        <div class="future-header">Future v2.0</div>
+        <div class="future-item">Temperature</div>
+        <div class="future-item">Pressure</div>
+        <div class="future-item">Phase Diagrams</div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<MoleculeState> OnStateSelected { get; set; }
+
+    [Parameter]
+    public MoleculeState SelectedState { get; set; }
+
+    private async Task SelectState(MoleculeState state)
+    {
+        await OnStateSelected.InvokeAsync(state);
+    }
+
+    private string GetActiveClass(MoleculeState state)
+    {
+        return SelectedState == state ? "state-active" : "";
+    }
+
+    private string GetStateDisplay(MoleculeState state)
+    {
+        switch (state)
+        {
+            case MoleculeState.Solid:
+                return "(s) Solid";
+            case MoleculeState.Liquid:
+                return "(l) Liquid";
+            case MoleculeState.Gas:
+                return "(g) Gas";
+            case MoleculeState.Aqueous:
+                return "(aq) Aqueous";
+            default:
+                return "None";
+        }
+    }
+}

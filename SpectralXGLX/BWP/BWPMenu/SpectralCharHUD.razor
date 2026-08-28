@@ -1,0 +1,150 @@
+@using SpectralXGLX.BWP
+
+@if (ActiveCharacter != null && ActiveCharacter.CharIsAlive)
+{
+    <div style="
+        position: absolute;
+        left: 20px;
+        bottom: 60px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        z-index: 60;
+        pointer-events: none;
+        font-family: 'Courier New', monospace;">
+
+        @* ── HP Bar ───────────────────────────────────────────────── *@
+        <div style="
+            position: relative;
+            width: 200px;
+            height: 28px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 3px;
+            overflow: hidden;
+            box-shadow: 0 0 10px @HpGlow;">
+
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: @HpPercent%;
+                background: @HpColor;
+                box-shadow: 0 0 8px @HpGlow;
+                transition: width 0.2s ease;
+                z-index: 3;
+                opacity: 0.45;">
+            </div>
+
+            <div style="
+                position: absolute;
+                inset: 0;
+                background-image: url('/iAssets/GothicFrame03.png');
+                background-size: cover;
+                pointer-events: none;
+                z-index: 2;">
+            </div>
+
+            <div style="
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: bold;
+                letter-spacing: 0.08em;
+                color: white;
+                text-shadow: 0 0 4px #000, 0 0 8px #000;
+                z-index: 4;">
+                @ActiveCharacter.CharHitPoints / @ActiveCharacter.CharMaxHP
+            </div>
+        </div>
+
+        @* ── Energy Bar ───────────────────────────────────────────── *@
+        <div style="
+            position: relative;
+            width: 200px;
+            height: 28px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 3px;
+            overflow: hidden;
+
+">
+
+            <div style="
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: @EnergyPercent%;
+                background: @EnergyColor;
+                box-shadow: 0 0 8px @EnergyColor;
+                transition: width 0.15s ease;
+                z-index: 3;
+                opacity: 0.45;">
+            </div>
+
+            <div style="
+                position: absolute;
+                inset: 0;
+                background-image: url('/iAssets/GothicFrame03.png');
+                background-size: cover;
+                pointer-events: none;
+                z-index: 2;">
+            </div>
+
+            <div style="
+                position: absolute;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: bold;
+                letter-spacing: 0.08em;
+                color: white;
+                text-shadow: 0 0 4px #000, 0 0 8px #000;
+                z-index: 4;">
+                @ActiveCharacter.CharResourceValue / @ActiveCharacter.CharMaxResourceValue
+            </div>
+        </div>
+
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public ISpectralCharacter? ActiveCharacter { get; set; }
+
+
+
+    private int HpPercent =>
+        ActiveCharacter == null || ActiveCharacter.CharMaxHP == 0
+            ? 0
+            : (int)((float)ActiveCharacter.CharHitPoints / ActiveCharacter.CharMaxHP * 100f);
+
+    private int EnergyPercent =>
+        ActiveCharacter == null || ActiveCharacter.CharMaxResourceValue == 0
+            ? 0
+            : (int)((float)ActiveCharacter.CharResourceValue / ActiveCharacter.CharMaxResourceValue * 100f);
+
+    private string HpColor =>
+        ActiveCharacter?.CharHPColor ?? "rgba(255,0,0,.7)";
+
+    private string HpGlow =>
+        "rgba(200,30,30,0.5)";
+
+    private string EnergyColor =>
+        ActiveCharacter?.CharEnergyColor ?? "rgba(255,100,0,.7)";
+
+        /*
+    private string EnergyGlow =>
+        ActiveCharacter?.CharEnergyGlow ?? ActiveCharacter?.CharEnergyColor ?? "rgba(255,120,0,.4)";
+        */
+
+
+}

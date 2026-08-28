@@ -1,0 +1,294 @@
+
+
+
+@if (showIntro)
+{
+    <div id="IntroOverlay">
+        <div>@((MarkupString)_starsOutput)</div>
+
+        <div class="star-wars-intro">
+            <p>
+                Once upon a time in a flat galaxy far, far away...<br /><br />
+                The mighty DEATH CUBE reigned supreme.<br />
+                Not spherical. Not round. Not even slightly curvy.<br />
+                Just six glorious faces of flat tyranny.<br /><br />
+                Planets trembled at its ninety-degree rotations.<br />
+                Stars scrambled as its edges clicked into place.<br /><br />
+                And the universe whispered in fear:<br />
+                "All hail the King of the Flat Dimension..."<br /><br />
+                But tonight… YOU dare to challenge the Cube.<br />
+                Prepare yourself, mortal.<br />
+                The Death Cube awaits...
+            </p>
+        </div>
+
+        <button class="start-btn" @onclick="HideIntro">Start Death Cube</button>
+    </div>
+}
+else
+{
+    <div id="GameViewport">
+        <div class="DiabloRedGlow title">Death Cube</div>
+        <div class="DiabloRedGlow subtitle">King of the Flat Universe</div>
+        <div class="DiabloRedGlow subtitle">Left Click hold move to rotate Faces, Right click Hold Move to Rotate Cube</div>
+
+        <div id="RenderSurface"
+             @onmousedown="OnMouseDown"
+             @onmouseup="OnMouseUp"
+             @onmousemove="OnMouseMove"
+             oncontextmenu="return false;">
+            @if (spawned)
+            {
+                @((MarkupString)(cubeOutput + lightOutput))
+            }
+
+            <!-- Move Log in lower-left -->
+            <div id="MoveLog">
+                @((MarkupString)moveInfo)
+                @((MarkupString)solvedMessage)
+            </div>
+
+            <!-- Buttons aligned on right side of viewport -->
+            <div id="ControlPanelRight">
+                <div class="DiabloRedGlow section">Cube</div>
+                <button class="fancy-btn" @onclick="RunCubeTest">Initiate Rubix Cube</button>
+                <button class="fancy-btn" @onclick="ToggleSpinMode">Toggle Spin Mode</button>
+                <button class="fancy-btn" @onclick="ToggleAutoComplete">Auto Complete</button>
+                <button class="fancy-btn" @onclick="ToggleScramble">Scramble</button>
+
+                <div class="DiabloRedGlow section">Faces</div>
+                <button class="fancy-btn" @onclick="SelectFrontFace">Front (Blue)</button>
+                <button class="fancy-btn" @onclick="SelectRightFace">Right (Red)</button>
+                <button class="fancy-btn" @onclick="SelectBackFace">Back (Green)</button>
+                <button class="fancy-btn" @onclick="SelectLeftFace">Left (Orange)</button>
+                <button class="fancy-btn" @onclick="SelectTopFace">Top (White)</button>
+                <button class="fancy-btn" @onclick="SelectBottomFace">Bottom (Yellow)</button>
+
+                <div id="CubeSizer">
+                    <span class="DiabloRedGlow">Cube Size:</span>
+                    <input type="range" min="50" max="600" step="50" value="@cubeSize" @oninput="OnCubeSizeChanged" />
+                    <span>@cubeSize px</span>
+                </div>
+            </div>
+
+            <!-- Light + Scene buttons in their own column on left side -->
+            <div id="ControlPanelLeft">
+                <div class="DiabloRedGlow section">Lighting</div>
+                <button class="fancy-btn" @onclick="ToggleLight">Toggle Light</button>
+                <button class="fancy-btn" @onclick="MoveLightLeft">Light Left</button>
+                <button class="fancy-btn" @onclick="MoveLightRight">Light Right</button>
+                <button class="fancy-btn" @onclick="MoveLightUp">Light Up</button>
+                <button class="fancy-btn" @onclick="MoveLightDown">Light Down</button>
+
+                <div class="DiabloRedGlow section">Scene</div>
+                <button class="fancy-btn" @onclick="ClearScene">Clear Scene</button>
+                <button class="fancy-btn" @onclick="ClearMoveLog">Clear Log</button>
+            </div>
+        </div>
+    </div>
+}
+<style>
+    #IntroOverlay {
+        width: 800px;
+        height: 800px;
+        background: black;
+        position: relative;
+        overflow: hidden;
+        margin: auto;
+        perspective: 600px;
+    }
+
+    .star-wars-intro {
+        position: absolute;
+        bottom: -100%;
+        width: 100%;
+        color: yellow;
+        font-family: 'Arial Black',sans-serif;
+        font-size: 1.5em;
+        text-align: center;
+        transform-origin: 50% 100%;
+        transform: rotateX(35deg);
+        animation: crawl 20s linear forwards;
+    }
+
+        .star-wars-intro p {
+            width: 60%;
+            margin: auto;
+            line-height: 1.6em;
+        }
+
+    @@keyframes crawl {
+        0% {
+            bottom: -100%;
+        }
+
+        100% {
+            bottom: 120%;
+        }
+    }
+
+    .start-btn {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%,-50%);
+        background: lime;
+        color: black;
+        font-size: 1.5em;
+        padding: 10px 20px;
+        border: none;
+        cursor: pointer;
+        z-index: 10;
+        opacity: 0;
+        animation: fadeIn 3s ease forwards;
+        animation-delay: 20s;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    #GameViewport {
+        width: 800px;
+        margin: 20px auto;
+        background: radial-gradient(circle at center,#000 70%,#111 100%);
+        padding: 20px;
+        border: 2px solid red;
+        box-shadow: 0 0 30px red;
+        text-align: center;
+    }
+
+    #RenderSurface {
+        width: 800px;
+        height: 600px;
+        background-color: black;
+        perspective: 800px;
+        position: relative;
+        border: 2px solid red;
+        box-shadow: 0 0 20px red;
+    }
+
+    #MoveLog {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        color: lime;
+        font-family: monospace;
+        width: 250px;
+        height: 120px;
+        overflow-y: auto;
+        border: 1px solid lime;
+        padding: 5px;
+        background-color: black;
+    }
+
+    #ControlPanelRight {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 180px;
+        text-align: left;
+        background: rgba(0,0,0,0.6);
+        padding: 8px;
+        border: 1px solid red;
+        box-shadow: 0 0 10px red;
+    }
+
+    #ControlPanelLeft {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        width: 180px;
+        text-align: left;
+        background: rgba(0,0,0,0.6);
+        padding: 8px;
+        border: 1px solid red;
+        box-shadow: 0 0 10px red;
+    }
+
+    .DiabloRedGlow.title {
+        font-size: 2.2em;
+        margin-bottom: 4px;
+    }
+
+    .DiabloRedGlow.subtitle {
+        font-size: 1.1em;
+        margin-bottom: 16px;
+    }
+
+    .DiabloRedGlow.section {
+        margin-top: 14px;
+        font-size: 1em;
+    }
+
+    .fancy-btn {
+        display: block;
+        width: 100%;
+        margin: 4px 0;
+        background: black;
+        color: red;
+        border: 1px solid red;
+        padding: 6px;
+        cursor: pointer;
+        font-family: 'Arial Black',sans-serif;
+        font-size: 0.8em;
+        transition: all 0.2s ease;
+    }
+
+        .fancy-btn:hover {
+            background: red;
+            color: black;
+            box-shadow: 0 0 10px red;
+        }
+
+    #CubeSizer {
+        margin-top: 10px;
+        color: lime;
+        font-family: monospace;
+    }
+</style>
+
+@code {
+    private bool showIntro = true;
+    private string _starsOutput = string.Empty;
+    private System.Timers.Timer? _starsTimer;
+
+    protected override void OnInitialized()
+    {
+        StartStars();
+    }
+
+    private void StartStars()
+    {
+        _starsTimer = new System.Timers.Timer(1000);
+        _starsTimer.Elapsed += (s, e) =>
+        {
+            var rnd = new Random();
+            _starsOutput = string.Empty;
+            for (int i = 0; i < 20; i++)
+            {
+                int x = rnd.Next(800);
+                int y = rnd.Next(800);
+                _starsOutput += $@"<div style='
+                    width:4px;height:4px;background:white;border-radius:50%;
+                    position:absolute;top:{y}px;left:{x}px;box-shadow:0 0 10px white;'>
+                </div>";
+            }
+            InvokeAsync(StateHasChanged);
+        };
+        _starsTimer.Start();
+    }
+
+    private void HideIntro()
+    {
+        showIntro = false;
+        _starsTimer?.Stop();
+        _starsOutput = string.Empty;
+    }
+}

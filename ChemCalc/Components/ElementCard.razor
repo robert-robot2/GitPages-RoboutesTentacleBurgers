@@ -1,0 +1,50 @@
+@using ChemCalc.Data
+
+@* Individual element card in periodic table *@
+
+<div class="element-card @GetElementTypeClass()"
+     style="background-color: @Element.Color; grid-column: @GridColumn; grid-row: @GridRow;"
+     @onclick="OnClick">
+
+    <div class="element-number">@Element.AtomicNumber</div>
+    <div class="element-symbol">@Element.Symbol</div>
+    <div class="element-name">@Element.Name</div>
+    <div class="element-mass">@Element.GetFormattedMass()</div>
+</div>
+
+@code {
+    [Parameter]
+    public Element Element { get; set; }
+
+    [Parameter]
+    public int GridColumn { get; set; }
+
+    [Parameter]
+    public int GridRow { get; set; }
+
+    [Parameter]
+    public EventCallback<Element> OnElementSelected { get; set; }
+
+    [Parameter]
+    public bool IsHighlighted { get; set; }
+
+    private async Task OnClick()
+    {
+        await OnElementSelected.InvokeAsync(Element);
+    }
+
+    private string GetElementTypeClass()
+    {
+        string baseClass = "element-clickable";
+
+        if (IsHighlighted)
+        {
+            baseClass += " element-highlighted";
+        }
+
+        // Add type-specific class for additional styling if needed
+        baseClass += $" element-type-{Element.ElementType.ToString().ToLower()}";
+
+        return baseClass;
+    }
+}

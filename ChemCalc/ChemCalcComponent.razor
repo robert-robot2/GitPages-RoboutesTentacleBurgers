@@ -1,0 +1,363 @@
+@page "/ChemCalcComponent"
+@using ChemCalc.Helpers
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+<PageTitle>Chemical Calculon - Ultimate Calculator</PageTitle>
+
+
+@using ChemCalc.Data
+@using ChemCalc.ChemEngine
+@using ChemCalc.Components
+
+@* Main ChemCalc Component - Chemical Engineering Calculator *@
+
+<div class="chemcalc-container">
+
+    @* Left Panel - Output *@
+    <div class="chemcalc-left">
+        <OutputPanel SelectedElement="@selectedElement" />
+
+        @* Reaction Type Display *@
+        <div class="reaction-type-display">
+            <div class="reaction-type-label">Reaction Type:</div>
+            <div class="reaction-type-value">@equationBuilder.GetReactionTypeString()</div>
+        </div>
+        @* Chem Button Tab *@
+        <div class="chem-button-tab">
+            <button class="chem-btn" @onclick="HandleAddMolecule">
+                Add Molecule
+            </button>
+            <button class="chem-btn" @onclick="HandleClearMolecule">
+                Clear Molecule
+            </button>
+            <button class="chem-btn" @onclick="HandleClearEquation">
+                Clear Equation
+            </button>
+            <button class="chem-btn mode-toggle-btn @(isChemMode ? "mode-active" : "")" @onclick="HandleToggleMode">
+                Mode: @GetModeDisplay()
+            </button>
+        </div>
+    </div>
+
+    @* Center Panel - Calculator and Periodic Table *@
+    <div class="chemcalc-center">
+        <EquationDisplay Equation="@currentEquation" EquationString="@equationBuilder.EquationString" />
+
+        @* Molecule Display - Part 2 Active *@
+        <div class="chemcalc-molecule-section">
+            <MoleculeDisplay CurrentMolecule="@currentMolecule" />
+        </div>
+        @* Math Functions Calculator (4x15 horizontal) *@
+        <div class="chemcalc-calculator-section">
+          
+            <CalculatorPanel IsChemMode="@isChemMode" OnChemOperator="@HandleChemOperator" />
+        </div>
+
+      
+
+        @* Periodic Table *@
+        <div class="chemcalc-periodic-section">
+            <PeriodicTableGrid OnElementSelected="@HandleElementSelected"
+                               HighlightedType="@highlightedCategory" />
+        </div>
+
+        @* Category Legend *@
+        <div class="chemcalc-legend-section">
+            <CategoryLegend OnCategorySelected="@HandleCategorySelected"
+                            SelectedCategory="@highlightedCategory" />
+        </div>
+
+    </div>
+
+    @* Right Panel - State Selector & Future Features *@
+    <div class="chemcalc-right">
+        <StateSelector OnStateSelected="@HandleStateSelected"
+                       SelectedState="@currentState" />
+    </div>
+
+</div>
+
+<script>
+    // ChemCalc JavaScript Interop Functions
+
+    window.chemcalcInterop = {
+
+        // ==================== ELEMENT HIGHLIGHTING ====================
+
+        /**
+         * Highlight all elements of a specific type
+         * param {string} elementType - The element type to highlight (e.g., "alkali", "halogen")
+         */
+        highlightElementType: function(elementType) {
+            // Remove all existing highlights
+            this.clearHighlights();
+
+            if (!elementType) return;
+
+            // Add highlight class to matching elements
+            const className = `element-type-${elementType.toLowerCase()}`;
+            const elements = document.querySelectorAll(`.${className}`);
+
+            elements.forEach(element => {
+                element.classList.add('element-highlighted');
+            });
+        },
+
+        /**
+         * Clear all element highlights
+         */
+        clearHighlights: function() {
+            const highlightedElements = document.querySelectorAll('.element-highlighted');
+            highlightedElements.forEach(element => {
+                element.classList.remove('element-highlighted');
+            });
+        },
+
+        /**
+         * Toggle highlight for a specific element type
+         * param {string} elementType - The element type to toggle
+         */
+        toggleHighlight: function(elementType) {
+            const className = `element-type-${elementType.toLowerCase()}`;
+            const elements = document.querySelectorAll(`.${className}`);
+
+            if (elements.length === 0) return;
+
+            // Check if first element is highlighted to determine toggle state
+            const isHighlighted = elements[0].classList.contains('element-highlighted');
+
+            if (isHighlighted) {
+                this.clearHighlights();
+            } else {
+                this.highlightElementType(elementType);
+            }
+        },
+
+        // ==================== ANIMATIONS ====================
+
+        /**
+         * Pulse animation on element selection
+         * param {HTMLElement} element - The element to animate
+         */
+        pulseElement: function(element) {
+            if (!element) return;
+
+            element.style.animation = 'none';
+            setTimeout(() => {
+                element.style.animation = 'pulse 0.5s ease';
+            }, 10);
+        },
+
+        /**
+         * Glow effect on element hover
+         * param {HTMLElement} element - The element to glow
+         * param {string} color - Glow color (hex)
+         */
+        addGlowEffect: function(element, color = '#ffcc00') {
+            if (!element) return;
+            element.style.boxShadow = `0 0 20px ${color}`;
+        },
+
+        /**
+         * Remove glow effect
+         * param {HTMLElement} element - The element to remove glow from
+         */
+        removeGlowEffect: function(element) {
+            if (!element) return;
+            element.style.boxShadow = '';
+        },
+
+        // ==================== SMOOTH SCROLLING ====================
+
+        /**
+         * Scroll to element smoothly
+         * param {string} elementId - ID of element to scroll to
+         */
+        scrollToElement: function(elementId) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        },
+
+        // ==================== MOLECULE DISPLAY EFFECTS ====================
+
+        /**
+         * Flash the equation display when equation changes
+         */
+        flashEquationDisplay: function() {
+            const equationDisplay = document.querySelector('.equation-display');
+            if (equationDisplay) {
+                equationDisplay.classList.add('flash-animation');
+                setTimeout(() => {
+                    equationDisplay.classList.remove('flash-animation');
+                }, 500);
+            }
+        },
+
+        /**
+         * Highlight molecule formula with glow
+         */
+        highlightMoleculeFormula: function() {
+            const formula = document.querySelector('.molecule-formula');
+            if (formula) {
+                formula.style.textShadow = '0 0 20px #4444ff';
+                setTimeout(() => {
+                    formula.style.textShadow = '';
+                }, 1000);
+            }
+        },
+
+        // ==================== BUTTON FEEDBACK ====================
+
+        /**
+         * Add ripple effect to button click
+         * param {HTMLElement} button - Button element
+         * param {number} x - Click X coordinate
+         * param {number} y - Click Y coordinate
+         */
+        addRippleEffect: function(button, x, y) {
+            if (!button) return;
+
+            const ripple = document.createElement('span');
+            ripple.classList.add('ripple');
+            ripple.style.left = `${x - button.offsetLeft}px`;
+            ripple.style.top = `${y - button.offsetTop}px`;
+
+            button.appendChild(ripple);
+
+            setTimeout(() => {
+                ripple.remove();
+            }, 600);
+        },
+
+        /**
+         * Vibrate on button press (mobile)
+         */
+        vibrateOnPress: function() {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(10);
+            }
+        },
+
+        // ==================== CALCULATOR DISPLAY ====================
+
+        /**
+         * Flash calculator display on error
+         */
+        flashCalculatorError: function() {
+            const display = document.querySelector('.calc-display-value');
+            if (display) {
+                display.style.color = '#ff0000';
+                display.style.textShadow = '0 0 10px #ff0000';
+                setTimeout(() => {
+                    display.style.color = '#00ff00';
+                    display.style.textShadow = '0 0 5px #00ff00';
+                }, 500);
+            }
+        },
+
+        // ==================== PERIODIC TABLE ZOOM ====================
+
+        /**
+         * Zoom effect on periodic table section
+         * param {boolean} zoomIn - True to zoom in, false to zoom out
+         */
+        zoomPeriodicTable: function(zoomIn) {
+            const periodicSection = document.querySelector('.chemcalc-periodic-section');
+            if (periodicSection) {
+                periodicSection.style.transform = zoomIn ? 'scale(1.05)' : 'scale(1)';
+                periodicSection.style.transition = 'transform 0.3s ease';
+            }
+        },
+
+        // ==================== INITIALIZATION ====================
+
+        /**
+         * Initialize all event listeners
+         */
+        initialize: function() {
+            console.log('ChemCalc Interop initialized');
+
+            // Add CSS for animations
+            this.addAnimationStyles();
+
+            // Set up periodic table hover effects
+            this.setupPeriodicTableEffects();
+        },
+
+        /**
+         * Add animation CSS dynamically
+         */
+        addAnimationStyles: function() {
+            const style = document.createElement('style');
+            style.textContent = `
+                @@keyframes pulse {
+                    0%, 100% { transform: scale(1); }
+                    50% { transform: scale(1.1); }
+                }
+
+                @@keyframes flash {
+                    0%, 100% { opacity: 1; }
+                    50% { opacity: 0.5; }
+                }
+
+                .flash-animation {
+                    animation: flash 0.5s ease;
+                }
+
+                .ripple {
+                    position: absolute;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.6);
+                    width: 20px;
+                    height: 20px;
+                    animation: ripple-animation 0.6s ease-out;
+                    pointer-events: none;
+                }
+
+                @@keyframes ripple-animation {
+                    to {
+                        transform: scale(4);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        },
+
+        /**
+         * Setup hover effects for periodic table elements
+         */
+        setupPeriodicTableEffects: function() {
+            document.addEventListener('DOMContentLoaded', () => {
+                const elementCards = document.querySelectorAll('.element-card');
+
+                elementCards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.zIndex = '100';
+                    });
+
+                    card.addEventListener('mouseleave', function() {
+                        this.style.zIndex = '1';
+                    });
+                });
+            });
+        }
+    };
+
+    // Auto-initialize when script loads
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', () => {
+            window.chemcalcInterop.initialize();
+        });
+    } else {
+        window.chemcalcInterop.initialize();
+    }
+</script>
+
+
+
+@code {
+    // Component code is in ChemCalcComponent.razor.cs
+}

@@ -1,0 +1,956 @@
+@page "/WarMap"
+
+
+<PageTitle>WarCraft - @(Game.CurrentMap?.MapName ?? "Battle")</PageTitle>
+<div class="DiabloBlueGlow" style="font-size:150%">WarCraft</div>
+
+
+@using WarCraftLibrary
+
+@inject WarGameService Game
+@inject NavigationManager NavManager
+
+
+  
+
+    <!-- Main Viewport (800x600) -->
+<div class="war-viewport" @ref="viewportRef" @onkeydown="HandleKeyDown"
+     @onkeyup="HandleKeyUp"
+     @onmousemove="HandleMouseMove"
+     @onmouseleave="HandleMouseLeave"
+     @onmousedown="HandleMouseDown"
+     @onmouseup="HandleMouseUp"
+     @onclick="HandleClick"
+     @onclick:preventDefault="Game.IsBuildMode"
+     @oncontextmenu="HandleRightClick"
+     @oncontextmenu:preventDefault="true"
+     tabindex="0">
+     <button class="menu-btn" @onclick="ReturnToMenu">Menu</button>
+
+
+    <div class="war-map" style="left:@Game.ViewportXpx; top:@Game.ViewportYpx;">
+
+        <!-- ===== CANVAS TILE LAYER ===== -->
+        @if (Game.TileMap != null && Game.TileAtlas != null)
+        {
+            // Trigger canvas redraw
+            _ = DrawTilesToCanvas();
+
+            <canvas @ref="tileCanvasRef"
+                    width="4096"
+                    height="4096"
+                    style="position:absolute; left:0; top:0; pointer-events:none; image-rendering: pixelated;">
+            </canvas>
+
+        }
+     
+        <!-- Gold Mines (CULLED) -->
+        @foreach (var mine in WarRegistry.GoldMines)
+        {
+            @if (Game.IsEntityVisible(mine.PosX, mine.PosY, mine.Width, mine.Height, 32))
+            {
+                <div style="@mine.EntityStyle">
+                    <img src="@mine.SpritePath" style="width:100%; height:100%;" alt="@mine.PlaceholderName" />
+                </div>
+            }
+        }
+        <!-- Trees (CULLED) -->
+        @foreach (var tree in WarRegistry.Trees)
+        {
+            @if (Game.IsEntityVisible(tree.PosX, tree.PosY, tree.Width, tree.Height, 32))
+            {
+                <div style="@tree.EntityStyle">
+                    <img src="@tree.SpritePath" style="width:100%; height:100%;" alt="@tree.PlaceholderName" />
+                </div>
+            }
+        }
+        <!-- Buildings (CULLED) -->
+        @foreach (var building in WarRegistry.Buildings)
+        {
+            @if (Game.IsEntityVisible(building, 32))
+            {
+@* Determine if building belongs to player/allies *@
+
+    bool isPlayerOwned = building.OwnerPlayerIndex == 0;
+    
+    // FFA Mode: Team = 0, everyone is enemy except player
+    // Team Mode: Team > 0, same team = ally
+    bool isAlly = false;
+    
+    if (building.OwnerTeam == 0)
+    {
+        // FFA: No allies except yourself
+        isAlly = false;
+    }
+    else if (Game.Players.Count > 0 && building.OwnerTeam == Game.Players[0].Team)
+    {
+        // Team mode: Same team = ally
+        isAlly = true;
+    }
+    else if (Game.Players.Count == 0 && building.Race == Game.PlayerFaction?.Race)
+    {
+        // Legacy mode fallback
+        isAlly = true;
+    }
+    
+    bool isEnemy = !isPlayerOwned && !isAlly;
+
+
+@if (isPlayerOwned || isAlly || !Game.FogOfWarEnabled || (isEnemy && FogOfWar.IsEntityVisible(building, Game)))
+{
+                    @* ? PHASE 4: Get current animated sprite *@
+                    var currentSprite = BuildingAnimationController.GetCurrentSprite(building);
+                    var constructionProgress = BuildingAnimationController.GetConstructionProgressPercentage(building);
+                    var hpPercentage = BuildingAnimationController.GetHPPercentage(building);
+
+                    <div style="@building.EntityStyle;" class="@(building.IsSelected ? "entity-selected" : "")">
+
+                        @* ? PHASE 4: Use animated sprite with state-based opacity *@
+                        <img src="@currentSprite"
+                             style="width:100%; height:100%;
+                                        @(building.CurrentBuildingState == BuildingAnimationState.Destroyed ? "opacity:0.3;" : "")"
+                             alt="@building.PlaceholderName" />
+
+                        @* Selection box *@
+                        @if (building.IsSelected)
+                        {
+                            <div class="selection-box"></div>
+                        }
+
+                        @* ? PHASE 4: Construction progress indicator *@
+                        @if (building.CurrentBuildingState == BuildingAnimationState.Constructing)
+                        {
+                            <div class="construction-overlay DiabloRedGlowWarMap">
+                                Building... @constructionProgress%
+                            </div>
+
+                            @* Optional: Construction progress bar *@
+                            <div style="position:absolute; bottom:0; left:0; right:0; height:4px; background:rgba(0,0,0,0.7);">
+                                <div style="height:100%; background:#0F0; width:@(constructionProgress)%;"></div>
+                            </div>
+                        }
+
+                        @* ? PHASE 4: HP bar for damaged buildings *@
+                        @if (building.CurrentBuildingState == BuildingAnimationState.Damaged && building.IsSelected)
+                        {
+                            <div style="position:absolute; bottom:-8px; left:0; right:0; height:3px; background:rgba(0,0,0,0.8);">
+                                <div style="height:100%;
+                                                        background:@(hpPercentage > 50 ? "#0F0" : hpPercentage > 25 ? "#FF0" : "#F00");
+                                                        width:@(hpPercentage)%;"></div>
+                            </div>
+                        }
+
+                        @* ? PHASE 4: Damage effects (smoke/fire) *@
+                        @if (BuildingAnimationController.ShouldShowSmoke(building))
+                        {
+                            <div class="smoke-effect">??</div>
+                        }
+                        @if (BuildingAnimationController.ShouldShowFire(building))
+                        {
+                            <div class="fire-effect">??</div>
+                        }
+
+                        @* ? PHASE 4: Destroyed indicator *@
+                        @if (building.CurrentBuildingState == BuildingAnimationState.Destroyed)
+                        {
+                            <div class="destroyed-overlay">DESTROYED</div>
+                        }
+                    </div>
+                }
+            }
+        }
+
+        <!-- Units (CULLED) -->
+        @foreach (var unit in WarRegistry.Units)
+        {
+            @if (Game.IsEntityVisible(unit, 32))
+            {
+                @* ? NEW: Only show if player's unit, ally unit, OR visible through fog *@
+@* Determine if unit belongs to player/allies *@
+
+    bool isPlayerOwned = unit.OwnerPlayerIndex == 0;
+    
+    // FFA Mode: Team = 0, everyone is enemy except player
+    // Team Mode: Team > 0, same team = ally
+    bool isAlly = false;
+    
+    if (unit.OwnerTeam == 0)
+    {
+        // FFA: No allies except yourself
+        isAlly = false;
+    }
+    else if (Game.Players.Count > 0 && unit.OwnerTeam == Game.Players[0].Team)
+    {
+        // Team mode: Same team = ally
+        isAlly = true;
+    }
+    else if (Game.Players.Count == 0 && unit.Race == Game.PlayerFaction?.Race)
+    {
+        // Legacy mode fallback
+        isAlly = true;
+    }
+    
+    bool isEnemy = !isPlayerOwned && !isAlly;
+
+
+@if (isPlayerOwned || isAlly || !Game.FogOfWarEnabled || (isEnemy && FogOfWar.IsEntityVisible(unit, Game)))
+{
+                    var spriteSheetPath = WarAnimations.GetAnimatedSpritePath(unit);
+                    var config = GetAnimationConfig(unit.CurrentAnimationState);
+                    var frameOffsetX = unit.AnimationFrame * -32;
+
+                    <div style="@unit.EntityStyle" class="@(unit.IsSelected ? "entity-selected" : "")">
+                        <!-- Animated Sprite with frame offset -->
+                        <div style="width:@(unit.Width)px; height:@(unit.Height)px; overflow:hidden;">
+                            <img src="@spriteSheetPath"
+                                 style="width:@(config.FrameCount* unit.Width)px; height:@(unit.Height)px;
+                            object-fit:none;
+                            object-position:@(frameOffsetX)px 0px;"
+                                 alt="@unit.PlaceholderName" />
+                        </div>
+
+                        @if (unit.IsSelected)
+                        {
+                            <div class="selection-circle"></div>
+                        }
+
+                        @if (unit.CarryingGold > 0)
+                        {
+                            <img src="/wc1sprites/ui/Gold001.png" class="carrying-indicator" alt="Gold" />
+                        }
+                        @if (unit.CarryingLumber > 0)
+                        {
+                            <img src="/wc1sprites/ui/Woood001.png" class="carrying-indicatorL" alt="Lumber" />
+                        }
+                    </div>
+                }
+            }
+        }
+ 
+        <!-- Projectiles (CULLED) -->
+        @foreach (var projectile in WarRegistry.Projectiles)
+        {
+            @if (Game.IsEntityVisible(projectile, 32))
+            {
+                <div style="@projectile.EntityStyle">
+                    <img src="@projectile.SpritePath"
+                         style="width:100%; height:100%;"
+                         alt="@projectile.PlaceholderName" />
+                </div>
+            }
+        }
+
+        <!-- ? PART 2: Rally Point Flags -->
+        @foreach (var building in WarRegistry.Buildings)
+        {
+          
+    bool rallyIsPlayerOwned = building.OwnerPlayerIndex == 0;
+    bool rallyIsAlly = false;
+    
+    if (building.OwnerTeam == 0)
+    {
+        rallyIsAlly = false; // FFA
+    }
+    else if (Game.Players.Count > 0 && building.OwnerTeam == Game.Players[0].Team)
+    {
+        rallyIsAlly = true; // Team mode
+    }
+    else if (Game.Players.Count == 0 && building.Race == Game.PlayerFaction?.Race)
+    {
+        rallyIsAlly = true; // Legacy
+    }
+
+
+@if (building.HasCustomRallyPoint &&
+        (rallyIsPlayerOwned || rallyIsAlly) &&
+        Game.IsEntityVisible(building.RallyX, building.RallyY, 32, 32, 32))
+{
+                <div style="position:absolute;
+                            left:@(building.RallyX - 16)px;
+                            top:@(building.RallyY - 32)px;
+                            width:32px;
+                            height:32px;
+                            pointer-events:none;
+                            z-index:50;">
+                    <!-- Flag emoji or you can use a sprite -->
+                    <div class="rally-flag" style="font-size:28px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">
+                        ??
+                    </div>
+                </div>
+            }
+        }
+
+        <!-- Ghost Building (placement preview) -->
+        @if (Game.IsBuildMode && Game.GhostBuildingPosition != null)
+        {
+            var ghostClass = Game.IsGhostPlacementValid ? "ghost-valid" : "ghost-invalid";
+            var ghostColor = Game.IsGhostPlacementValid ? "rgba(0,255,0,0.3)" : "rgba(255,0,0,0.3)";
+            var borderColor = Game.IsGhostPlacementValid ? "#0F0" : "#F00";
+
+            int ghostSize = Game.BuildingToBuild switch
+            {
+                "Road" => 32,
+                "Farm" => 64,
+                "WoodenWall" => 32,     // ? NEW
+                "StoneWall" => 32,      // ? NEW
+                "WoodTower" => 64,      // ? NEW
+                "StoneTower" => 64,     // ? NEW
+                    "Church" => 96,         // ? NEW
+    "CultistHut" => 96,     // ? NEW
+                "Barracks" => 128,
+                "LumberMill" => 96,
+                "ArcheryRange" => 128,
+                "Blacksmith" => 96,
+                "Stables" => 64,      // ? NEW: 2x2 grid
+                "Pen" => 64,          // ? NEW: 2x2 grid
+                "KnightsHold" => 96,  // ? NEW: 2x2 grid
+                "RaiderLair" => 96,   // ? NEW: 2x2 grid
+                _ => 128
+            };
+
+            <div style="position:absolute;
+                left:@(Game.GhostBuildingPosition.Value.x)px;
+                top:@(Game.GhostBuildingPosition.Value.y)px;
+                width:@(ghostSize)px;
+                height:@(ghostSize)px;
+                border:3px dashed @borderColor;
+                background:@ghostColor;
+                pointer-events:none;
+                z-index:999;">
+
+                <!-- Show building sprite at 50% opacity -->
+                @if (Game.BuildingToBuild == "Barracks")
+                {
+                    <img src="@GetBuildingSprite()"
+                         style="width:100%; height:100%; opacity:0.5;" />
+                }
+
+                <!-- Show text indicator -->
+                <div style="position:absolute; bottom:-25px; left:0; right:0;
+                        text-align:center; color:@borderColor; font-weight:bold;">
+                    @(Game.IsGhostPlacementValid ? "? Valid" : "? Invalid")
+                </div>
+            </div>
+        }
+
+
+
+
+
+
+        </div>
+
+        @*
+    <div style="position:absolute; top:120px; right:10px; z-index:9999; display:flex; flex-direction:column; gap:10px;">
+        <button @onclick="ForceVictory"
+                style="padding:12px 20px; background:#0F0; color:#000; border:3px solid #0A0;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? FORCE VICTORY
+        </button>
+        <button @onclick="ForceDefeat"
+                style="padding:12px 20px; background:#F00; color:#FFF; border:3px solid #A00;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? FORCE DEFEAT
+        </button>
+
+        <!-- ? NEW: Kill All Orcs Button -->
+        <button @onclick="KillAllOrcs"
+                style="padding:12px 20px; background:#8B0000; color:#FFF; border:3px solid #FF0000;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? KILL ALL ORCS
+        </button>
+
+        <!-- ? NEW: Kill All Humans Button (for testing defeat) -->
+        <button @onclick="KillAllHumans"
+                style="padding:12px 20px; background:#000080; color:#FFF; border:3px solid #0000FF;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? KILL ALL HUMANS
+        </button>
+    </div>
+    <div style="position:absolute; top:120px; right:10px; z-index:9999; display:flex; flex-direction:column; gap:10px;">
+        <button @onclick="ForceVictory"
+                style="padding:12px 20px; background:#0F0; color:#000; border:3px solid #0A0;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? FORCE VICTORY
+        </button>
+        <button @onclick="ForceDefeat"
+                style="padding:12px 20px; background:#F00; color:#FFF; border:3px solid #A00;
+                       font-weight:bold; font-size:14px; cursor:pointer; border-radius:5px;">
+            ?? FORCE DEFEAT
+        </button>
+    </div>
+    *@
+
+
+
+
+    <WarUI @ref="warUI" />
+    <TechTree @ref="techTree" />
+    @* ? OPTIONAL: Fog of War Debug Indicator *@
+    @if (!Game.FogOfWarEnabled)
+    {
+        <div style="position:absolute; top:50px; right:10px;
+                    background:rgba(0,255,0,0.8); color:#000;
+                    padding:8px 12px; font-weight:bold; font-size:14px;
+                    border:2px solid #0F0; z-index:9999; pointer-events:none;">
+            FOG OF WAR: OFF (F3)
+        </div>
+    }
+    <!-- Debug Grid -->
+    @if (Game.ShowDebugGrid)
+    {
+        <div class="debug-grid">
+            @for (int x = 0; x < Game.GridWidth; x++)
+            {
+                for (int y = 0; y < Game.GridHeight; y++)
+                {
+                    <div style="position:absolute; left:@(x * 32)px; top:@(y * 32)px; width:32px; height:32px; border:1px solid rgba(255,255,255,0.1); pointer-events:none;"></div>
+                }
+            }
+        </div>
+
+    }
+    @if (Game.ShowDebugInfo)
+    {
+        int tilesRendered = Game.CachedVisibleTiles.Count;
+        <div class="debug-info">
+            <div>Camera: (@Game.CameraX, @Game.CameraY)</div>
+            <div>Buildings: @WarRegistry.Buildings.Count</div>
+            <div>Units: @WarRegistry.Units.Count</div>
+            <div>Gold: @Game.PlayerGold | Lumber: @Game.PlayerLumber</div>
+            <div>Selected: @(WarRegistry.SelectedBuilding?.PlaceholderName ?? WarRegistry.SelectedUnits.FirstOrDefault()?.PlaceholderName ?? "None")</div>
+            <!-- ADD THESE LINES -->
+                    int tilesRendered = Game.CachedVisibleTiles.Count;
+            ?? TILES: @tilesRendered / @(Game.TileMap.GridWidth* Game.TileMap.GridHeight)<br />
+            <div style="color: cyan">ViewportXpx: @Game.ViewportXpx</div>
+            <div style="color: cyan">ViewportYpx: @Game.ViewportYpx</div>
+            <!-- END NEW LINES -->
+
+            <div>Trees: @WarRegistry.Trees.Count</div>
+            <div>Gold Mines: @WarRegistry.GoldMines.Count</div>
+            <div>Last Click: (@lastClickWorldX, @lastClickWorldY)</div>
+            <div>Last Grid: (@lastClickGridX, @lastClickGridY)</div>
+            <div style="position:absolute; top:400px; right:10px; z-index:9999; background:rgba(0,0,0,0.8); color:#0F0; padding:10px; font-size:11px; max-height:300px; overflow-y:auto;">
+                <strong>?? UNIT OWNERSHIP DEBUG:</strong><br />
+                @foreach (var unit in WarRegistry.Units.Take(10))
+                {
+                    <div style="color: @(unit.OwnerPlayerIndex == 0 ? "#0F0" : "#F00")">
+                        @unit.PlaceholderName: Owner=@unit.OwnerPlayerIndex, Team=@unit.OwnerTeam, Race=@unit.Race
+                    </div>
+                }
+                <br />
+                <strong>?? BUILDING OWNERSHIP DEBUG:</strong><br />
+                @foreach (var building in WarRegistry.Buildings.Take(10))
+                {
+                    <div style="color: @(building.OwnerPlayerIndex == 0 ? "#0F0" : "#F00")">
+                        @building.PlaceholderName: Owner=@building.OwnerPlayerIndex, Team=@building.OwnerTeam, Race=@building.Race
+                    </div>
+                }
+            </div>
+            <!-- ADD SELECTION INFO -->
+            <div>
+                Selected: @(WarRegistry.SelectedBuilding?.PlaceholderName ??
+                            WarRegistry.SelectedUnits.FirstOrDefault()?.PlaceholderName ??
+                            "None")
+            </div>
+            <!-- END NEW LINE -->
+
+            <div style="color: @(Game.IsEdgeScrolling ? "#FF0" : "#0F0")">
+                Edge Scroll: @(Game.IsEdgeScrolling ? "ACTIVE" : "OFF")
+                @if (Game.ScrollingUp)
+                {
+                    <span> ?</span>
+                }
+                @if (Game.ScrollingDown)
+                {
+                    <span> ?</span>
+                }
+                @if (Game.ScrollingLeft)
+                {
+                    <span> ?</span>
+                }
+                @if (Game.ScrollingRight)
+                {
+                    <span> ?</span>
+                }
+            </div>
+        </div>
+        <!-- Draw Buildings -->
+        @foreach (var building in WarRegistry.Buildings)
+        {
+            <div style="
+                    position:absolute;
+                    left:@(building.PosX - Game.CameraX)px;
+                    top:@(building.PosY - Game.CameraY)px;
+                    width:@building.Width;
+                    height:@building.Height;
+                    border:2px solid rgba(0,255,0,0.7);
+                    pointer-events:none;">
+            </div>
+        }
+
+        <!-- Draw Units -->
+        @foreach (var unit in WarRegistry.Units)
+        {
+            <div style="
+                    position:absolute;
+                    left:@(unit.PosX - Game.CameraX)px;
+                    top:@(unit.PosY - Game.CameraY)px;
+                    width:@unit.Width;
+                    height:@unit.Height;
+                    border:2px solid rgba(0,0,255,0.7);
+                    pointer-events:none;">
+            </div>
+        }
+        <!-- Draw Click Boxes (red) -->
+        @foreach (var building in WarRegistry.Buildings)
+        {
+            <div style="
+                    position:absolute;
+                    left:@(building.PosX - Game.CameraX)px;
+                    top:@(building.PosY - Game.CameraY)px;
+                    width:@building.Width;
+                    height:@building.Height;
+                    border:2px dashed rgba(255,0,0,0.9);
+                    background:rgba(255,0,0,0.1);
+                    pointer-events:none;">
+                <span style="position:absolute; top:0; left:0; font-size:10px; color:#FFF;">@building.PlaceholderName</span>
+            </div>
+        }
+
+        @foreach (var unit in WarRegistry.Units)
+        {
+            <div style="
+                    position:absolute;
+                    left:@(unit.PosX - Game.CameraX)px;
+                    top:@(unit.PosY - Game.CameraY)px;
+                    width:@unit.Width;
+                    height:@unit.Height;
+                    border:2px dashed rgba(255,128,0,0.9);
+                    background:rgba(255,128,0,0.1);
+                    pointer-events:none;">
+                <span style="position:absolute; top:0; left:0; font-size:10px; color:#FFF;">@unit.PlaceholderName</span>
+            </div>
+        }
+        <!-- Hover Highlight for Clicked Entity -->
+        @if (hoveredBuilding != null)
+        {
+            <div style="
+                position:absolute;
+                left:@(hoveredBuilding.PosX - Game.CameraX)px;
+                top:@(hoveredBuilding.PosY - Game.CameraY)px;
+                width:@hoveredBuilding.Width;
+                height:@hoveredBuilding.Height;
+                border:3px solid yellow;
+                background:rgba(255,255,0,0.2);
+                pointer-events:none;
+                z-index:1000;">
+                <span style="position:absolute; top:0; left:0; font-size:12px; color:#000;">
+                    @hoveredBuilding.PlaceholderName
+                </span>
+            </div>
+        }
+
+        @if (hoveredUnit != null)
+        {
+            <div style="
+                position:absolute;
+                left:@(hoveredUnit.PosX - Game.CameraX)px;
+                top:@(hoveredUnit.PosY - Game.CameraY)px;
+                width:@hoveredUnit.Width;
+                height:@hoveredUnit.Height;
+                border:3px solid orange;
+                background:rgba(255,165,0,0.2);
+                pointer-events:none;
+                z-index:1000;">
+                <span style="position:absolute; top:0; left:0; font-size:12px; color:#000;">
+                    @hoveredUnit.PlaceholderName
+                </span>
+            </div>
+        }
+        <!-- DEBUG: Peasant -> Building Collision / Drop-off Overlay -->
+@foreach (var peasant in WarRegistry.Units.OfType<Peasant>())
+{
+    if (peasant.TargetTownHall != null)
+    {
+        var building = peasant.TargetTownHall;
+
+     
+          // Drop-off point rectangle (green)
+
+    if (peasant.TargetTownHall != null)
+    {
+        var b = peasant.TargetTownHall;
+
+        // Simple logic: drop at nearest edge to peasant
+        int dropX = peasant.PosX < b.PosX ? b.PosX - peasant.Width : 
+                    peasant.PosX > b.PosX + b.Width ? b.PosX + b.Width :
+                    peasant.PosX;
+
+        int dropY = peasant.PosY < b.PosY ? b.PosY - peasant.Height :
+                    peasant.PosY > b.PosY + b.Height ? b.PosY + b.Height :
+                    peasant.PosY;
+
+        <div style="
+            position:absolute;
+            left:@(dropX - Game.CameraX)px;
+            top:@(dropY - Game.CameraY)px;
+            width:@peasant.Width;
+            height:@peasant.Height;
+            border:2px solid lime;
+            background-color:rgba(0,255,0,0.2);
+            pointer-events:none;
+            z-index:10000;">
+        </div>
+    }
+
+        
+    }
+}
+
+
+    }
+
+    <!-- ? DRAG SELECTION BOX -->
+    @if (isDragging)
+    {
+        <div style="position: absolute;
+                    left: @(Math.Min(dragStartX, dragCurrentX) - Game.CameraX)px;
+                    top: @(Math.Min(dragStartY, dragCurrentY) - Game.CameraY)px;
+                    width: @(Math.Abs(dragCurrentX - dragStartX))px;
+                    height: @(Math.Abs(dragCurrentY - dragStartY))px;
+                    border: 2px dashed #0F0;
+                    background: rgba(0, 255, 0, 0.1);
+                    pointer-events: none;
+                    z-index: 999;">
+        </div>
+    }
+
+
+    @* ? SVG FOG OF WAR OVERLAY *@
+    @if (Game.FogOfWarEnabled)
+    {
+        var visionCircles = GetVisionCircles();
+
+        <svg width="1024" height="768"
+             style="position:absolute; top:0; left:0; pointer-events:none; z-index:100;">
+            <defs>
+                <mask id="fogMask">
+                    @* ? INVERTED: White = show fog, Black circles = clear vision *@
+                    <rect width="1024" height="768" fill="white" />
+
+                    @* Draw BLACK circles to "cut out" fog where vision is *@
+                    @foreach (var (x, y, radius) in visionCircles)
+                    {
+                        <circle cx="@x" cy="@y" r="@radius" fill="black" />
+                    }
+                </mask>
+            </defs>
+
+            @* Black fog with inverted mask applied *@
+            <rect width="1024" height="768" fill="black" opacity="0.7" mask="url(#fogMask)" />
+        </svg>
+    }
+    <button class="menu-btn" @onclick="ReturnToMenu">Menu</button>
+
+
+    <!-- Minimap -->
+    <div class="war-minimap"
+         @ref="minimapRef"
+         @onclick="HandleMinimapClick"
+         @onclick:stopPropagation="true"
+         @oncontextmenu="HandleMinimapRightClick"
+         @oncontextmenu:preventDefault="true"
+         @oncontextmenu:stopPropagation="true">
+        <div class="minimap-border">
+            @*
+            @foreach (var map in MapLibrary.AvailableMaps)
+            {
+                <img src="@map.PreviewPath" style="width:@(Game.MinimapSize)px; height:@(Game.MinimapSize)px;" alt="Minimap" />
+            }
+            *@
+            @*
+            <img src="@Game.CurrentMapTileset" style="width:@(Game.MinimapSize)px; height:@(Game.MinimapSize)px;" alt="Minimap" />
+            *@
+            <div class="minimap-camera" style="left:@(Game.MinimapCameraX)px; top:@(Game.MinimapCameraY)px; width:@(Game.MinimapCameraWidth)px; height:@(Game.MinimapCameraHeight)px;"></div>
+
+            @* ? NEW: Show player + allied buildings *@
+            @foreach (var building in WarRegistry.Buildings.Where(b => b.OwnerPlayerIndex == 0 || (b.OwnerTeam > 0 && Game.Players.Count > 0 && b.OwnerTeam == Game.Players[0].Team)))
+            {
+                int minimapX = (int)(building.PosX * Game.MinimapScale);
+                int minimapY = (int)(building.PosY * Game.MinimapScale);
+
+                <div class="minimap-player-building"
+                     style="left:@(minimapX)px; top:@(minimapY)px;">
+                </div>
+            }
+
+            @* ? NEW: Show player + allied units *@
+            @foreach (var unit in WarRegistry.Units.Where(u => (u.OwnerPlayerIndex == 0 || (u.OwnerTeam > 0 && Game.Players.Count > 0 && u.OwnerTeam == Game.Players[0].Team)) && u.State != UnitState.Dead))
+            {
+                int minimapX = (int)(unit.PosX * Game.MinimapScale);
+                int minimapY = (int)(unit.PosY * Game.MinimapScale);
+
+                <div class="minimap-player-unit"
+                     style="left:@(minimapX)px; top:@(minimapY)px;">
+                </div>
+            }
+
+            @* Keep selected units indicator (pulsing dot) *@
+            @foreach (var unit in WarRegistry.SelectedUnits)
+            {
+                int minimapUnitX = (int)(unit.PosX * Game.MinimapScale);
+                int minimapUnitY = (int)(unit.PosY * Game.MinimapScale);
+
+                <div class="minimap-selected-unit"
+                     style="left:@(minimapUnitX)px; top:@(minimapUnitY)px;">
+                </div>
+            }
+        </div>
+    </div>
+
+
+
+    <!-- ? VICTORY/DEFEAT OVERLAY -->
+    @if (Game.IsGameOver)
+    {
+        <div class="game-end-overlay">
+            <div class="game-end-panel">
+                <!-- Victory/Defeat Banner -->
+                <div class="game-end-title @(Game.GameEndState == "VICTORY" ? "victory" : "defeat")">
+                    @if (Game.GameEndState == "VICTORY")
+                    {
+                        <span>?? VICTORY! ??</span>
+                    }
+                    else
+                    {
+                        <span>?? DEFEAT ??</span>
+                    }
+                </div>
+
+    
+    <!-- ? PLAYER STATS -->
+    <h4 class="stats-section-title">Your Forces</h4>
+                    <div class="game-end-stats">
+                        <h3>Battle Statistics</h3>
+
+                        <div class="stats-scroll-container">
+                            <div class="stats-columns">
+                                <!-- ? LEFT COLUMN: PLAYER -->
+                                <div class="stats-column player-column">
+                                    <h4 class="column-header player">Your Forces</h4>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Units Trained:</span>
+                                        <span class="stat-value">@Game.UnitsTrainedCount</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Buildings Constructed:</span>
+                                        <span class="stat-value">@Game.BuildingsConstructedCount</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Units Remaining:</span>
+                                        <span class="stat-value">@GetPlayerUnitsCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Buildings Remaining:</span>
+                                        <span class="stat-value">@GetPlayerBuildingsCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Enemies Killed:</span>
+                                        <span class="stat-value">@Game.EnemyUnitsKilledCount</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Enemy Buildings Destroyed:</span>
+                                        <span class="stat-value">@Game.EnemyBuildingsDestroyedCount</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Gold Gathered:</span>
+                                        <span class="stat-value">@Game.TotalGoldGathered</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Lumber Gathered:</span>
+                                        <span class="stat-value">@Game.TotalLumberGathered</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Gold:</span>
+                                        <span class="stat-value">@Game.PlayerGold</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Lumber:</span>
+                                        <span class="stat-value">@Game.PlayerLumber</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Population:</span>
+                                        <span class="stat-value">@Game.PlayerCurrentPop / @Game.PlayerMaxPop</span>
+                                    </div>
+                                </div>
+
+                                <!-- ? RIGHT COLUMN: ENEMY -->
+                                <div class="stats-column enemy-column">
+                                    <h4 class="column-header enemy">Enemy Forces</h4>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Units Trained:</span>
+                                        <span class="stat-value enemy">@GetEnemyUnitsTrainedCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Buildings Constructed:</span>
+                                        <span class="stat-value enemy">@GetEnemyBuildingsConstructedCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Units Remaining:</span>
+                                        <span class="stat-value enemy">@GetEnemyUnitsCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Buildings Remaining:</span>
+                                        <span class="stat-value enemy">@GetEnemyBuildingsCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Player Units Killed:</span>
+                                        <span class="stat-value enemy">@GetPlayerUnitsKilledCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Player Buildings Destroyed:</span>
+                                        <span class="stat-value enemy">@GetPlayerBuildingsDestroyedCount()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Gold Gathered:</span>
+                                        <span class="stat-value enemy">@GetEnemyGoldGathered()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Lumber Gathered:</span>
+                                        <span class="stat-value enemy">@GetEnemyLumberGathered()</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Gold:</span>
+                                        <span class="stat-value enemy">@(Game.AIFaction?.Gold ?? 0)</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Lumber:</span>
+                                        <span class="stat-value enemy">@(Game.AIFaction?.Lumber ?? 0)</span>
+                                    </div>
+
+                                    <div class="stat-row">
+                                        <span class="stat-label">Final Population:</span>
+                                        <span class="stat-value enemy">@(Game.AIFaction?.CurrentPop ?? 0) / @(Game.AIFaction?.MaxPop ?? 0)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                       <!-- ? GAME INFO -->
+    <h4 class="stats-section-title">Match Info</h4>
+    <div class="stats-grid">
+        <div class="stat-item">
+            <span class="stat-label">Game Duration:</span>
+            <span class="stat-value">@FormatGameDuration()</span>
+        </div>
+        
+        <div class="stat-item">
+            <span class="stat-label">Map:</span>
+            <span class="stat-value">@(Game.CurrentMap?.MapName ?? "Unknown")</span>
+        </div>
+    </div>
+                    </div>
+
+
+                <!-- Return to Menu Button -->
+                <button class="game-end-button" @onclick="ReturnToMenu">
+                    Return to Main Menu
+                </button>
+</div>
+                
+
+
+
+
+            </div>
+        
+    }
+
+</div> <!-- End of .war-viewport -->
+
+
+
+<script>
+    window.getElementRect = (el) => {
+        const r = el.getBoundingClientRect();
+        return { left: r.left, top: r.top, width: r.width, height: r.height };
+    };
+
+    // ? NEW: Minimap-specific helper
+    window.getMinimapRect = (el) => {
+        const r = el.getBoundingClientRect();
+        return {
+            left: r.left,
+            top: r.top,
+            width: r.width,
+            height: r.height
+        };
+    };
+
+
+
+
+        // ? ADD: Cache the atlas image globally
+    window.cachedAtlasImage = null;
+    window.cachedAtlasPath = null;
+
+    window.drawTilesToCanvas = async (canvas, atlasPath, tileData) => {
+        const ctx = canvas.getContext('2d');
+
+        // ? Load and cache atlas image ONCE
+        if (!window.cachedAtlasImage || window.cachedAtlasPath !== atlasPath) {
+            const atlasImage = new Image();
+            atlasImage.src = atlasPath;
+
+            await new Promise((resolve, reject) => {
+                if (atlasImage.complete) {
+                    resolve();
+                } else {
+                    atlasImage.onload = resolve;
+                    atlasImage.onerror = reject;
+                }
+            });
+
+            window.cachedAtlasImage = atlasImage;
+            window.cachedAtlasPath = atlasPath;
+        }
+
+        // ? Now clear and redraw instantly (no loading delay)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        for (const tile of tileData) {
+            ctx.drawImage(
+                window.cachedAtlasImage,  // ? Use cached image
+                tile.atlasX, tile.atlasY, 32, 32,
+                tile.x, tile.y, 32, 32
+            );
+        }
+    };
+
+
+</script>
+
+
+

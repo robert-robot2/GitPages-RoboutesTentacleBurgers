@@ -1,0 +1,202 @@
+@* ============================================================
+   AffinityDisplay.razor
+   AntigenHunter — Results Summary Panel
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+@* ============================================================
+   AffinityDisplay.razor
+   AntigenHunter — Results Summary Panel
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+@* TEMP DEBUG — remove after confirming *@
+@if (Result != null)
+{
+    <div style="color:lime; font-family:monospace; font-size:0.8rem; padding:8px; background:#0a1820; border:1px solid #0e3a52; border-radius:4px; margin-bottom:8px">
+        ✅ Result exists |
+        IsComplete: @Result.IsComplete |
+        HasError: @Result.HasError |
+        Error: "@Result.ErrorMessage" |
+        Generations: @Result.GenerationsCompleted |
+        BestNm: @Result.BestAffinityNm
+    </div>
+}
+else
+{
+    <div style="color:orange; font-family:monospace; font-size:0.8rem; padding:8px; background:#0a1820; border:1px solid #0e3a52; border-radius:4px; margin-bottom:8px">
+        ⚠️ Result is NULL
+    </div>
+}
+
+@if (Result != null && Result.IsComplete)
+{
+    <div class="ah-animate-in">
+
+        @* ── Score Summary ────────────────────────────────── *@
+        <div class="ah-results-summary">
+            <div class="ah-result-stat ah-result-stat--original">
+                <div class="ah-result-stat__label">Original Affinity</div>
+                <div class="ah-result-stat__value">
+                    @Result.StartingAffinityDisplay
+                </div>
+            </div>
+            <div class="ah-result-stat ah-result-stat--best">
+                <div class="ah-result-stat__label">Best Achieved</div>
+                <div class="ah-result-stat__value">
+                    @Result.BestAffinityDisplay
+                </div>
+            </div>
+            <div class="ah-result-stat ah-result-stat--improvement">
+                <div class="ah-result-stat__label">Fold Improvement</div>
+                <div class="ah-result-stat__value">
+                    @Result.FoldImprovementDisplay
+                    @if (Result.AchievedImprovement)
+                    {
+                        <span style="font-size:1rem;margin-left:6px">✅</span>
+                    }
+                </div>
+            </div>
+        </div>
+
+        @* ── Summary Text ─────────────────────────────────── *@
+        <div class="ah-text-sm ah-mt-sm ah-mb-md"
+             style="color:var(--text-secondary);font-style:italic">
+            @Result.SummaryText
+        </div>
+
+        @* ── Chart ────────────────────────────────────────── *@
+        <AffinityChart ChartPoints="Result.ChartPoints"
+                       StartNm="Result.StartingAffinityNm"
+                       BestNm="Result.BestAffinityNm"
+                       BestGeneration="Result.BestAffinityGeneration"
+                       FoldImprovement="Result.FoldImprovement" />
+
+        @* ── Optimized Sequence ───────────────────────────── *@
+        <div class="ah-mt-lg">
+            <div class="ah-flex-between ah-mb-sm">
+                <div class="ah-label">🧬 Optimized Sequence</div>
+                <div class="ah-flex-wrap" style="gap:6px">
+                    <button class="ah-btn ah-btn--ghost ah-btn--sm"
+                            @onclick="CopySequence"
+                            type="button">
+                        @(_copied ? "✅ Copied!" : "📋 Copy")
+                    </button>
+                    <button class="ah-btn ah-btn--danger ah-btn--sm"
+                            @onclick="OnReset"
+                            type="button">
+                        ↩ Reset
+                    </button>
+                </div>
+            </div>
+
+            <SequenceHighlighter Sequence="Result.BestSequence"
+                                 ShowLegend="true"
+                                 ShowStats="true" />
+        </div>
+
+        @* ── Mutation Diff ────────────────────────────────── *@
+        @{
+            var diffs = Result.GetSequenceDiff();
+        }
+        @if (diffs.Any())
+        {
+            <div class="ah-mt-md">
+                <div class="ah-label">🔬 Key Changes from Original</div>
+                <div class="ah-flex-wrap ah-mt-sm">
+                    @foreach (var (pos, from, to, region) in diffs.Take(10))
+                    {
+                        <span class="ah-badge ah-badge--cyan"
+                              title="@region">
+                            @from → @to @(pos + 1)
+                        </span>
+                    }
+                    @if (diffs.Count > 10)
+                    {
+                        <span class="ah-badge ah-badge--muted">
+                            +@(diffs.Count - 10) more
+                        </span>
+                    }
+                </div>
+            </div>
+        }
+
+        @* ── Run Stats ────────────────────────────────────── *@
+        <div class="ah-mt-md">
+            <div class="ah-flex-wrap">
+                <span class="ah-badge ah-badge--muted">
+                    ⏱ @Result.Duration.TotalSeconds.ToString("F1")s
+                </span>
+                <span class="ah-badge ah-badge--muted">
+                    @Result.GenerationsCompleted rounds
+                </span>
+                <span class="ah-badge ah-badge--muted">
+                    @Result.TotalAcceptedMutations accepted mutations
+                </span>
+                <span class="ah-badge ah-badge--cyan">
+                    Most active: @Result.MostMutatedRegion
+                </span>
+                @if (Result.BestSingleMutation != null)
+                {
+                    <span class="ah-badge ah-badge--gold">
+                        Best single: @Result.BestSingleMutation.Notation
+                    </span>
+                }
+            </div>
+        </div>
+
+    </div>
+}
+else if (IsRunning)
+{
+    <div class="ah-progress">
+        <div class="ah-progress__label">
+            <span>Running simulation...</span>
+            <span>@ProgressPercent%</span>
+        </div>
+        <div class="ah-progress__bar-track">
+            <div class="ah-progress__bar-fill"
+                 style="width:@ProgressPercent%"></div>
+        </div>
+        <div class="ah-status">
+            <span class="ah-status__dot ah-status__dot--active"></span>
+            <span>@StatusMessage</span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="ah-empty">
+        <div class="ah-empty__icon">📊</div>
+        <div class="ah-empty__text">
+            Results will appear here after the simulation runs
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public SimulationRunResult? Result    { get; set; }
+    [Parameter] public bool IsRunning                 { get; set; }
+    [Parameter] public int  ProgressPercent           { get; set; }
+    [Parameter] public string StatusMessage           { get; set; } = string.Empty;
+    [Parameter] public EventCallback OnResetClicked   { get; set; }
+
+    private bool _copied;
+
+    private async Task CopySequence()
+    {
+        if (Result?.BestSequence == null) return;
+        // Note: JSInterop copy can be wired up in host page
+        _copied = true;
+        await Task.Delay(2000);
+        _copied = false;
+        StateHasChanged();
+    }
+
+    private async Task OnReset() =>
+        await OnResetClicked.InvokeAsync();
+}

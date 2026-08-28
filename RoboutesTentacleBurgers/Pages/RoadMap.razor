@@ -1,0 +1,466 @@
+@page "/roadmap"
+
+<PageTitle>SpectralX Engine — Roadmap</PageTitle>
+
+<div class="roadmap-root">
+
+    <!-- ── HEADER ─────────────────────────────────────────────────────────── -->
+    <div class="rm-header">
+        <div class="rm-header-bg"></div>
+        <div class="rm-header-content">
+            <div class="rm-eyebrow">Robert Chilewski · 2026</div>
+            <h1 class="rm-title">SpectralX Engine</h1>
+            <div class="rm-subtitle">WebGL2 · C# · Blazor WASM · Built From Scratch</div>
+            <div class="rm-links">
+              <a href="https://github.com/robert-robot2" target="_blank" class="rm-link">⚙ GitHub</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PROGRESS BAR ───────────────────────────────────────────────────── -->
+    <div class="rm-progress-section">
+        <div class="rm-stats-row">
+            <div class="rm-stat rm-stat-green">
+                <div class="rm-stat-val">85%</div>
+                <div class="rm-stat-lbl">Complete</div>
+            </div>
+        
+            <div class="rm-stat rm-stat-purple">
+                <div class="rm-stat-val">26</div>
+                <div class="rm-stat-lbl">Systems Shipped</div>
+            </div>
+            <div class="rm-stat rm-stat-red">
+                <div class="rm-stat-val">11</div>
+                <div class="rm-stat-lbl">On Roadmap</div>
+            </div>
+        </div>
+        <div class="rm-bar-wrap">
+            <div class="rm-bar-track">
+                <div class="rm-bar-fill" style="width:75%">
+                    <span class="rm-bar-label">81% — Phase 1 Complete</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── PHASE 1 — SHIPPED ──────────────────────────────────────────────── -->
+    <div class="rm-section">
+        <div class="rm-section-header rm-green-header">
+            <span class="rm-section-icon">✅</span>
+            <div>
+                <div class="rm-section-title">Phase 1 — Shipped</div>
+                <div class="rm-section-meta">85% Complete</div>
+            </div>
+        </div>
+
+        <div class="rm-table-wrap">
+            <table class="rm-table">
+                <thead>
+                    <tr class="rm-thead-green">
+                        <th class="rm-th rm-th-num">#</th>
+                        <th class="rm-th">Feature</th>
+                        <th class="rm-th rm-hide-sm">Detail</th>
+                        <th class="rm-th rm-th-hrs">Est. Hours</th>
+                        <th class="rm-th rm-th-status">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (item, idx) in ShippedItems.Select((x, i) => (x, i)))
+                    {
+                        <tr class="@(idx % 2 == 0 ? "rm-row-even" : "rm-row-odd")">
+                            <td class="rm-td rm-td-num rm-num-green">@item.Num</td>
+                            <td class="rm-td rm-td-feature">@item.Feature</td>
+                            <td class="rm-td rm-td-detail rm-hide-sm">@item.Detail</td>
+                            <td class="rm-td rm-td-hrs rm-hrs-green">@item.Hours</td>
+                            <td class="rm-td rm-td-status"><span class="rm-badge rm-badge-done">✅ DONE</span></td>
+                        </tr>
+                    }
+                    <tr class="rm-total-row">
+                        <td colspan="3" class="rm-td rm-total-label">PHASE 1 TOTAL</td>
+                        <td class="rm-td rm-total-val rm-hrs-green">~428 hrs</td>
+                
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── PHASE 2 — ROADMAP ──────────────────────────────────────────────── -->
+    <div class="rm-section">
+        <div class="rm-section-header rm-orange-header">
+            <span class="rm-section-icon">🔧</span>
+            <div>
+                <div class="rm-section-title">Phase 2 — Roadmap to 90%</div>
+                <div class="rm-section-meta">~408 hrs · Est. 2 months side-time · Targets 90–95% professional complete</div>
+            </div>
+        </div>
+
+        <div class="rm-table-wrap">
+            <table class="rm-table">
+                <thead>
+                    <tr class="rm-thead-orange">
+                        <th class="rm-th rm-th-num">#</th>
+                        <th class="rm-th">Feature</th>
+                        <th class="rm-th rm-hide-sm">Detail</th>
+                        <th class="rm-th rm-th-hrs">Est. Hours</th>
+                        <th class="rm-th rm-th-hrs rm-hide-sm">Side-Time</th>
+                        <th class="rm-th rm-th-status">Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var (item, idx) in RoadmapItems.Select((x, i) => (x, i)))
+                    {
+                        <tr class="@(idx % 2 == 0 ? "rm-row-even" : "rm-row-odd")">
+                            <td class="rm-td rm-td-num rm-num-orange">@item.Num</td>
+                            <td class="rm-td rm-td-feature">@item.Feature</td>
+                            <td class="rm-td rm-td-detail rm-hide-sm">@item.Detail</td>
+                            <td class="rm-td rm-td-hrs rm-hrs-orange">@item.Hours</td>
+                            <td class="rm-td rm-td-hrs rm-hide-sm" style="color:#888">@item.SideTime</td>
+                            <td class="rm-td rm-td-status">
+                                <span class="rm-badge @item.PriorityClass">@item.Priority</span>
+                            </td>
+                        </tr>
+                    }
+                    <tr class="rm-total-row">
+                        <td colspan="3" class="rm-td rm-total-label">PHASE 2 TOTAL</td>
+                        <td class="rm-td rm-total-val rm-hrs-orange">~408 hrs</td>
+                        <td class="rm-td rm-hide-sm" style="color:#888">~2 months</td>
+                        <td class="rm-td rm-total-status"><span class="rm-badge rm-badge-pending">🔧 PENDING</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ── NOTES ──────────────────────────────────────────────────────────── -->
+    <div class="rm-section">
+        <div class="rm-section-header rm-blue-header">
+            <span class="rm-section-icon">📋</span>
+            <div>
+                <div class="rm-section-title">Notes</div>
+                <div class="rm-section-meta">Priority guide and implementation notes</div>
+            </div>
+        </div>
+        <div class="rm-notes-grid">
+            <div class="rm-note rm-note-red">
+                <div class="rm-note-title">🔴 STL / OBJ Loader — Do First</div>
+                <div class="rm-note-body">Binary STL is trivial to parse (~8 hrs) and plugs directly into the existing upload/render pipeline. Highest priority single item — directly targets medical device visualization use cases (prosthetics CAD, orthotics tooling). Do this before anything else.</div>
+            </div>
+            <div class="rm-note rm-note-orange">
+                <div class="rm-note-title">🟠 Skeletal Animation — Hardest Item</div>
+                <div class="rm-note-body">Bone hierarchy, inverse kinematics, blend trees, and skinned mesh GPU deformation. Realistically 80+ hrs even at full grind pace. This is the single most complex remaining system — plan accordingly.</div>
+            </div>
+            <div class="rm-note rm-note-blue">
+                <div class="rm-note-title">🟡 PBR + SSAO — Biggest Visual Jump</div>
+                <div class="rm-note-body">PBR materials (metallic/roughness/normal maps) combined with SSAO (contact shadow crevices) produce the largest single visual quality improvement per hour invested. These two together move the engine from "impressive" to "production AAA quality" on surface rendering.</div>
+            </div>
+            <div class="rm-note rm-note-green">
+                <div class="rm-note-title">🟢 90% vs 95% Target</div>
+                <div class="rm-note-body">Completing roadmap items 01–10 reaches ~90% professional complete. Items 11–13 (SSGI, frustum culling, occlusion culling) push toward 95%+ and make the engine genuinely Unreal Engine web-competitive on every measurable axis.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ── FOOTER ─────────────────────────────────────────────────────────── -->
+    <div class="rm-footer">
+        <div>SpectralX Engine · Robert Chilewski · Warrington PA · robertchilewski83@gmail.com</div>
+        <div style="margin-top:6px; opacity:0.6; font-size:0.8rem;"></div>
+    </div>
+
+</div>
+
+@code {
+
+    record ShippedItem(string Num, string Feature, string Detail, string Hours);
+    record RoadmapItem(string Num, string Feature, string Detail, string Hours, string SideTime, string Priority, string PriorityClass);
+
+    List<ShippedItem> ShippedItems = new()
+    {
+        new("01", "WebGL2 Engine Core",       "C#/Blazor WASM, no frameworks, full render loop",             "80 hrs"),
+        new("02", "Shadow System",            "PCF + PCSS + 3 original SpecXS algorithms (V1/V2/V3)",        "60 hrs"),
+        new("03", "Anti-Aliasing Pipeline",   "FXAA, SMAA, TAA + 3 original SpectralAA algorithms",          "50 hrs"),
+        new("04", "GPU Tilemap / Terrain",    "512×512 dynamic heights, normals, 6-material paint system",   "40 hrs"),
+        new("05", "Sky / Sun / Moon System",  "Day-night cycle, sun disk, scatter, cloud + star layers",     "30 hrs"),
+        new("06", "Instanced Particles",      "5,000+ billboard particles, per-instance color/size/offset",  "20 hrs"),
+        new("07", "Instanced Foliage",        "Grass, trees, bushes — multi-material instanced draw",        "20 hrs"),
+        new("08", "SDF Text Rendering",       "MSDF atlas, glow, outline, CSS-style shadow blur passes",     "25 hrs"),
+        new("09", "FBX Asset Pipeline",       "Multi-material, UV mapping, normals, triangulation",          "30 hrs"),
+        new("10", "32-Light System",          "Point, spot, area, directional + per-light shadow maps",      "25 hrs"),
+        new("11", "Portal Scene Switching",   "Trigger-based scene swap, full GPU + state reset",            "10 hrs"),
+        new("12", "Gamepad Input",            "Analog movement, look, full controller support",              "8 hrs"),
+        new("13", "4 Live Azure Scenes",      "1M vert scene, instant load, 10,000+ FPS benchmark",         "20 hrs"),
+        new("14", "Sprite Sheet Animation",   "UV offset animation, frame timing, portal effects",           "10 hrs"),
+        new("15", "STL / OBJ Loader",       "Binary STL parser → existing render pipeline",            "1 hrs/4/4/26"),
+        new("16", "GLTF 2.0 / GLB Loader",       "GLTF 2.0 / GLB Mesh Support Imports from Blender",            "1 hrs/4/4/26"),
+        new("17", "Single Engine Source Fusion",       "Supports infinite canvas Scenes/Transitions of all Sizes on infinite pages.",            "20 hrs/4/30/26"),
+        new("18", "Full 2d Animation State Machine Support",       "Supports all 2d Animations and Animation States",            "20 hrs/5/2/26"),
+        new("19", "Frustum Culling",        "Skip draw calls for off-screen geometry", "2 hrs/5/6/26"),
+        new("20", "Destruction Culling",      "Attempted occlusion culling that just destroy objects to no intent", "1 hrs/5/28/26"),
+         new("21", "HRDI Skyspheres",      "Max 16k HDRI Textured skyspheres", "20 hrs/6/15/26"),
+          new("22", "GPU Per Pixel Splat Maps",      "Infinite texture layer array 4RGBA channel Splat Maps", "1 hrs/6/15/26"),
+               new("23", "LandScape PBR materials",      "", "1 hrs/7/15/26"),
+                    new("24", "Inifinte scene transitrion array",      "", "1 hrs/7/15/26"),
+                        new("25", "Camera system overhaul Now supports full blender camera modes ortho orbit, Plus Freecam",      "", "1 hrs/7/15/26"),
+                             new("25", "WebGPU Hybrid Mod architecture",      "Supports Text System overlay", "1 hrs/7/24/26"),
+                                  new("26", "WebGPU Particle System",      "", "1 hrs/7/24/26"),
+    };
+
+    List<RoadmapItem> RoadmapItems = new()
+    {
+      
+        new("02", "Skeletal Animation",     "Bone rigs, skinned mesh deformation, blend trees",         "80 hrs",  "3–4 weeks", "🔴 HIGH",    "rm-badge-high"),
+        new("03", "Metahuman Support",      "Rigged character pipeline, morph targets",                 "60 hrs",  "2–3 weeks", "🔴 HIGH",    "rm-badge-high"),
+        new("04", "PBR Materials",          "Metallic/roughness/normal map fragment shader upgrade",    "40 hrs",  "1–2 weeks", "🟠 HIGH",    "rm-badge-med-high"),
+        new("05", "Normal Mapping",         "Tangent-space normals, TBN matrix in vertex shader",       "16 hrs",  "2–3 days",  "🟠 HIGH",    "rm-badge-med-high"),
+        new("06", "SSAO",                   "Screen-space ambient occlusion, contact shadow crevices",  "24 hrs",  "3–5 days",  "🟠 HIGH",    "rm-badge-med-high"),
+        new("07", "Bloom",                  "Emissive bleed post-pass, threshold + blur chain",         "16 hrs",  "2–3 days",  "🟡 MED",     "rm-badge-medium"),
+        new("08", "Tone Mapping / HDR",     "ACES / Reinhard, prevents washed bright scenes",           "8 hrs",   "1 day",     "🟡 MED",     "rm-badge-medium"),
+        new("09", "Volumetric Lighting",    "God rays, ray-march fragment shader, uses shadow maps",    "40 hrs",  "1–2 weeks", "🟡 MED",     "rm-badge-medium"),
+        new("10", "SSR",                    "Screen-space reflections, depth buffer ray trace",         "32 hrs",  "1 week",    "🟡 MED",     "rm-badge-medium"),
+        new("11", "SSGI",                   "Screen-space global illumination, bounce light",           "48 hrs",  "1–2 weeks", "🟢 ADV",     "rm-badge-adv"),     
+        new("13", "Occlusion Culling",      "Skip geometry hidden behind other meshes",                 "24 hrs",  "3–5 days",  "🟢 OPT",     "rm-badge-adv"),
+    };
+}
+
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    .roadmap-root {
+        font-family: 'Syne', sans-serif;
+        background: #0a0e1a;
+        color: #e8eaf0;
+        min-height: 100vh;
+        padding: 0 0 60px 0;
+    }
+
+    /* ── HEADER ────────────────────────────────────────────────────────────── */
+    .rm-header {
+        position: relative;
+        overflow: hidden;
+        padding: 64px 48px 52px;
+        background: linear-gradient(135deg, #0d1526 0%, #0a1230 50%, #111827 100%);
+        border-bottom: 1px solid #1e2d4a;
+    }
+    .rm-header-bg {
+        position: absolute; inset: 0;
+        background:
+            radial-gradient(ellipse 60% 80% at 80% 50%, rgba(30,120,255,0.07) 0%, transparent 70%),
+            radial-gradient(ellipse 40% 60% at 10% 80%, rgba(255,120,30,0.05) 0%, transparent 70%);
+        pointer-events: none;
+    }
+    .rm-header-content { position: relative; z-index: 1; max-width: 960px; }
+    .rm-eyebrow {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; letter-spacing: 0.18em;
+        color: #4a7fc1; text-transform: uppercase; margin-bottom: 12px;
+    }
+    .rm-title {
+        font-size: clamp(2.4rem, 5vw, 4rem);
+        font-weight: 800; letter-spacing: -0.02em;
+        color: #ffffff; margin: 0 0 10px;
+        text-shadow: 0 0 60px rgba(50,140,255,0.3);
+    }
+    .rm-subtitle {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.9rem; color: #5a7fa8; margin-bottom: 24px;
+        letter-spacing: 0.05em;
+    }
+    .rm-links { display: flex; gap: 16px; flex-wrap: wrap; }
+    .rm-link {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.8rem; color: #4a9eff;
+        text-decoration: none; padding: 6px 16px;
+        border: 1px solid #1e3a5f; border-radius: 4px;
+        background: rgba(30,90,180,0.1);
+        transition: all 0.2s;
+    }
+    .rm-link:hover { background: rgba(30,90,180,0.25); border-color: #4a9eff; color: #80bfff; }
+
+    /* ── PROGRESS ──────────────────────────────────────────────────────────── */
+    .rm-progress-section {
+        padding: 32px 48px;
+        background: #0d1220;
+        border-bottom: 1px solid #1a2540;
+    }
+    .rm-stats-row {
+        display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px;
+    }
+    .rm-stat {
+        flex: 1; min-width: 100px;
+        padding: 16px 20px; border-radius: 8px;
+        text-align: center; border: 1px solid transparent;
+    }
+    .rm-stat-val {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 1.6rem; font-weight: 600; line-height: 1;
+    }
+    .rm-stat-lbl {
+        font-size: 0.7rem; text-transform: uppercase;
+        letter-spacing: 0.1em; margin-top: 6px; opacity: 0.7;
+    }
+    .rm-stat-green  { background: rgba(30,113,69,0.15);  border-color: rgba(30,113,69,0.3);  }
+    .rm-stat-green .rm-stat-val  { color: #4dbb80; }
+    .rm-stat-blue   { background: rgba(30,78,180,0.15);  border-color: rgba(30,78,180,0.3);  }
+    .rm-stat-blue .rm-stat-val   { color: #4a9eff; }
+    .rm-stat-orange { background: rgba(197,90,17,0.15);  border-color: rgba(197,90,17,0.3);  }
+    .rm-stat-orange .rm-stat-val { color: #ff8c42; }
+    .rm-stat-gray   { background: rgba(80,90,110,0.15);  border-color: rgba(80,90,110,0.3);  }
+    .rm-stat-gray .rm-stat-val   { color: #a0aec0; }
+    .rm-stat-purple { background: rgba(120,60,200,0.15); border-color: rgba(120,60,200,0.3); }
+    .rm-stat-purple .rm-stat-val { color: #b488ff; }
+    .rm-stat-red    { background: rgba(180,40,40,0.15);  border-color: rgba(180,40,40,0.3);  }
+    .rm-stat-red .rm-stat-val    { color: #ff6b6b; }
+
+    .rm-bar-wrap { max-width: 100%; }
+    .rm-bar-track {
+        background: #1a2540; border-radius: 6px;
+        height: 32px; overflow: hidden;
+        border: 1px solid #243050;
+    }
+    .rm-bar-fill {
+        height: 100%; border-radius: 6px;
+        background: linear-gradient(90deg, #1a6b3c 0%, #28a060 60%, #4dbb80 100%);
+        display: flex; align-items: center; justify-content: flex-end;
+        padding-right: 16px;
+        box-shadow: 0 0 20px rgba(40,160,96,0.4);
+        transition: width 1s ease;
+    }
+    .rm-bar-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; font-weight: 600;
+        color: #fff; letter-spacing: 0.05em;
+    }
+
+    /* ── SECTION ───────────────────────────────────────────────────────────── */
+    .rm-section { padding: 40px 48px; max-width: 1400px; margin: 0 auto; }
+
+    .rm-section-header {
+        display: flex; align-items: center; gap: 20px;
+        padding: 20px 28px; border-radius: 10px;
+        margin-bottom: 24px; border-left: 4px solid transparent;
+    }
+    .rm-green-header  { background: rgba(30,113,69,0.12);  border-color: #28a060; }
+    .rm-orange-header { background: rgba(197,90,17,0.12);  border-color: #ff8c42; }
+    .rm-blue-header   { background: rgba(30,78,180,0.12);  border-color: #4a9eff; }
+
+    .rm-section-icon { font-size: 1.8rem; }
+    .rm-section-title {
+        font-size: 1.25rem; font-weight: 700; letter-spacing: -0.01em;
+        color: #e8eaf0;
+    }
+    .rm-section-meta {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem; color: #5a7fa8;
+        letter-spacing: 0.05em; margin-top: 4px;
+    }
+
+    /* ── TABLE ─────────────────────────────────────────────────────────────── */
+    .rm-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid #1a2540; }
+    .rm-table {
+        width: 100%; border-collapse: collapse;
+        font-size: 0.88rem;
+    }
+
+    .rm-thead-green th { background: #0f2a1a; color: #4dbb80; }
+    .rm-thead-orange th { background: #1e1208; color: #ff8c42; }
+    .rm-th {
+        padding: 14px 16px; text-align: left;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.72rem; font-weight: 600;
+        letter-spacing: 0.1em; text-transform: uppercase;
+        border-bottom: 1px solid #1a2540;
+        white-space: nowrap;
+    }
+    .rm-th-num    { width: 48px; text-align: center; }
+    .rm-th-hrs    { width: 100px; text-align: center; }
+    .rm-th-status { width: 120px; text-align: center; }
+
+    .rm-row-even { background: #0d1220; }
+    .rm-row-odd  { background: #0a0e1a; }
+    .rm-row-even:hover, .rm-row-odd:hover { background: #121928; }
+
+    .rm-td {
+        padding: 13px 16px;
+        border-bottom: 1px solid #141e30;
+        vertical-align: middle;
+    }
+    .rm-td-num    { text-align: center; }
+    .rm-td-feature {
+        font-weight: 600; color: #c8d4e8;
+        white-space: nowrap;
+    }
+    .rm-td-detail { color: #5a7090; font-size: 0.82rem; }
+    .rm-td-hrs    { text-align: center; white-space: nowrap; }
+    .rm-td-status { text-align: center; }
+
+    .rm-num-green  { font-family: 'JetBrains Mono', monospace; color: #28a060; font-weight: 600; }
+    .rm-num-orange { font-family: 'JetBrains Mono', monospace; color: #ff8c42; font-weight: 600; }
+    .rm-hrs-green  { font-family: 'JetBrains Mono', monospace; color: #4dbb80; font-weight: 600; }
+    .rm-hrs-orange { font-family: 'JetBrains Mono', monospace; color: #ff8c42; font-weight: 600; }
+
+    .rm-total-row {
+        background: #0f1a2e !important;
+        border-top: 2px solid #1e3050;
+    }
+    .rm-total-label {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; font-weight: 700;
+        letter-spacing: 0.12em; color: #5a7fa8;
+        text-transform: uppercase;
+    }
+    .rm-total-val {
+        text-align: center; font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+    }
+    .rm-total-status { text-align: center; }
+
+    /* ── BADGES ────────────────────────────────────────────────────────────── */
+    .rm-badge {
+        display: inline-block; padding: 4px 10px;
+        border-radius: 4px; font-size: 0.7rem; font-weight: 700;
+        font-family: 'JetBrains Mono', monospace;
+        letter-spacing: 0.05em; white-space: nowrap;
+    }
+    .rm-badge-done     { background: rgba(40,160,96,0.2);  color: #4dbb80; border: 1px solid rgba(40,160,96,0.4); }
+    .rm-badge-pending  { background: rgba(90,100,130,0.2); color: #8090b0; border: 1px solid rgba(90,100,130,0.4); }
+    .rm-badge-first    { background: rgba(220,50,50,0.2);  color: #ff6b6b; border: 1px solid rgba(220,50,50,0.5); }
+    .rm-badge-high     { background: rgba(180,40,40,0.2);  color: #ff8080; border: 1px solid rgba(180,40,40,0.4); }
+    .rm-badge-med-high { background: rgba(197,90,17,0.2);  color: #ff8c42; border: 1px solid rgba(197,90,17,0.4); }
+    .rm-badge-medium   { background: rgba(180,160,20,0.2); color: #d4c040; border: 1px solid rgba(180,160,20,0.4); }
+    .rm-badge-adv      { background: rgba(30,160,80,0.15); color: #50c080; border: 1px solid rgba(30,160,80,0.3); }
+
+    /* ── NOTES ─────────────────────────────────────────────────────────────── */
+    .rm-notes-grid {
+        display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+    .rm-note {
+        padding: 20px 24px; border-radius: 10px;
+        border: 1px solid transparent;
+    }
+    .rm-note-red    { background: rgba(180,40,40,0.08);   border-color: rgba(180,40,40,0.2); }
+    .rm-note-orange { background: rgba(197,90,17,0.08);   border-color: rgba(197,90,17,0.2); }
+    .rm-note-blue   { background: rgba(30,78,180,0.08);   border-color: rgba(30,78,180,0.2); }
+    .rm-note-green  { background: rgba(30,113,69,0.08);   border-color: rgba(30,113,69,0.2); }
+    .rm-note-title  { font-weight: 700; font-size: 0.9rem; margin-bottom: 10px; color: #c8d4e8; }
+    .rm-note-body   { font-size: 0.82rem; color: #5a7090; line-height: 1.65; }
+
+    /* ── FOOTER ────────────────────────────────────────────────────────────── */
+    .rm-footer {
+        text-align: center; padding: 32px 48px 24px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 0.75rem; color: #2a3a5a;
+        border-top: 1px solid #141e30;
+        letter-spacing: 0.05em;
+    }
+
+    /* ── RESPONSIVE ────────────────────────────────────────────────────────── */
+    @@media (max-width: 768px) {
+        .rm-header, .rm-progress-section, .rm-section { padding: 24px 20px; }
+        .rm-hide-sm { display: none; }
+        .rm-stats-row { gap: 10px; }
+        .rm-stat { padding: 12px 10px; }
+        .rm-stat-val { font-size: 1.2rem; }
+    }
+</style>
+

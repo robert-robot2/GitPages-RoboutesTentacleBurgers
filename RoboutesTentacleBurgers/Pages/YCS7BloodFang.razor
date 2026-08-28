@@ -1,0 +1,1053 @@
+﻿
+@page "/YCS7BloodFang"
+<style>
+    @@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0
+    }
+
+    :root {
+        --red: #ff1a1a;
+        --red-dim: #990000;
+        --red-glow: #ff1a1a44;
+        --red-dark: #1a0000;
+        --bg: #000;
+        --panel: #0a0000;
+        --panel2: #110000;
+        --border: #330000;
+        --border-bright: #660000;
+        --font: 'Share Tech Mono',monospace;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--red);
+        font-family: var(--font);
+        font-size: 11px;
+        overflow-x: hidden
+    }
+
+    .deck {
+        display: grid;
+        grid-template-columns: 1fr 2fr 1fr;
+        grid-template-rows: auto auto auto;
+        gap: 4px;
+        padding: 4px;
+        min-height: 100vh
+    }
+
+    .hdr {
+        grid-column: 1/-1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--red-dim);
+        padding: 4px 8px;
+        background: var(--panel)
+    }
+
+    .hdr-title {
+        font-size: 15px;
+        letter-spacing: 3px;
+        text-shadow: 0 0 8px var(--red)
+    }
+
+    .hdr-glyphs {
+        font-size: 18px;
+        letter-spacing: 6px;
+        opacity: .7;
+        filter: drop-shadow(0 0 4px var(--red))
+    }
+
+    .status-bar {
+        display: flex;
+        gap: 12px;
+        font-size: 10px;
+        color: var(--red-dim)
+    }
+
+        .status-bar span {
+            color: var(--red)
+        }
+
+    .left-col {
+        display: grid;
+        grid-template-rows: repeat(4,1fr);
+        gap: 4px
+    }
+
+    .center-col {
+        display: grid;
+        grid-template-rows: 2fr 1fr 1fr;
+        gap: 4px
+    }
+
+    .right-col {
+        display: grid;
+        grid-template-rows: repeat(4,1fr);
+        gap: 4px
+    }
+
+    .monitor {
+        background: var(--panel);
+        border: 1px solid var(--border-bright);
+        padding: 6px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: border-color .2s
+    }
+
+        .monitor:hover {
+            border-color: var(--red);
+            box-shadow: 0 0 8px var(--red-glow) inset
+        }
+
+        .monitor.alert {
+            border-color: var(--red);
+            animation: pulse 1s infinite
+        }
+
+        .monitor.active {
+            border-color: var(--red);
+            box-shadow: 0 0 12px var(--red-glow) inset
+        }
+    @@keyframes pulse {
+        0%, 100% {
+            box-shadow: 0 0 4px var(--red-glow) inset
+        }
+
+        50% {
+            box-shadow: 0 0 16px var(--red-glow) inset
+        }
+    }
+
+    .mon-id {
+        position: absolute;
+        top: 3px;
+        right: 5px;
+        font-size: 9px;
+        color: var(--red-dim);
+        opacity: .6
+    }
+
+    .mon-title {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--red);
+        margin-bottom: 4px;
+        text-shadow: 0 0 4px var(--red)
+    }
+
+    .mon-glyph {
+        font-size: 22px;
+        line-height: 1;
+        filter: drop-shadow(0 0 6px var(--red));
+        margin-bottom: 2px
+    }
+
+    .glyph-label {
+        font-size: 9px;
+        color: var(--red-dim);
+        letter-spacing: 1px
+    }
+
+    .bar-row {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        margin: 2px 0
+    }
+
+    .bar-label {
+        font-size: 9px;
+        color: var(--red-dim);
+        width: 40px;
+        flex-shrink: 0
+    }
+
+    .bar-track {
+        flex: 1;
+        height: 5px;
+        background: var(--red-dark);
+        border: 1px solid var(--border)
+    }
+
+    .bar-fill {
+        height: 100%;
+        background: var(--red);
+        transition: width 1s
+    }
+
+    .bar-val {
+        font-size: 9px;
+        color: var(--red);
+        width: 26px;
+        text-align: right
+    }
+
+    .tactical {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        min-height: 160px
+    }
+
+    canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%
+    }
+
+    .grid-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: repeating-linear-gradient(0deg,transparent,transparent 19px,#1a000033 20px), repeating-linear-gradient(90deg,transparent,transparent 19px,#1a000033 20px)
+    }
+
+    .data-line {
+        display: flex;
+        justify-content: space-between;
+        font-size: 9px;
+        margin: 1px 0
+    }
+
+    .data-val {
+        color: var(--red)
+    }
+
+    .data-key {
+        color: var(--red-dim)
+    }
+
+    .comms-log {
+        overflow: hidden;
+        max-height: 80px
+    }
+
+    .log-entry {
+        font-size: 9px;
+        padding: 1px 0;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        gap: 6px;
+        align-items: flex-start
+    }
+
+    .log-time {
+        color: var(--red-dim);
+        flex-shrink: 0
+    }
+
+    .log-msg {
+        color: var(--red);
+        opacity: .8
+    }
+
+        .log-msg.warn {
+            opacity: 1;
+            color: #ff4444
+        }
+
+    .freq-row {
+        display: flex;
+        gap: 2px;
+        margin: 3px 0
+    }
+
+    .freq-bar {
+        width: 4px;
+        background: var(--red-dim);
+        transition: height .3s;
+        border-radius: 1px 1px 0 0
+    }
+
+    .btn-row {
+        display: flex;
+        gap: 3px;
+        margin-top: 4px;
+        flex-wrap: wrap
+    }
+
+    .btn {
+        background: var(--red-dark);
+        border: 1px solid var(--red-dim);
+        color: var(--red);
+        font-family: var(--font);
+        font-size: 9px;
+        padding: 2px 6px;
+        cursor: pointer;
+        letter-spacing: 1px;
+        transition: all .15s
+    }
+
+        .btn:hover {
+            background: var(--red-glow);
+            border-color: var(--red);
+            text-shadow: 0 0 4px var(--red)
+        }
+
+        .btn.danger {
+            border-color: #ff0000;
+            color: #ff0000
+        }
+
+    .ring-wrap {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 70px
+    }
+
+    svg.ring {
+        overflow: visible
+    }
+
+    .plasma-chamber {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px;
+        margin: 4px 0
+    }
+
+    .chamber {
+        background: var(--red-dark);
+        border: 1px solid var(--red-dim);
+        padding: 3px;
+        text-align: center
+    }
+
+    .chamber-num {
+        font-size: 16px;
+        color: var(--red);
+        text-shadow: 0 0 6px var(--red)
+    }
+
+    .chamber-lbl {
+        font-size: 8px;
+        color: var(--red-dim)
+    }
+
+    .scanner-wrap {
+        position: relative;
+        height: 80px;
+        display: flex;
+        align-items: center;
+        justify-content: center
+    }
+
+    .threat-list {
+        font-size: 9px
+    }
+
+    .threat-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 1px 0;
+        border-bottom: 1px solid var(--border)
+    }
+
+    .threat-id {
+        color: var(--red)
+    }
+
+    .threat-dist {
+        color: var(--red-dim)
+    }
+
+    .threat-status {
+        color: #ff4444;
+        font-size: 8px
+    }
+
+    .shimmer {
+        animation: shimmer 2s infinite
+    }
+    @@keyframes shimmer {
+        0%, 100% {
+            opacity: 1
+        }
+
+        50% {
+            opacity: .5
+        }
+    }
+
+    .crew-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3px
+    }
+
+    .crew-card {
+        background: var(--red-dark);
+        border: 1px solid var(--border);
+        padding: 3px
+    }
+
+    .crew-name {
+        font-size: 9px;
+        color: var(--red);
+        letter-spacing: 1px
+    }
+
+    .crew-role {
+        font-size: 8px;
+        color: var(--red-dim)
+    }
+
+    .crew-vital {
+        font-size: 8px;
+        color: var(--red)
+    }
+
+    .ai-line {
+        font-size: 9px;
+        color: var(--red);
+        padding: 1px 0;
+        border-bottom: 1px solid var(--border)
+    }
+
+        .ai-line.thinking {
+            opacity: .6;
+            animation: shimmer 1.5s infinite
+        }
+
+    .alert-badge {
+        position: absolute;
+        top: 3px;
+        left: 5px;
+        background: var(--red);
+        color: #000;
+        font-size: 8px;
+        padding: 1px 4px;
+        letter-spacing: 1px
+    }
+
+    .mode-indicator {
+        font-size: 9px;
+        padding: 1px 6px;
+        border: 1px solid var(--red-dim);
+        color: var(--red-dim)
+    }
+
+        .mode-indicator.active {
+            border-color: var(--red);
+            color: var(--red);
+            text-shadow: 0 0 4px var(--red)
+        }
+
+    .scrolling-glyph {
+        font-size: 11px;
+        opacity: .15;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        overflow: hidden;
+        white-space: nowrap;
+        letter-spacing: 2px;
+        pointer-events: none;
+        animation: scroll-left 20s linear infinite
+    }
+    @@keyframes scroll-left {
+        from {
+            transform: translateX(100%)
+        }
+
+        to {
+            transform: translateX(-100%)
+        }
+    }
+
+    .nav-sphere {
+        position: relative;
+        height: 90px;
+        display: flex;
+        align-items: center;
+        justify-content: center
+    }
+
+    .wep-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 2px 0;
+        font-size: 9px
+    }
+
+    .wep-name {
+        color: var(--red-dim)
+    }
+
+    .wep-status {
+        padding: 1px 4px;
+        font-size: 8px
+    }
+
+    .wep-ready {
+        color: var(--red);
+        border: 1px solid var(--red-dim)
+    }
+
+    .wep-charge {
+        color: #ff4444;
+        border: 1px solid #ff4444;
+        animation: pulse 2s infinite
+    }
+
+    .tick {
+        font-size: 18px;
+        color: var(--red);
+        text-align: center;
+        text-shadow: 0 0 10px var(--red);
+        font-weight: bold;
+        letter-spacing: 4px;
+        margin: 4px 0
+    }
+</style>
+
+<div class="deck" id="deck">
+
+    <div class="hdr">
+        <div>
+            <div class="hdr-glyphs" id="glyphHeader">꩜ ᚷ ᛦ ᚩ ᛉ ᚫ ꩜ ᛞ ᚱ</div>
+            <div class="hdr-title">YCS-7 BLOOD FANG — COMMAND DECK ONLINE</div>
+        </div>
+        <div class="status-bar">
+            <span>SHIP-TIME <span id="clock">00:00:00</span></span>
+            <span>CREW <span>14/14</span></span>
+            <span>HULL <span>97%</span></span>
+            <span>THREAT <span id="threatLevel">LOW</span></span>
+            <span>MODE <span id="shipMode">CRUISE</span></span>
+        </div>
+    </div>
+
+    <div class="left-col">
+
+        <div class="monitor" id="m1">
+            <div class="mon-id">M-01</div>
+            <div class="mon-title">ᚷᛦᚩ — PLASMA ENGINE A</div>
+            <div class="mon-glyph">꩜</div>
+            <div class="glyph-label">KETH-VAL :: THRUST CORE ALPHA</div>
+            <div class="bar-row"><span class="bar-label">THRUST</span><div class="bar-track"><div class="bar-fill" id="thrustA" style="width:72%"></div></div><span class="bar-val" id="thrustAv">72%</span></div>
+            <div class="bar-row"><span class="bar-label">PLASMA</span><div class="bar-track"><div class="bar-fill" id="plasmaA" style="width:88%"></div></div><span class="bar-val" id="plasmaAv">88%</span></div>
+            <div class="bar-row"><span class="bar-label">TEMP</span><div class="bar-track"><div class="bar-fill" id="tempA" style="width:54%"></div></div><span class="bar-val" id="tempAv">54%</span></div>
+            <div class="data-line"><span class="data-key">DETONATION/SEC</span><span class="data-val" id="detA">847</span></div>
+            <div class="data-line"><span class="data-key">CHAMBER PSI</span><span class="data-val">4.2M</span></div>
+            <div class="btn-row"><button class="btn" onclick="boostEngine('A')">ᛉ BOOST</button><button class="btn" onclick="cutEngine('A')">ᚫ CUT</button></div>
+            <div class="scrolling-glyph">ᚷᛦᚩᛉᚫᛞᚱᚹᚷᛦᚩᛉᚫᛞᚱᚹᚷᛦᚩ</div>
+        </div>
+
+        <div class="monitor" id="m2">
+            <div class="mon-id">M-02</div>
+            <div class="mon-title">ᚹᚫᛞ — PLASMA ENGINE B</div>
+            <div class="mon-glyph">ᛦ</div>
+            <div class="glyph-label">VETH-KAL :: THRUST CORE BETA</div>
+            <div class="bar-row"><span class="bar-label">THRUST</span><div class="bar-track"><div class="bar-fill" id="thrustB" style="width:69%"></div></div><span class="bar-val" id="thrustBv">69%</span></div>
+            <div class="bar-row"><span class="bar-label">PLASMA</span><div class="bar-track"><div class="bar-fill" id="plasmaB" style="width:91%"></div></div><span class="bar-val" id="plasmaBv">91%</span></div>
+            <div class="bar-row"><span class="bar-label">TEMP</span><div class="bar-track"><div class="bar-fill" id="tempB" style="width:61%"></div></div><span class="bar-val" id="tempBv">61%</span></div>
+            <div class="data-line"><span class="data-key">DETONATION/SEC</span><span class="data-val" id="detB">812</span></div>
+            <div class="data-line"><span class="data-key">CHAMBER PSI</span><span class="data-val">4.1M</span></div>
+            <div class="btn-row"><button class="btn" onclick="boostEngine('B')">ᛉ BOOST</button><button class="btn" onclick="cutEngine('B')">ᚫ CUT</button></div>
+            <div class="scrolling-glyph">ᚹᚫᛞᚱᚹᚫᛞᚱᚹᚫᛞᚱᚹᚫᛞᚱᚹᚫᛞ</div>
+        </div>
+
+        <div class="monitor" id="m3">
+            <div class="mon-id">M-03</div>
+            <div class="mon-title">ᚱᛃᚷ — POWER GRID</div>
+            <div class="mon-glyph">ᛃ</div>
+            <div class="glyph-label">RAK-JEL :: ELECTRICAL CORE</div>
+            <div class="plasma-chamber">
+                <div class="chamber"><div class="chamber-num" id="cap1">94</div><div class="chamber-lbl">CAP-1 %</div></div>
+                <div class="chamber"><div class="chamber-num" id="cap2">87</div><div class="chamber-lbl">CAP-2 %</div></div>
+                <div class="chamber"><div class="chamber-num" id="cap3">91</div><div class="chamber-lbl">CAP-3 %</div></div>
+                <div class="chamber"><div class="chamber-num" id="cap4">78</div><div class="chamber-lbl">CAP-4 %</div></div>
+            </div>
+            <div class="data-line"><span class="data-key">OUTPUT GW</span><span class="data-val" id="powerOut">14.7</span></div>
+            <div class="data-line"><span class="data-key">DRAW GW</span><span class="data-val">11.2</span></div>
+            <div class="scrolling-glyph">ᚱᛃᚷᚩᛦᚱᛃᚷᚩᛦᚱᛃᚷᚩᛦᚱᛃᚷ</div>
+        </div>
+
+        <div class="monitor" id="m4">
+            <div class="mon-id">M-04</div>
+            <div class="mon-title">ᛏᚢᚾ — LIFE SUPPORT</div>
+            <div class="mon-glyph">ᚢ</div>
+            <div class="glyph-label">TUL-NAR :: BIOSPHERE CTRL</div>
+            <div class="bar-row"><span class="bar-label">O2</span><div class="bar-track"><div class="bar-fill" style="width:96%"></div></div><span class="bar-val">96%</span></div>
+            <div class="bar-row"><span class="bar-label">CO2</span><div class="bar-track"><div class="bar-fill" style="width:4%"></div></div><span class="bar-val">4%</span></div>
+            <div class="bar-row"><span class="bar-label">PRESS</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="bar-val">1atm</span></div>
+            <div class="bar-row"><span class="bar-label">TEMP</span><div class="bar-track"><div class="bar-fill" style="width:68%"></div></div><span class="bar-val">21°C</span></div>
+            <div class="data-line"><span class="data-key">RAD SHIELD</span><span class="data-val">ACTIVE</span></div>
+            <div class="scrolling-glyph">ᛏᚢᚾᛃᚷᛏᚢᚾᛃᚷᛏᚢᚾᛃᚷᛏᚢᚾ</div>
+        </div>
+
+    </div>
+
+    <div class="center-col">
+
+        <div class="monitor active" id="m5">
+            <div class="mon-id">M-05 / M-06</div>
+            <div class="mon-title">ᛉᚫᛞᚱ — TACTICAL DISPLAY</div>
+            <div class="tactical">
+                <div class="grid-overlay"></div>
+                <canvas id="tacCanvas" width="600" height="160"></canvas>
+            </div>
+            <div style="display:flex;gap:6px;margin-top:4px;flex-wrap:wrap">
+                <span style="font-size:9px;color:var(--red)">● YCS-7 BLOOD FANG</span>
+                <span style="font-size:9px;color:#ffaa00">◆ FRIENDLY x3</span>
+                <span style="font-size:9px;color:#ff4444">▲ HOSTILE x2</span>
+                <span style="font-size:9px;color:#aa00aa">✦ UNKNOWN x1</span>
+            </div>
+            <div class="btn-row">
+                <button class="btn" onclick="setMode('CRUISE')">ᚷ CRUISE</button>
+                <button class="btn" onclick="setMode('COMBAT')">ᛦ COMBAT</button>
+                <button class="btn" onclick="setMode('STEALTH')">ᚩ STEALTH</button>
+                <button class="btn danger" onclick="setMode('FULL ASSAULT')">꩜ ASSAULT</button>
+            </div>
+            <div class="scrolling-glyph">꩜ᛉᚫᛞᚱᚹᛃᚷᛦᚩᛉᚫᛞᚱᚹᛃᚷᛦᚩ꩜ᛉᚫᛞᚱᚹᛃᚷ</div>
+        </div>
+
+        <div class="monitor" id="m7">
+            <div class="mon-id">M-07 / M-08</div>
+            <div class="mon-title">ᚹᛃᚷ — COMMS / ECM DEFENSE</div>
+            <div style="display:flex;gap:4px;height:calc(100% - 30px)">
+                <div style="flex:1">
+                    <div class="glyph-label">SIGNAL SPECTRUM</div>
+                    <div class="freq-row" id="freqBars"></div>
+                    <div class="data-line"><span class="data-key">FREQ HOP</span><span class="data-val shimmer">ACTIVE</span></div>
+                    <div class="data-line"><span class="data-key">QKD KEY</span><span class="data-val">VALID</span></div>
+                    <div class="data-line"><span class="data-key">ECM STATUS</span><span class="data-val" id="ecmStatus">NOMINAL</span></div>
+                    <div class="data-line"><span class="data-key">JAMMING DET</span><span class="data-val" id="jamDet">NONE</span></div>
+                    <div class="btn-row">
+                        <button class="btn" onclick="triggerECM()">ᛉ COUNTER-JAM</button>
+                        <button class="btn" onclick="burnKeys()">ᚫ BURN KEYS</button>
+                    </div>
+                </div>
+                <div style="flex:1;border-left:1px solid var(--border);padding-left:6px">
+                    <div class="glyph-label">FLEET COMMS LOG</div>
+                    <div class="comms-log" id="commsLog"></div>
+                    <div class="btn-row" style="margin-top:4px">
+                        <button class="btn" onclick="broadcastAlert()">꩜ FLEET ALERT</button>
+                    </div>
+                </div>
+            </div>
+            <div class="scrolling-glyph">ᚹᛃᚷᚩᛦᚹᛃᚷᚩᛦᚹᛃᚷᚩᛦᚹᛃᚷᚩᛦ</div>
+        </div>
+
+        <div class="monitor" id="m9">
+            <div class="mon-id">M-09 / M-10</div>
+            <div class="mon-title">ᛞᚱᚹ — AI SHIP BRAIN</div>
+            <div id="aiLog" style="max-height:90px;overflow:hidden"></div>
+            <div style="display:flex;gap:4px;margin-top:4px;flex-wrap:wrap">
+                <span class="mode-indicator active" id="modeNav">NAV</span>
+                <span class="mode-indicator active" id="modeWeap">WEAP</span>
+                <span class="mode-indicator" id="modeCloaking">CLOAK</span>
+                <span class="mode-indicator active" id="modeEcm">ECM</span>
+                <span class="mode-indicator" id="modeHunt">HUNT</span>
+            </div>
+            <div class="btn-row">
+                <button class="btn" onclick="sendPrompt('Design the AI neural network architecture for my Yautja space frigate brain system — include threat classification, damage control, and fleet coordination modules')">꩜ DESIGN AI CORE ↗</button>
+            </div>
+            <div class="scrolling-glyph">ᛞᚱᚹᛏᚢᛞᚱᚹᛏᚢᛞᚱᚹᛏᚢᛞᚱᚹᛏᚢᛞ</div>
+        </div>
+
+    </div>
+
+    <div class="right-col">
+
+        <div class="monitor" id="m11">
+            <div class="mon-id">M-11</div>
+            <div class="mon-title">ᚩᛉᚫ — WEAPONS ARRAY</div>
+            <div class="mon-glyph">ᚩ</div>
+            <div class="glyph-label">OKH-ZEL :: ARMAMENT CTRL</div>
+            <div class="wep-row"><span class="wep-name">PLASMA CANNON ×4</span><span class="wep-status wep-ready">READY</span></div>
+            <div class="wep-row"><span class="wep-name">RAIL GUN ×2</span><span class="wep-status wep-ready">READY</span></div>
+            <div class="wep-row"><span class="wep-name">MISSILE BAY ×16</span><span class="wep-status wep-ready">12 RDY</span></div>
+            <div class="wep-row"><span class="wep-name">POINT DEF ×8</span><span class="wep-status wep-charge">CHARGING</span></div>
+            <div class="wep-row"><span class="wep-name">CLOAKING MINE</span><span class="wep-status wep-ready">×6 RDY</span></div>
+            <div class="btn-row">
+                <button class="btn danger" onclick="fireAll()">꩜ FIRE ALL</button>
+                <button class="btn" onclick="safeWeapons()">ᚫ SAFE</button>
+            </div>
+            <div class="scrolling-glyph">ᚩᛉᚫᛞᚱᚩᛉᚫᛞᚱᚩᛉᚫᛞᚱᚩᛉᚫᛞ</div>
+        </div>
+
+        <div class="monitor" id="m12">
+            <div class="mon-id">M-12</div>
+            <div class="mon-title">ᚫᛞᚱ — THREAT SCANNER</div>
+            <div class="scanner-wrap">
+                <canvas id="scanCanvas" width="120" height="80"></canvas>
+            </div>
+            <div class="threat-list" id="threatList">
+                <div class="threat-row"><span class="threat-id">BOGEY-01</span><span class="threat-dist">847 km</span><span class="threat-status">HOSTILE</span></div>
+                <div class="threat-row"><span class="threat-id">BOGEY-02</span><span class="threat-dist">1204 km</span><span class="threat-status">HOSTILE</span></div>
+                <div class="threat-row"><span class="threat-id">UNKNOWN-1</span><span class="threat-dist">3310 km</span><span class="threat-status" style="color:#aa00aa">UNIDENT</span></div>
+            </div>
+            <div class="scrolling-glyph">ᚫᛞᚱᚹᛃᚫᛞᚱᚹᛃᚫᛞᚱᚹᛃᚫᛞᚱᚹ</div>
+        </div>
+
+        <div class="monitor" id="m13">
+            <div class="mon-id">M-13 / M-14</div>
+            <div class="mon-title">ᛃᚷᛦ — NAVIGATION</div>
+            <div class="nav-sphere">
+                <canvas id="navCanvas" width="120" height="80"></canvas>
+            </div>
+            <div class="data-line"><span class="data-key">HEADING</span><span class="data-val" id="heading">047.3°</span></div>
+            <div class="data-line"><span class="data-key">VELOCITY</span><span class="data-val">0.004c</span></div>
+            <div class="data-line"><span class="data-key">DEST ETA</span><span class="data-val">14h 22m</span></div>
+            <div class="data-line"><span class="data-key">GRAV DRIFT</span><span class="data-val">-0.002°</span></div>
+            <div class="btn-row">
+                <button class="btn" onclick="sendPrompt('Calculate optimal plasma burn trajectory to intercept BOGEY-01 for the Yautja frigate Blood Fang at 0.004c')">ᛃ PLOT INTERCEPT ↗</button>
+            </div>
+            <div class="scrolling-glyph">ᛃᚷᛦᚩᛉᛃᚷᛦᚩᛉᛃᚷᛦᚩᛉᛃᚷᛦᚩ</div>
+        </div>
+
+        <div class="monitor" id="m15">
+            <div class="mon-id">M-15 / M-16</div>
+            <div class="mon-title">ᚢᚾᛏ — CREW STATUS</div>
+            <div class="crew-grid">
+                <div class="crew-card"><div class="crew-name">꩜ COMMANDER</div><div class="crew-role">SCAR-7</div><div class="crew-vital">♥ 98%</div></div>
+                <div class="crew-card"><div class="crew-name">ᛦ ENGINEER</div><div class="crew-role">KETH-3</div><div class="crew-vital">♥ 100%</div></div>
+                <div class="crew-card"><div class="crew-name">ᚩ WEAPONS</div><div class="crew-role">DRAK-2</div><div class="crew-vital">♥ 94%</div></div>
+                <div class="crew-card"><div class="crew-name">ᚱ NAVIGATOR</div><div class="crew-role">VAL-9</div><div class="crew-vital">♥ 100%</div></div>
+                <div class="crew-card"><div class="crew-name">ᚹ COMMS</div><div class="crew-role">MEL-1</div><div class="crew-vital">♥ 97%</div></div>
+                <div class="crew-card"><div class="crew-name">ᛞ MEDIC</div><div class="crew-role">ZEL-5</div><div class="crew-vital">♥ 100%</div></div>
+            </div>
+            <div class="scrolling-glyph">ᚢᚾᛏᛃᚷᚢᚾᛏᛃᚷᚢᚾᛏᛃᚷᚢᚾᛏᛃ</div>
+        </div>
+
+    </div>
+
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);gap:4px">
+
+        <div class="monitor" id="m17">
+            <div class="mon-id">M-17</div>
+            <div class="mon-title">ᛦᚱᛃ — HULL INTEGRITY</div>
+            <div class="bar-row"><span class="bar-label">BOW</span><div class="bar-track"><div class="bar-fill" style="width:98%"></div></div><span class="bar-val">98%</span></div>
+            <div class="bar-row"><span class="bar-label">PORT</span><div class="bar-track"><div class="bar-fill" style="width:97%"></div></div><span class="bar-val">97%</span></div>
+            <div class="bar-row"><span class="bar-label">STARBD</span><div class="bar-track"><div class="bar-fill" style="width:95%"></div></div><span class="bar-val">95%</span></div>
+            <div class="bar-row"><span class="bar-label">AFT</span><div class="bar-track"><div class="bar-fill" style="width:99%"></div></div><span class="bar-val">99%</span></div>
+            <div class="bar-row"><span class="bar-label">SHIELDS</span><div class="bar-track"><div class="bar-fill" id="shieldBar" style="width:84%"></div></div><span class="bar-val" id="shieldVal">84%</span></div>
+        </div>
+
+        <div class="monitor" id="m18">
+            <div class="mon-id">M-18</div>
+            <div class="mon-title">ᚩᚢᛞ — DAMAGE CTRL</div>
+            <div class="data-line"><span class="data-key">SECTION A</span><span class="data-val">NOMINAL</span></div>
+            <div class="data-line"><span class="data-key">SECTION B</span><span class="data-val">NOMINAL</span></div>
+            <div class="data-line"><span class="data-key">SECTION C</span><span class="data-val">NOMINAL</span></div>
+            <div class="data-line"><span class="data-key">SECTION D</span><span class="data-val">NOMINAL</span></div>
+            <div class="data-line"><span class="data-key">REPAIR BOTS</span><span class="data-val">12 ACTIVE</span></div>
+            <div class="btn-row"><button class="btn" onclick="deployRepair()">ᚹ DEPLOY BOTS</button></div>
+        </div>
+
+        <div class="monitor" id="m19">
+            <div class="mon-id">M-19</div>
+            <div class="mon-title">ᛉᛃᛦ — SENSOR ARRAY</div>
+            <div class="data-line"><span class="data-key">LIDAR</span><span class="data-val shimmer">SCANNING</span></div>
+            <div class="data-line"><span class="data-key">GRAVIMETRIC</span><span class="data-val shimmer">ACTIVE</span></div>
+            <div class="data-line"><span class="data-key">THERMAL</span><span class="data-val shimmer">ACTIVE</span></div>
+            <div class="data-line"><span class="data-key">EM PASSIVE</span><span class="data-val shimmer">LISTENING</span></div>
+            <div class="data-line"><span class="data-key">RANGE</span><span class="data-val">4400 km</span></div>
+            <div class="data-line"><span class="data-key">CONTACTS</span><span class="data-val" id="contactCount">6</span></div>
+        </div>
+
+        <div class="monitor" id="m20">
+            <div class="mon-id">M-20</div>
+            <div class="mon-title">꩜ — MASTER ALERT</div>
+            <div class="tick" id="masterGlyph">꩜</div>
+            <div style="font-size:10px;text-align:center;letter-spacing:2px;margin:4px 0" id="masterStatus">ALL SYSTEMS NOMINAL</div>
+            <div class="data-line"><span class="data-key">ALERTS ACTIVE</span><span class="data-val" id="alertCount">0</span></div>
+            <div class="data-line"><span class="data-key">SYSTEM TIME</span><span class="data-val" id="sysClock">--</span></div>
+            <div class="btn-row">
+                <button class="btn danger" onclick="redAlert()">꩜ RED ALERT</button>
+                <button class="btn" onclick="clearAlerts()">ᚫ CLEAR</button>
+            </div>
+        </div>
+
+        <div class="monitor" id="mAux">
+            <div class="mon-id">AUX</div>
+            <div class="mon-title">ᚹᚫᛞ — MISSION LOG</div>
+            <div class="ai-line">ᛃ 00:00 — SYSTEMS BOOT COMPLETE</div>
+            <div class="ai-line">ᚷ 00:01 — PLASMA ENG A+B NOMINAL</div>
+            <div class="ai-line">ᛦ 00:02 — 2 HOSTILES DETECTED</div>
+            <div class="ai-line shimmer" id="missionLatest">ᚩ 00:03 — MONITORING...</div>
+            <div class="btn-row">
+                <button class="btn" onclick="sendPrompt('Write the full C++ plasma engine detonation sequencer code for the Blood Fang frigate with microsecond precision timing and fault detection')">꩜ CODE ENGINE ↗</button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+    const GLYPHS = ['꩜', 'ᚷ', 'ᛦ', 'ᚩ', 'ᛉ', 'ᚫ', 'ᛞ', 'ᚱ', 'ᚹ', 'ᛃ', 'ᚢ', 'ᚾ', 'ᛏ', 'ᛖ'];
+    let alerts = 0;
+    let t = 0;
+
+    function clock() {
+        const n = new Date();
+        const s = String(n.getHours()).padStart(2, '0') + ':' + String(n.getMinutes()).padStart(2, '0') + ':' + String(n.getSeconds()).padStart(2, '0');
+        document.getElementById('clock').textContent = s;
+        document.getElementById('sysClock').textContent = s;
+    }
+
+    function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+    function rndF(a, b) { return (Math.random() * (b - a) + a).toFixed(1); }
+
+    function fluctuate() {
+        t++;
+        const tA = rnd(65, 85); document.getElementById('thrustA').style.width = tA + '%'; document.getElementById('thrustAv').textContent = tA + '%';
+        const pA = rnd(82, 95); document.getElementById('plasmaA').style.width = pA + '%'; document.getElementById('plasmaAv').textContent = pA + '%';
+        const tmA = rnd(48, 70); document.getElementById('tempA').style.width = tmA + '%'; document.getElementById('tempAv').textContent = tmA + '%';
+        document.getElementById('detA').textContent = rnd(820, 870);
+        const tB = rnd(62, 78); document.getElementById('thrustB').style.width = tB + '%'; document.getElementById('thrustBv').textContent = tB + '%';
+        const pB = rnd(85, 96); document.getElementById('plasmaB').style.width = pB + '%'; document.getElementById('plasmaBv').textContent = pB + '%';
+        const tmB = rnd(55, 70); document.getElementById('tempB').style.width = tmB + '%'; document.getElementById('tempBv').textContent = tmB + '%';
+        document.getElementById('detB').textContent = rnd(795, 830);
+        document.getElementById('cap1').textContent = rnd(88, 98);
+        document.getElementById('cap2').textContent = rnd(80, 95);
+        document.getElementById('cap3').textContent = rnd(85, 97);
+        document.getElementById('cap4').textContent = rnd(70, 88);
+        document.getElementById('powerOut').textContent = rndF(13.5, 16.0);
+        drawTactical();
+        drawScanner();
+        drawNav();
+        animateFreq();
+    }
+
+    function drawTactical() {
+        const c = document.getElementById('tacCanvas');
+        const ctx = c.getContext('2d');
+        const W = c.offsetWidth || 600, H = c.offsetHeight || 160;
+        c.width = W; c.height = H;
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = '#1a0000'; ctx.lineWidth = 1;
+        for (let x = 0; x < W; x += 30) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke(); }
+        for (let y = 0; y < H; y += 20) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+        const cx = W / 2, cy = H / 2;
+        for (let r = 20; r < 100; r += 20) {
+            ctx.strokeStyle = '#330000'; ctx.lineWidth = 0.5;
+            ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.stroke();
+        }
+        ctx.strokeStyle = '#ff1a1a44'; ctx.lineWidth = 1;
+        ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.stroke();
+        ctx.fillStyle = '#ff1a1a'; ctx.shadowBlur = 8; ctx.shadowColor = '#ff1a1a';
+        ctx.font = 'bold 14px monospace'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('꩜', cx, cy);
+        ctx.shadowBlur = 0;
+        const friends = [{ x: cx + 60 + Math.sin(t * 0.05) * 5, y: cy - 30, c: '#ffaa00', g: '◆' }, { x: cx - 80 + Math.cos(t * 0.04) * 4, y: cy + 20, c: '#ffaa00', g: '◆' }, { x: cx + 30, y: cy + 55, c: '#ffaa00', g: '◆' }];
+        const foes = [{ x: cx + 140 + Math.sin(t * 0.07) * 8, y: cy - 10 + Math.cos(t * 0.06) * 6, c: '#ff4444', g: '▲' }, { x: cx - 110 + Math.cos(t * 0.05) * 6, y: cy - 40 + Math.sin(t * 0.08) * 5, c: '#ff4444', g: '▲' }];
+        const unk = [{ x: cx + 180 + Math.sin(t * 0.03) * 12, y: cy + 30, c: '#aa00aa', g: '✦' }];
+        [...friends, ...foes, ...unk].forEach(o => {
+            ctx.fillStyle = o.c; ctx.shadowColor = o.c; ctx.shadowBlur = 6;
+            ctx.font = '12px monospace'; ctx.textAlign = 'center';
+            ctx.fillText(o.g, o.x, o.y);
+        });
+        ctx.shadowBlur = 0;
+        ctx.strokeStyle = '#ff444433'; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+        foes.forEach(f => { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(f.x, f.y); ctx.stroke(); });
+        ctx.setLineDash([]);
+    }
+
+    function drawScanner() {
+        const c = document.getElementById('scanCanvas');
+        const ctx = c.getContext('2d');
+        const W = c.width, H = c.height, cx = W / 2, cy = H / 2;
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = '#1a0000';
+        for (let r = 15; r < 60; r += 15) { ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.lineWidth = 0.5; ctx.stroke(); }
+        const sweep = (t * 0.08) % (Math.PI * 2);
+        const grad = ctx.createConicalGradient ? null : null;
+        ctx.strokeStyle = '#ff1a1a'; ctx.lineWidth = 1; ctx.shadowBlur = 4; ctx.shadowColor = '#ff1a1a';
+        ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(sweep) * 58, cy + Math.sin(sweep) * 58); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ff4444'; ctx.font = '10px monospace';
+        ctx.fillText('▲', cx + 45, cy - 8); ctx.fillText('▲', cx - 42, cy - 25);
+        ctx.fillStyle = '#aa00aa'; ctx.fillText('✦', cx + 65, cy + 18);
+        ctx.fillStyle = '#ff1a1a'; ctx.fillText('꩜', cx - 4, cy + 4);
+    }
+
+    function drawNav() {
+        const c = document.getElementById('navCanvas');
+        const ctx = c.getContext('2d');
+        const W = c.width, H = c.height, cx = W / 2, cy = H / 2;
+        ctx.clearRect(0, 0, W, H);
+        ctx.strokeStyle = '#330000'; ctx.lineWidth = 0.5;
+        ctx.beginPath(); ctx.arc(cx, cy, 40, 0, Math.PI * 2); ctx.stroke();
+        ctx.beginPath(); ctx.arc(cx, cy, 25, 0, Math.PI * 2); ctx.stroke();
+        const a = (t * 0.02) % (Math.PI * 2);
+        ctx.strokeStyle = '#ff1a1a'; ctx.lineWidth = 2; ctx.shadowBlur = 4; ctx.shadowColor = '#ff1a1a';
+        ctx.beginPath(); ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(a) * 38, cy + Math.sin(a) * 38); ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.fillStyle = '#ff1a1a'; ctx.font = '10px monospace'; ctx.textAlign = 'center';
+        ctx.fillText('N', cx, cy - 44); ctx.fillText('S', cx, cy + 52);
+        ctx.fillText('E', cx + 52, cy + 4); ctx.fillText('W', cx - 50, cy + 4);
+        document.getElementById('heading').textContent = (47.3 + Math.sin(t * 0.01) * 0.5).toFixed(1) + '°';
+    }
+
+    function animateFreq() {
+        const c = document.getElementById('freqBars');
+        if (!c.children.length) {
+            for (let i = 0; i < 28; i++) { const b = document.createElement('div'); b.className = 'freq-bar'; b.style.alignSelf = 'flex-end'; c.appendChild(b); }
+        }
+        Array.from(c.children).forEach(b => {
+            const h = rnd(4, 28); b.style.height = h + 'px';
+            b.style.background = h > 20 ? '#ff4444' : '#ff1a1a';
+        });
+    }
+
+    const aiMessages = [
+        'ᛃ THREAT CLASSIFICATION RUNNING...',
+        'ᚩ WEAPONS LOCK CONFIRMED ON BOGEY-01',
+        'ᚷ PLASMA SYNC A+B OPTIMAL',
+        'ᛦ ECM SWEEP — NO INTRUSION',
+        'ᚱ COURSE DEVIATION +0.002° CORRECTED',
+        'ᚹ FLEET PING ACKNOWLEDGED',
+        'ᛞ CREW VITALS NOMINAL ALL STATIONS',
+        'ᛉ SENSOR SWEEP 4400km COMPLETE',
+        'ᚫ AI WATCHDOG CYCLE OK',
+        'ᚢ LIFE SUPPORT STABLE — O2 96%',
+    ];
+    let aiIdx = 0;
+    function updateAI() {
+        const log = document.getElementById('aiLog');
+        const line = document.createElement('div');
+        line.className = 'ai-line';
+        if (aiIdx === aiMessages.length - 1) line.classList.add('thinking');
+        line.textContent = aiMessages[aiIdx % aiMessages.length];
+        log.insertBefore(line, log.firstChild);
+        if (log.children.length > 5) log.removeChild(log.lastChild);
+        aiIdx++;
+    }
+
+    const commsMessages = [
+        { t: '00:00', m: 'FLEET: YCS-9 GHOST CLAW ONLINE', w: false },
+        { t: '00:01', m: 'FLEET: PATROL SECTOR 7 CLEAR', w: false },
+        { t: '00:02', m: '!! BOGEY-01 ENCRYPTED PROBE DETECTED', w: true },
+        { t: '00:03', m: 'QKD REKEY COMPLETE — SECURE', w: false },
+        { t: '00:04', m: 'YCS-11: WE HAVE VISUAL ON HOSTILE', w: false },
+        { t: '00:05', m: '!! CHAOS ECM FRIGATE 1200km', w: true },
+        { t: '00:06', m: 'FREQ HOP ENGAGED — SPECTRUM CLEAR', w: false },
+    ];
+    let commsIdx = 0;
+    function updateComms() {
+        const log = document.getElementById('commsLog');
+        const entry = commsMessages[commsIdx % commsMessages.length];
+        const div = document.createElement('div');
+        div.className = 'log-entry';
+        div.innerHTML = `<span class="log-time">${entry.t}</span><span class="log-msg${entry.w ? ' warn' : ''}">${entry.m}</span>`;
+        log.insertBefore(div, log.firstChild);
+        if (log.children.length > 5) log.removeChild(log.lastChild);
+        commsIdx++;
+    }
+
+    function setMode(mode) {
+        document.getElementById('shipMode').textContent = mode;
+        const m5 = document.getElementById('m5');
+        if (mode === 'COMBAT' || mode === 'FULL ASSAULT') {
+            document.getElementById('threatLevel').textContent = 'HIGH';
+            m5.classList.add('alert');
+            document.getElementById('masterStatus').textContent = 'COMBAT MODE ENGAGED';
+            addAlert();
+        } else if (mode === 'STEALTH') {
+            document.getElementById('threatLevel').textContent = 'LOW';
+            m5.classList.remove('alert');
+            document.getElementById('modeCloaking').classList.add('active');
+        } else {
+            document.getElementById('threatLevel').textContent = 'LOW';
+            m5.classList.remove('alert');
+            document.getElementById('masterStatus').textContent = 'ALL SYSTEMS NOMINAL';
+        }
+    }
+
+    function addAlert() {
+        alerts++;
+        document.getElementById('alertCount').textContent = alerts;
+        document.getElementById('masterGlyph').style.textShadow = '0 0 20px #ff0000';
+    }
+
+    function clearAlerts() {
+        alerts = 0;
+        document.getElementById('alertCount').textContent = 0;
+        document.getElementById('masterStatus').textContent = 'ALL SYSTEMS NOMINAL';
+        document.getElementById('masterGlyph').style.textShadow = '';
+        document.getElementById('m5').classList.remove('alert');
+        document.getElementById('threatLevel').textContent = 'LOW';
+    }
+
+    function redAlert() {
+        setMode('FULL ASSAULT');
+        document.getElementById('masterStatus').textContent = '!! RED ALERT !!';
+        document.getElementById('ecmStatus').textContent = 'UNDER ATTACK';
+        document.getElementById('jamDet').textContent = 'CHAOS ECM';
+        document.getElementById('m7').classList.add('alert');
+        addAlert();
+    }
+
+    function triggerECM() {
+        document.getElementById('ecmStatus').textContent = 'COUNTER-JAM';
+        setTimeout(() => { document.getElementById('ecmStatus').textContent = 'NOMINAL'; }, 2000);
+    }
+
+    function burnKeys() {
+        document.getElementById('ecmStatus').textContent = 'REKEYING...';
+        setTimeout(() => { document.getElementById('ecmStatus').textContent = 'NOMINAL'; }, 1500);
+    }
+
+    function broadcastAlert() {
+        updateComms();
+    }
+
+    function boostEngine(e) {
+        const el = document.getElementById('thrust' + e);
+        el.style.width = '100%';
+        document.getElementById('thrust' + e + 'v').textContent = 'MAX';
+        setTimeout(() => { el.style.width = '75%'; document.getElementById('thrust' + e + 'v').textContent = '75%'; }, 1500);
+    }
+
+    function cutEngine(e) {
+        const el = document.getElementById('thrust' + e);
+        el.style.width = '10%';
+        document.getElementById('thrust' + e + 'v').textContent = '10%';
+    }
+
+    function fireAll() {
+        document.getElementById('masterStatus').textContent = 'WEAPONS FREE — FIRING';
+        addAlert();
+        setTimeout(() => { document.getElementById('masterStatus').textContent = 'VOLLEY COMPLETE'; }, 2000);
+    }
+
+    function safeWeapons() {
+        document.getElementById('masterStatus').textContent = 'WEAPONS SAFED';
+    }
+
+    function deployRepair() {
+        document.getElementById('masterStatus').textContent = 'REPAIR BOTS DEPLOYED';
+    }
+
+    function updateMissionLog() {
+        const msgs = ['ᚩ MONITORING BOGEY-01...', 'ᛦ PLASMA SYNC OPTIMAL', 'ᚱ COURSE HOLDING', 'ᛉ SENSOR SWEEP OK', 'ᚹ FLEET COMMS NOMINAL', 'ᛞ ALL CREW VITAL'];
+        document.getElementById('missionLatest').textContent = msgs[Math.floor(Math.random() * msgs.length)];
+    }
+
+    setInterval(clock, 1000);
+    setInterval(fluctuate, 1200);
+    setInterval(updateAI, 2500);
+    setInterval(updateComms, 3500);
+    setInterval(updateMissionLog, 4000);
+    clock(); fluctuate(); updateAI(); updateComms(); animateFreq();
+</script>

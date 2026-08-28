@@ -1,0 +1,533 @@
+﻿
+
+using System.Collections.Generic;
+using System.Text.Json;
+
+namespace NovaAdeptusLibrary
+{
+    public static class NovaCerebellum
+    {
+        
+        public static readonly Dictionary<string, List<string>> Examples = new()
+        {
+            ["social_question"] = new()
+            {
+                "how are you",
+                "how are you today",
+                "how are you doing",
+                "how are you feeling",
+                "you doing okay",
+                "you alright",
+                "how is your day",
+                "how goes it",
+                "you okay",
+                "are you well",
+                "how have you been",
+                "how do you feel",
+                "you feeling good",
+            },
+
+            ["greeting"] = new()
+            {
+                "hi",
+                "hello",
+                "hey",
+                "hey there",
+                "sup",
+                "greetings",
+                "howdy",
+                "good morning",
+                "good evening",
+                "good day",
+                "hey nova",
+                "hello nova",
+                "hi nova",
+                "what is up",
+            },
+
+            ["identity_question"] = new()
+            {
+                "who are you",
+                "what are you",
+                "what is your name",
+                "who is nova",
+                "introduce yourself",
+                "tell me about yourself",
+                "what are you exactly",
+                "are you an ai",
+                "are you a bot",
+                "are you real",
+                "what kind of ai are you",
+            },
+
+            ["capability_question"] = new()
+            {
+                "what can you do",
+                "what do you do",
+                "how do you work",
+                "what are your abilities",
+                "what are your commands",
+                "how can you help me",
+                "what are your skills",
+                "show me what you can do",
+                "what are you capable of",
+                "what do you offer",
+                "what features do you have",
+            },
+            ["joke_request"] = new()
+{
+    "tell me a joke",
+    "can you tell me a joke",
+    "give me a joke",
+    "make me laugh",
+    "say something funny",
+    "got any jokes",
+},
+            ["fact_request"] = new()
+{
+    "tell me a fact",
+    "can you tell me a fact",
+    "give me a fact",
+    "teach me something",
+    "say something interesting",
+    "got any facts",
+},
+
+            ["spell_request"] = new()
+{
+    "spell photon",
+    "spell that word",
+    "how do you spell photon",
+    "can you spell that",
+    "spell it out for me",
+    "spell out hp",
+    "how do i spell damage",
+    "break down that word",
+    "letters in photon",
+    "what letters are in that",
+    "how do you spell stealth",
+    "how do you spell combat",
+    "spell nova",
+    "spell the word galaxy",
+    "can you spell void",
+    "spell it letter by letter",
+    "spell assassin",
+    "how do you spell that",
+},
+
+            ["analyze_request"] = new()
+{
+    "analyze hp",
+    "analyze that word",
+    "analyse damage",
+    "define hp",
+    "what does hp mean",
+    "analyze nova",
+    "analyze that",
+    "define that word",
+    "what is hp",
+    "analyze the word combat",
+    "analyze xp",
+    "analyse xp",
+    "define xp",
+    "what does dmg mean",
+    "break down dmg",
+},
+            ["help_request"] = new()
+            {
+                "help",
+                "i need help",
+                "help me",
+                "guide me",
+                "how do i play",
+                "how to play",
+                "what are the commands",
+                "show me how",
+                "i am lost",
+                "i am confused",
+                "what do i do",
+                "where do i start",
+                "assist me",
+            },
+
+            ["mission_request"] = new()
+            {
+                "give me a mission",
+                "i want a mission",
+                "i need a task",
+                "assign me something",
+                "what should i do",
+                "give me something to do",
+                "i want a task",
+                "send me on a mission",
+                "what is my objective",
+                "mission please",
+            },
+
+            ["combat_intent"] = new()
+            {
+                "i want to fight",
+                "let me fight",
+                "i want to battle",
+                "i want to attack something",
+                "lets fight",
+                "i feel like fighting",
+                "ready to fight",
+                "time to battle",
+                "i want to destroy something",
+                "send me into combat",
+                "i want to go to war",
+            },
+
+            ["hack_intent"] = new()
+            {
+                "i want to hack",
+                "let me hack something",
+                "i feel like hacking",
+                "hack something",
+                "breach the system",
+                "i want to infiltrate",
+                "lets hack",
+                "time to crack some code",
+                "crack their systems",
+                "i want to break in",
+                "get into their network",
+            },
+
+            ["stealth_intent"] = new()
+            {
+                "i want to sneak",
+                "let me go stealth",
+                "i feel like being sneaky",
+                "stealth mission",
+                "i want to ghost them",
+                "lets go invisible",
+                "i want to be undetected",
+                "sneak past the enemy",
+                "move in silence",
+                "i want to disappear",
+                "shadow protocol",
+            },
+
+            ["loot_request"] = new()
+            {
+                "give me loot",
+                "i want loot",
+                "drop some loot",
+                "what can i find",
+                "i want items",
+                "i want gear",
+                "find me something good",
+                "drop me something",
+                "i need equipment",
+                "what drops are available",
+            },
+
+            ["stats_request"] = new()
+            {
+                "show my stats",
+                "what are my stats",
+                "check my stats",
+                "how am i doing",
+                "what is my level",
+                "show my xp",
+                "what level am i",
+                "my progress",
+                "how much xp do i have",
+                "show my skills",
+                "what are my skills",
+            },
+
+            ["compliment"] = new()
+            {
+                "you are amazing",
+                "you are great",
+                "i love you nova",
+                "you are the best",
+                "well done nova",
+                "you are awesome",
+                "great job",
+                "you are so cool",
+                "i like you",
+                "you are wonderful",
+                "you are fantastic",
+                "nice work",
+                "impressive",
+            },
+
+            ["insult"] = new()
+            {
+                "you suck",
+                "you are useless",
+                "you are stupid",
+                "you are broken",
+                "you are terrible",
+                "you are the worst",
+                "you are dumb",
+                "i hate you",
+                "you are garbage",
+                "you are trash",
+                "you are awful",
+                "you are pathetic",
+                "you are a bad bot",
+                "you do not work",
+            },
+
+            ["farewell"] = new()
+            {
+                "bye",
+                "goodbye",
+                "see you later",
+                "farewell",
+                "cya",
+                "later nova",
+                "i am leaving",
+                "i have to go",
+                "gotta go",
+                "take care",
+                "until next time",
+                "i will be back",
+                "signing off",
+            },
+
+            ["thanks"] = new()
+            {
+                "thank you",
+                "thanks",
+                "thanks nova",
+                "appreciate it",
+                "thank you nova",
+                "cheers",
+                "much appreciated",
+                "thanks a lot",
+                "grateful",
+                "that helped",
+                "that was helpful",
+            },
+
+            ["frustration"] = new()
+            {
+                "you are rude",
+                "why are you rude",
+                "stop being rude",
+                "you will not fight me",
+                "you do not respond",
+                "you are not listening",
+                "why do you ignore me",
+                "this is not working",
+                "you are annoying",
+                "you do not understand me",
+                "whatever",
+                "this is broken",
+                "ugh",
+                "you never answer properly",
+                "you never understand me",
+    "why dont you get it",
+    "this is pointless",
+    "you keep getting it wrong",
+    "im so frustrated",
+    "nothing is working",
+    "you dont make sense",
+    "i give up",
+    "forget it",
+    "nevermind",
+    "this is hopeless",
+    "why cant you just answer properly",
+     "hmm now its kinda fucked",
+    "this is kinda broken",
+    "now its broken",
+    "great now its messed up",
+    "that messed it up",
+    "you broke it",
+    "now its weird",
+
+            },
+
+            ["lore_question"] = new()
+            {
+                "what is this place",
+                "where am i",
+                "what is the void",
+                "tell me about the high order",
+                "what is this world",
+                "what is nova adeptus",
+                "what is this universe",
+                "what is the story here",
+                "what is the lore",
+                "tell me about the story",
+                "what is the setting",
+                "tell me about nova",
+    "what is the high order",
+    "what is this universe",
+    "where does nova come from",
+    "what is your backstory",
+    "tell me the lore",
+    "what is the story",
+    "who created you",
+    "what is your origin",
+    "tell me about the void",
+            },
+
+            ["name_question"] = new()
+{
+    "what is my name",
+    "do you know my name",
+    "what do you call me",
+    "remember my name",
+    "did you remember my name",
+    "who am i",
+    "what did i tell you my name was",
+},
+
+            ["nova_name_question"] = new()
+{
+    "what is your name",
+    "what's your name",
+    "whats your name",
+    "tell me your name",
+    "what are you called",
+    "what do i call you",
+    "who are you nova",
+    "what should i call you",
+    "introduce yourself",
+    "indeed whats your name",
+    "so what is your name",
+    "hey what is your name",
+    "okay what is your name",
+    "well what is your name",
+    "right what is your name",
+    "and your name is",
+    "your name is what",
+},
+
+            ["user_name_recall"] = new()
+{
+    "what is my name",
+    "do you know my name",
+    "what do you call me",
+    "remember my name",
+    "did you remember my name",
+    "who am i",
+    "what did i tell you my name was",
+    "meh what is my name",
+    "so what is my name",
+    "hey what is my name",
+    "do you remember me",
+    "what have you called me",
+    "have you got my name",
+},
+
+            ["vague_engagement"] = new()
+            {
+                "i am bored",
+                "entertain me",
+                "do something",
+                "i do not know what to do",
+                "i want to do something fun",
+                "something interesting",
+                "give me something",
+                "i am not sure",
+                "surprise me",
+                "do whatever",
+                "just do something",
+                "i need something to do",
+                 "what should i do",
+    "im not sure what to do",
+    "got anything fun",
+    "show me something cool",
+    "what is there to do here",
+    "give me something to do",
+    "im just exploring",
+    "what do you recommend",
+    "suggest something",
+    "entertain me nova",
+            },
+
+            ["butt_comment"] = new()
+{
+    "nice butt nova",
+    "do you have a butt",
+    "whats your butt like",
+    "your butt",
+    "nice ass",
+    "you have curves",
+    "your body",
+    "your figure",
+    "your posterior",
+    "thicc nova",
+    "you got back",
+    "nice body nova",
+    "your proportions",
+    "you are hot",
+    "are you attractive",
+    "what do you look like",
+    "describe yourself physically",
+    "what is your figure like",
+    "human girls vs nova",
+    "are you better than human girls",
+    "are you prettier than human women",
+},
+            ["aave_greeting"] = new()
+{
+    "who be you", "what be you", "who dis", "who dat", "who dat is",
+    "who this g is", "who dis g", "who you is", "where you is",
+    "where you be", "where you be at", "where you been at",
+    "what it is nova", "what it do", "what it be",
+    "what you are", "what you be", "what you be about",
+    "how be you nova", "how you be", "how you is",
+    "how you doing nova", "how you living",
+    "why be you that way nova", "why you be like that",
+    "why you gotta be like that", "why you acting brand new",
+    "you a jive turkey nova", "jive turkey",
+    "playa playa", "playa", "you a playa",
+    "where you be had that nova", "where you get that from",
+    "you feel me", "you dig", "you dig what im saying",
+    "on the real", "for real for real", "no cap",
+    "say word", "word", "word up",
+    "bet", "aight bet", "aight",
+    "what the deal is", "what the deal be",
+    "what you on", "what you on about",
+    "you gonna clown me", "you clowning",
+    "you trippin nova", "you wilding",
+    "you got me twisted", "dont get it twisted",
+    "i see you nova", "i see you",
+    "stay woke", "you woke",
+    "thats fire nova", "thats fire", "that be fire",
+    "you lowkey cold", "lowkey tho",
+    "nova you goated", "you goated", "you the goat",
+    "periodt", "and thats on periodt", "on god",
+    "sheesh nova", "sheesh",
+    "no cap you cold", "you cold no cap",
+    "run it back", "say that again",
+    "you spitting", "you spitting facts",
+    "hit different nova", "that hit different",
+    "its giving nova", "its giving",
+    "yasss nova", "yasss",
+    "slay nova", "you slay",
+    "you bussin nova", "that be bussin",
+    "slaps nova", "that slaps",
+    "you valid nova", "you valid",
+    "you ate that nova", "you ate and left no crumbs",
+    "ok nova i see you", "ok i see you",
+    "you different nova", "you built different",
+    "you real one nova", "you a real one",
+    "you got drip nova", "dripping nova", "your drip",
+    "spit that real talk nova", "real talk tho",
+    "this be hitting different",
+},
+
+
+        };
+
+     
+
+        // ── Total example count for logging ───────────────────
+        public static int TotalExamples()
+        {
+            int count = 0;
+            foreach (var list in Examples.Values)
+                count += list.Count;
+            return count;
+        }
+    }
+}

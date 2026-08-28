@@ -1,0 +1,142 @@
+@page "/Calculon2"
+@using CalculonLibrary.Helpers
+@using Microsoft.AspNetCore.Components.Forms
+@inject IJSRuntime JSRuntime
+<PageTitle>Calculon - Ultimate Scientific Calculator</PageTitle>
+
+
+
+<div class="DiabloBlueGlow" style="font-size:150%; text-align: center; margin-bottom: 1rem;">
+    Calculon Ultimate
+</div>
+
+<div class="calculon-shell" style="@BackgroundStyle">
+    <!-- Display -->
+    <div class="calculon-display">
+        <div class="angle-mode-indicator">@State.GetAngleModeDisplay()</div>
+        <div class="memory-indicator">@(State.HasMemory ? "M" : "")</div>
+        <div class="display-value">@State.DisplayValue</div>
+    </div>
+
+    <!-- Button Grid: 6 columns × 9 rows -->
+    <div class="calculon-grid">
+        @foreach (var btn in Buttons)
+        {
+            var isNumber = int.TryParse(btn, out _);
+            var cssClass = isNumber ? "calc-btn number-btn" : "calc-btn";
+            <button class="@cssClass" @onclick="() => Press(btn)">
+                @GetButtonLabel(btn)
+            </button>
+        }
+    </div>
+
+    <!-- Wide Buttons Row: THEME and BG -->
+    <div class="wide-buttons-row">
+        <button class="wide-btn theme-btn" @onclick="CycleTheme">
+            <span>?? THEME</span>
+        </button>
+        <button class="wide-btn bg-btn" @onclick="TriggerBackgroundUpload">
+            <span>??? BG</span>
+        </button>
+    </div>
+
+    <!-- Hidden file input for background upload -->
+    <InputFile id="bgFileInput" @ref="fileInputRef" OnChange="HandleBackgroundUpload" accept="image/*" style="display: none;" />
+</div>
+
+<!-- Theme Info Display -->
+<div style="text-align: center; margin-top: 1rem; color: var(--calc-button-text);">
+    Current Theme: @ThemeManager.GetCurrentTheme().Name
+</div>
+
+@code {
+    private InputFile? fileInputRef;
+    private string BackgroundStyle = "";
+}
+
+
+<script>
+        // Calculon JavaScript Interop Functions
+
+    // Convert uploaded image file to base64 string
+    window.calculonInterop = {
+        // Read file as base64
+        readFileAsBase64: async function (fileInputElement) {
+            return new Promise((resolve, reject) => {
+                const file = fileInputElement.files[0];
+                if (!file) {
+                    reject("No file selected");
+                    return;
+                }
+
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    resolve(e.target.result);
+                };
+
+                reader.onerror = function (e) {
+                    reject("Error reading file");
+                };
+
+                reader.readAsDataURL(file);
+            });
+        },
+
+        // Apply background image to calculator shell
+        applyBackgroundImage: function (base64Image) {
+            const shell = document.querySelector('.calculon-shell');
+            if (shell) {
+                shell.style.backgroundImage = `url('${base64Image}')`;
+                shell.style.backgroundSize = 'cover';
+                shell.style.backgroundPosition = 'center';
+            }
+        },
+
+        // Reset background to default
+        resetBackground: function () {
+            const shell = document.querySelector('.calculon-shell');
+            if (shell) {
+                shell.style.backgroundImage = "url('/iAssets/Calculon006.png')";
+            }
+        },
+
+        // Apply theme CSS variables
+        applyTheme: function (primaryColor, secondaryColor, glowColor, displayTextColor, buttonTextColor, borderColor) {
+            const root = document.documentElement;
+            root.style.setProperty('--calc-primary-color', primaryColor);
+            root.style.setProperty('--calc-secondary-color', secondaryColor);
+            root.style.setProperty('--calc-glow-color', glowColor);
+            root.style.setProperty('--calc-display-text', displayTextColor);
+            root.style.setProperty('--calc-button-text', buttonTextColor);
+            root.style.setProperty('--calc-border-color', borderColor);
+        },
+
+        // Trigger file input click
+        triggerFileInput: function (fileInputId) {
+            const input = document.getElementById(fileInputId);
+            if (input) {
+                input.click();
+            }
+        },
+
+        // Add button press animation
+        animateButton: function (buttonElement) {
+            if (buttonElement) {
+                buttonElement.classList.add('button-pressed');
+                setTimeout(() => {
+                    buttonElement.classList.remove('button-pressed');
+                }, 150);
+            }
+        },
+
+        // Vibrate on button press (mobile)
+        vibrateOnPress: function () {
+            if ('vibrate' in navigator) {
+                navigator.vibrate(10);
+            }
+        }
+    };
+
+
+</script>

@@ -1,0 +1,815 @@
+
+<div id="@ContainerId" class="viewport-container">
+    <canvas id="SpectralX-Viewport"
+            @ref="CanvasRef"
+            class="@CanvasClass"
+            style="@Viewport.Style"
+            tabindex="0"
+            @onkeydown="Engine.Input.HandleKeyDown"
+            @onkeyup="e => Input.HandleKeyUp(e)"
+            @onmousedown="async e => {
+                await Input.HandleMouseDown(e);
+                if (Engine.ActiveScene == SpectralXEngine.SceneID.Home)
+                    Input.HandleScrollbarMouseDown(e);
+            }
+            "
+            @onmousemove="async e => {
+                await Input.HandleMouseMove(e);
+                if (Engine.ActiveScene == SpectralXEngine.SceneID.Home)
+                    Input.HandleScrollbarMouseMove(e);
+            }
+            "
+            @onmouseup="async e => {
+                await Input.HandleMouseUp(e);
+                if (Engine.ActiveScene == SpectralXEngine.SceneID.Home)
+                    Input.HandleScrollbarMouseUp(e);
+            }
+            "
+    @onwheel="Input.HandleWheel"
+    @onwheel:preventDefault="true"
+    @oncontextmenu="Input.PreventContextMenu"
+    @oncontextmenu:preventDefault="true">
+</canvas>
+
+<div id="SpectralX-Loader" style="position:absolute; inset:0; z-index:100;
+    pointer-events:none; flex-direction:column; align-items:center;
+    justify-content:center; display:none;">
+    <svg class="sx-loading-progress" viewBox="0 0 100 100">
+        <circle r="40" cx="50" cy="50" />
+        <circle r="40" cx="50" cy="50" />
+    </svg>
+    <div class="sx-loading-text">0%</div>
+</div>
+
+    @if (Engine != null && UIHidden)
+    {
+        <div class="sx-menu-overlay" @onclick="ToggleUIHidden">
+            <div class="sx-menu" @onclick:stopPropagation="true">
+
+                <canvas id="sx-blob-canvas"></canvas>
+
+                <div class="sx-menu-logo">
+                    <img src="/iAssets/WebGL2Logo001.png" alt="WebGL2" class="sx-webgl-logo" />
+                </div>
+
+                <div class="sx-tabs">
+                    <button class="sx-tab @(ActiveTab == "video" ? "sx-tab--active" : "")"
+                            @onclick='() => ActiveTab = "video"'>
+                        VIDEO
+                    </button>
+                    <button class="sx-tab @(ActiveTab == "audio" ? "sx-tab--active" : "")"
+                            @onclick='() => ActiveTab = "audio"'>
+                        AUDIO
+                    </button>
+                    <button class="sx-tab @(ActiveTab == "controls" ? "sx-tab--active" : "")"
+                            @onclick='() => ActiveTab = "controls"'>
+                        CONTROLS
+                    </button>
+                    <button class="sx-tab @(ActiveTab == "options" ? "sx-tab--active" : "")"
+                            @onclick='() => ActiveTab = "options"'>
+                        OPTIONS
+                    </button>
+                </div>
+
+                <div class="sx-tab-content">
+
+                    @if (ActiveTab == "video")
+                    {
+                        <div class="sx-section">
+                            <label class="sx-label">AA MODE</label>
+                            <select class="sx-select" value="@((int)Engine.ActiveAA)" @onchange="OnAAModeChanged">
+                                <option value="0">None</option>
+                                <option value="1">MSAA</option>
+                                <option value="2">FXAA</option>
+                                <option value="3">SMAA</option>
+                                <option value="4">TAA</option>
+                                <option value="5">SpectralAA V1</option>
+                                <option value="6">SpectralAA V2</option>
+                                <option value="7">SpectralAA V3</option>
+                            </select>
+                        </div>
+
+                        <div class="sx-section">
+                            <label class="sx-label">SHADOW MODE</label>
+                            <select class="sx-select" value="@((int)Engine.ActiveShadow)" @onchange="OnShadowModeChanged">
+                                <option value="0">PCF V1</option>
+                                <option value="1">PCSS V1</option>
+                                <option value="2">SpectralX VDS V1</option>
+                                <option value="3">SpectralX RPD V2</option>
+                                <option value="4">SpectralX IGN V3</option>
+                            </select>
+                        </div>
+
+                        <div class="sx-section">
+                            <div class="sx-label-row">
+                                <label class="sx-label">TIME OF DAY</label>
+                                <span class="sx-value">@GetTimeLabel()</span>
+                            </div>
+                            <input type="range" class="sx-range" min="0" max="1" step="0.01"
+                                   value="0.5" @onchange="OnTimeOfDayChanged" />
+                        </div>
+
+                        <div class="sx-section">
+                            <label class="sx-label">CAMERA MODE</label>
+                            @{
+                                int defaultCam = SpectralXEngine.SceneID.IsBWPScene(Engine.ActiveScene) ? 2
+                                    : SpectralXEngine.SceneID.IsWebViewScene(Engine.ActiveScene) ? 0
+                                    : 1;
+                            }
+                            <select class="sx-select" value="@defaultCam" @onchange="OnCameraModeChanged">
+                                <option value="0">Webpage View</option>
+                                <option value="1">Free Cam</option>
+                                <option value="2">Orthographic</option>
+                                <option value="3">Orbit</option>
+                            </select>
+                        </div>
+
+                        @if (Engine?.ActiveCameraMode == SpectralXGLX.SpectralXComponent.SpectralXEngine.CameraMode.Orthographic)
+                        {
+                            <div class="sx-section">
+                                <label class="sx-label">ORTHO LOCK</label>
+                                <button class="sx-toggle @(Engine.OrthoCamera.LockToPlayer ? "sx-toggle--on" : "")"
+                                        @onclick="() => Engine.OrthoCamera.LockToPlayer = !Engine.OrthoCamera.LockToPlayer">
+                                    @(Engine.OrthoCamera.LockToPlayer ? "🔒 LOCKED" : "🔓 FREE")
+                                </button>
+                            </div>
+                        }
+                    }
+
+                    @if (ActiveTab == "audio")
+                    {
+                        <div class="sx-placeholder">
+                            <div class="sx-placeholder-icon">◈</div>
+                            <span>Audio settings coming soon</span>
+                        </div>
+                    }
+
+                    @if (ActiveTab == "controls")
+                    {
+                        <div class="sx-binds">
+                            @foreach (var kv in SpectralXGLX.Services.KeybindConfig.Bindings)
+                            {
+                                <div class="sx-bind-row">
+                                    <span class="sx-bind-action">@kv.Key</span>
+                                    <span class="sx-bind-key">@(string.IsNullOrEmpty(kv.Value) ? "—" : kv.Value)</span>
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (ActiveTab == "options")
+                    {
+                        <div class="sx-placeholder">
+                            <div class="sx-placeholder-icon">◈</div>
+                            <span>Options coming soon</span>
+                        </div>
+                    }
+
+                </div>
+
+                <div class="sx-menu-footer">
+                    <span>SPECTRAL X ENGINE</span>
+                    <button class="sx-close" @onclick="ToggleUIHidden">✕ CLOSE</button>
+                </div>
+
+            </div>
+        </div>
+    }
+
+
+            
+    @if (Engine != null && LandscapePanelVisible)
+    {
+        <div style="position:absolute; left:8px; top:8px; bottom:8px; width:110px;
+            background:rgba(0,0,0,0.72); border:1px solid rgba(255,255,255,0.15);
+            border-radius:6px; display:flex; flex-direction:column;
+            padding:8px 6px; gap:6px; overflow-y:auto; z-index:20;
+            font-family:'Courier New',monospace; color:#fff; font-size:11px;">
+
+            @* ?? Panel Title ??????????????????????????????????????????????? *@
+            <div style="text-align:center; font-size:10px; color:#aaa;
+                border-bottom:1px solid rgba(255,255,255,0.15); padding-bottom:4px;">
+                LANDSCAPE
+            </div>
+
+            @* Mode toggle *@
+            <button @onclick="Engine.ToggleLandscapeActive"
+                    style="width:100%; padding:4px 2px; font-size:10px;
+                font-family:'Courier New',monospace;
+                background:@(Engine.TileMap.IsActive ? "#1a6b3a" : "rgba(80,0,0,0.6)");
+                color:@(Engine.TileMap.IsActive ? "#7fff9a" : "#ff6b6b");
+                border:1px solid @(Engine.TileMap.IsActive ? "#2ecc71" : "#c0392b");
+                border-radius:3px; cursor:pointer; text-align:center;">
+                @(Engine.TileMap.IsActive ? "? ACTIVE" : "? INACTIVE")
+            </button>
+
+            @* ?? Save / Load Buttons *@
+            <div style="display:flex; gap:3px;">
+                <button @onclick="async () => { await Engine.SaveLandscape(); _savedFlash = true; await Task.Delay(800); _savedFlash = false; StateHasChanged(); }"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:@(_savedFlash ? "#1a3a6b" : "rgba(255,255,255,0.07)");
+                    color:@(_savedFlash ? "#7faaff" : "#ccc");
+                    border:1px solid @(_savedFlash ? "#2e71cc" : "rgba(255,255,255,0.12)");
+                    border-radius:3px; cursor:pointer; text-align:center;">
+                    @(_savedFlash ? "SAVED!" : "?? SAVE")
+                </button>
+                <button @onclick="async () => { await Engine.LoadLandscape(); }"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:rgba(255,255,255,0.07);
+                    color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer; text-align:center;">
+                    ?? LOAD
+                </button>
+            </div>
+
+            @* ── Height Map ─────────────────────────────────────────────────── *@
+            <div style="font-size:9px; color:#888;
+                border-top:1px solid rgba(255,255,255,0.12); padding-top:4px;">
+                HEIGHT MAP
+            </div>
+            <div style="display:flex; gap:3px;">
+                <button @onclick="async () => await Engine.ExportHeightMap()"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:rgba(255,255,255,0.07); color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer;">
+                    ↑ EXPORT
+                </button>
+                <button @onclick="async () => await Engine.ImportHeightMap()"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:rgba(255,255,255,0.07); color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer;">
+                    ↓ IMPORT
+                </button>
+            </div>
+
+            @* ── Paint Map ───────────────────────────────────────────────────── *@
+            <div style="font-size:9px; color:#888;
+                border-top:1px solid rgba(255,255,255,0.12); padding-top:4px;">
+                PAINT MAP
+            </div>
+            <div style="display:flex; gap:3px;">
+                <button @onclick="async () => await Engine.ExportPaintMap()"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:rgba(255,255,255,0.07); color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer;">
+                    ↑ EXPORT
+                </button>
+                <button @onclick="async () => await Engine.ImportPaintMap()"
+                        style="flex:1; padding:4px 2px; font-size:10px;
+                    font-family:'Courier New',monospace;
+                    background:rgba(255,255,255,0.07); color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer;">
+                    ↓ IMPORT
+                </button>
+            </div>
+
+            @* ── Defaults ────────────────────────────────────────────────────── *@
+            <div style="font-size:9px; color:#888;
+                border-top:1px solid rgba(255,255,255,0.12); padding-top:4px;">
+                DEFAULTS
+            </div>
+            <button @onclick="() => Engine.LoadDefaultLandscape()"
+                    style="width:100%; padding:4px 2px; font-size:10px;
+                font-family:'Courier New',monospace;
+                background:rgba(80,40,0,0.6); color:#ffb347;
+                border:1px solid #c0692b;
+                border-radius:3px; cursor:pointer;">
+                ↺ LOAD DEFAULT
+            </button>
+            <button @onclick="async () => await Engine.LoadDefaultImportLandscape()"
+                    style="width:100%; padding:4px 2px; font-size:10px;
+                font-family:'Courier New',monospace;
+                background:rgba(0,60,80,0.6); color:#47d4ff;
+                border:1px solid #2b8fc0;
+                border-radius:3px; cursor:pointer;">
+                ★ LOAD DEFAULT IMPORT
+            </button>
+
+
+
+
+            @* ?? Paint Mode Buttons *@
+            <div style="display:flex; flex-direction:column; gap:3px;
+                opacity:@(Engine.TileMap.IsActive ? "1" : "0.4");
+                pointer-events:@(Engine.TileMap.IsActive ? "auto" : "none");">
+                <div style="font-size:9px; color:#888; margin-bottom:1px;">MODE</div>
+
+                @foreach (var mode in Enum.GetValues<SpectralXGLX.SpectralXComponent.TilePaintMode>())
+                {
+                    bool modeActive = Engine.TileMap.PaintMode == mode;
+                    string modeLabel = mode switch
+                    {
+                        SpectralXGLX.SpectralXComponent.TilePaintMode.PaintMaterial => "?? Paint",
+                        SpectralXGLX.SpectralXComponent.TilePaintMode.RaiseTopology => "? Raise",
+                        SpectralXGLX.SpectralXComponent.TilePaintMode.LowerTopology => "? Lower",
+                        SpectralXGLX.SpectralXComponent.TilePaintMode.SmoothTopology => "? Smooth",
+                        SpectralXGLX.SpectralXComponent.TilePaintMode.FlattenTopology => "? Flatten",
+                        _ => mode.ToString()
+                    };
+
+                    <button @onclick="() => Engine.SetPaintMode(mode)"
+                            style="width:100%; padding:4px 2px; font-size:10px;
+                        font-family:'Courier New',monospace;
+                        background:@(modeActive ? "#1a6b3a" : "rgba(255,255,255,0.07)");
+                        color:@(modeActive ? "#7fff9a" : "#ccc");
+                        border:1px solid @(modeActive ? "#2ecc71" : "rgba(255,255,255,0.12)");
+                        border-radius:3px; cursor:pointer; text-align:left;">
+                        @modeLabel
+                    </button>
+                }
+            </div>
+
+            @* ?? Brush Size ???????????????????????????????????????????????? *@
+            <div style="display:flex; flex-direction:column; gap:3px;">
+                <div style="font-size:9px; color:#888;">
+                    BRUSH  <span style="color:#fff; float:right;">@Engine.TileMap.BrushSize</span>
+                </div>
+                <input type="range" min="0" max="8" step="1"
+                       value="@Engine.TileMap.BrushSize"
+                       @oninput="e => Engine.SetBrushSize(int.Parse(e.Value!.ToString()!))"
+                       style="width:100%; accent-color:#2ecc71;" />
+            </div>
+
+            @* ?? Blend Strength — only in paint material mode *@
+            @if (Engine.TileMap.PaintMode == SpectralXGLX.SpectralXComponent.TilePaintMode.PaintMaterial)
+            {
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div style="font-size:9px; color:#888;">
+                        BLEND
+                        <span style="color:#fff; float:right;">
+                            @Engine.TileMap.BlendStrength.ToString("F2")
+                        </span>
+                    </div>
+                    <input type="range" min="0.0" max="1.0" step="0.05"
+                           value="@Engine.TileMap.BlendStrength"
+                           @oninput="e => Engine.SetBlendStrength(float.Parse(e.Value!.ToString()!))"
+                           style="width:100%; accent-color:#9b59b6;" />
+                    <div style="font-size:8px; color:#666; line-height:1.3;">
+                        blend zone<br />below paint
+                    </div>
+                </div>
+            }
+
+            @* ?? Topology Strength — only in topology modes ???????????????? *@
+            @if (Engine.TileMap.PaintMode != SpectralXGLX.SpectralXComponent.TilePaintMode.PaintMaterial)
+            {
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div style="font-size:9px; color:#888;">
+                        STRENGTH
+                        <span style="color:#fff; float:right;">
+                            @Engine.TileMap.TopologyStrength.ToString("F2")
+                        </span>
+                    </div>
+                    <input type="range" min="0.05" max="1.0" step="0.05"
+                           value="@Engine.TileMap.TopologyStrength"
+                           @oninput="e => Engine.SetTopologyStrength(float.Parse(e.Value!.ToString()!))"
+                           style="width:100%; accent-color:#e67e22;" />
+                </div>
+            }
+
+            @* ?? Flatten Target Height — only in flatten mode ?????????????? *@
+            @if (Engine.TileMap.PaintMode == SpectralXGLX.SpectralXComponent.TilePaintMode.FlattenTopology)
+            {
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                    <div style="font-size:9px; color:#888;">
+                        TARGET H
+                        <span style="color:#fff; float:right;">
+                            @Engine.TileMap.FlattenTargetHeight.ToString("F1")
+                        </span>
+                    </div>
+                    <input type="range" min="-5" max="10" step="0.5"
+                           value="@Engine.TileMap.FlattenTargetHeight"
+                           @oninput="e => Engine.SetFlattenTarget(float.Parse(e.Value!.ToString()!))"
+                           style="width:100%; accent-color:#3498db;" />
+                </div>
+            }
+
+            @* ?? Material Divider ?????????????????????????????????????????? *@
+            <div style="font-size:9px; color:#888;
+                border-top:1px solid rgba(255,255,255,0.12); padding-top:4px;">
+                MATERIAL
+            </div>
+
+            @* ?? Texture Swatches ?????????????????????????????????????????? *@
+            @for (int i = 0; i < SpectralXGLX.SpectralXComponent.SpectralXLandTileMap.TexturePaths.Length; i++)
+            {
+                int matIndex = i;
+                bool isSelected = (int)Engine.TileMap.ActiveMaterial == matIndex;
+                string texPath = SpectralXGLX.SpectralXComponent.SpectralXLandTileMap.TexturePaths[matIndex];
+                string matName = SpectralXGLX.SpectralXComponent.SpectralXLandTileMap.MaterialNames[matIndex];
+
+                <div @onclick="() => Engine.SetActiveMaterial((SpectralXGLX.SpectralXComponent.TileMaterial)matIndex)"
+                     style="cursor:pointer; border-radius:4px; overflow:hidden;
+                    border:2px solid @(isSelected ? "#2ecc71" : "rgba(255,255,255,0.15)");
+                    box-shadow:@(isSelected ? "0 0 6px #2ecc71" : "none");
+                    transition: border 0.1s;">
+
+                    <img src="@texPath" alt="@matName"
+                         style="width:100%; height:60px; object-fit:cover;
+                    display:block; image-rendering:pixelated;" />
+
+                    <div style="text-align:center; font-size:9px; padding:2px 0;
+                        background:rgba(0,0,0,0.6);
+                        color:@(isSelected ? "#7fff9a" : "#aaa");">
+                        @matName
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+
+
+
+
+<button class="fullscreen-toggle" @onclick="ToggleViewport">
+    @ToggleIcon
+</button>
+
+@Debug.Output
+
+@ChildContent
+
+</div>
+
+
+<style>
+    .sx-menu-overlay {
+        position: absolute;
+        inset: 0;
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0, 0, 0, 0.55);
+        backdrop-filter: blur(2px);
+    }
+
+    .sx-menu {
+        position: relative;
+        width: min(480px, 96vw);
+        max-height: min(700px, 92vh);
+        display: flex;
+        flex-direction: column;
+        background: rgba(4, 10, 22, 0.96);
+        border: 1px solid rgba(30, 120, 255, 0.3);
+        border-radius: 6px;
+        overflow: hidden;
+        font-family: 'Courier New', monospace;
+        box-shadow: 0 0 40px rgba(20, 80, 255, 0.15), 0 0 80px rgba(20, 80, 255, 0.05);
+    }
+
+    #sx-blob-canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        opacity: 1;
+        z-index: 0;
+    }
+
+    .sx-menu-logo {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 18px 0 10px;
+        border-bottom: 1px solid rgba(30, 120, 255, 0.15);
+    }
+
+    .sx-webgl-logo {
+        height: 36px;
+        object-fit: contain;
+        filter: drop-shadow(0 0 8px rgba(60, 140, 255, 0.9)) drop-shadow(0 0 18px rgba(60, 140, 255, 0.5));
+    }
+
+    .sx-tabs {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        border-bottom: 1px solid rgba(30, 120, 255, 0.2);
+    }
+
+    .sx-tab {
+        flex: 1;
+        padding: 10px 4px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        color: rgba(120, 160, 255, 0.5);
+        font-family: 'Courier New', monospace;
+        font-size: 10px;
+        letter-spacing: 0.12em;
+        cursor: pointer;
+        transition: color 0.15s, border-color 0.15s;
+    }
+
+        .sx-tab:hover {
+            color: rgba(120, 160, 255, 0.85);
+        }
+
+    .sx-tab--active {
+        color: #5ba3ff;
+        border-bottom-color: #5ba3ff;
+    }
+
+    .sx-tab-content {
+        position: relative;
+        z-index: 1;
+        flex: 1;
+        overflow-y: auto;
+        padding: 16px 20px;
+        scrollbar-width: thin;
+        scrollbar-color: rgba(30, 120, 255, 0.3) transparent;
+    }
+
+        .sx-tab-content::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .sx-tab-content::-webkit-scrollbar-thumb {
+            background: rgba(30, 120, 255, 0.3);
+            border-radius: 2px;
+        }
+
+    .sx-section {
+        margin-bottom: 18px;
+    }
+
+    .sx-label {
+        display: block;
+        font-size: 9px;
+        letter-spacing: 0.15em;
+        color: rgba(80, 140, 255, 0.7);
+        margin-bottom: 6px;
+    }
+
+    .sx-label-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-bottom: 6px;
+    }
+
+    .sx-value {
+        font-size: 9px;
+        color: rgba(120, 180, 255, 0.8);
+        letter-spacing: 0.08em;
+    }
+
+    .sx-select {
+        width: 100%;
+        background: rgba(10, 25, 60, 0.8);
+        border: 1px solid rgba(30, 120, 255, 0.25);
+        border-radius: 3px;
+        color: #a8c8ff;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        padding: 7px 10px;
+        cursor: pointer;
+        outline: none;
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%235ba3ff'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+    }
+
+        .sx-select:focus {
+            border-color: rgba(30, 120, 255, 0.6);
+        }
+
+    .sx-range {
+        width: 100%;
+        accent-color: #5ba3ff;
+        cursor: pointer;
+    }
+
+    .sx-toggle {
+        width: 100%;
+        padding: 7px 10px;
+        background: rgba(10, 25, 60, 0.8);
+        border: 1px solid rgba(30, 120, 255, 0.25);
+        border-radius: 3px;
+        color: rgba(120, 160, 255, 0.6);
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        cursor: pointer;
+        text-align: center;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+
+    .sx-toggle--on {
+        background: rgba(20, 60, 140, 0.6);
+        border-color: rgba(30, 120, 255, 0.5);
+        color: #7fbbff;
+    }
+
+    .sx-binds {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .sx-bind-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 6px 8px;
+        border-radius: 3px;
+        background: rgba(10, 25, 60, 0.4);
+        border: 1px solid rgba(30, 120, 255, 0.08);
+    }
+
+        .sx-bind-row:nth-child(even) {
+            background: rgba(10, 25, 60, 0.2);
+        }
+
+    .sx-bind-action {
+        font-size: 10px;
+        color: rgba(120, 160, 255, 0.65);
+        letter-spacing: 0.06em;
+    }
+
+    .sx-bind-key {
+        font-size: 10px;
+        color: #5ba3ff;
+        background: rgba(20, 60, 140, 0.4);
+        border: 1px solid rgba(30, 120, 255, 0.3);
+        border-radius: 2px;
+        padding: 2px 7px;
+        letter-spacing: 0.08em;
+    }
+
+    .sx-placeholder {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        padding: 60px 20px;
+        color: rgba(80, 120, 200, 0.4);
+        font-size: 11px;
+        letter-spacing: 0.1em;
+    }
+
+    .sx-placeholder-icon {
+        font-size: 28px;
+        opacity: 0.3;
+    }
+
+    .sx-menu-footer {
+        position: relative;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 20px;
+        border-top: 1px solid rgba(30, 120, 255, 0.15);
+        font-size: 9px;
+        color: rgba(60, 100, 180, 0.5);
+        letter-spacing: 0.12em;
+    }
+
+    .sx-close {
+        background: transparent;
+        border: 1px solid rgba(30, 120, 255, 0.2);
+        border-radius: 3px;
+        color: rgba(120, 160, 255, 0.5);
+        font-family: 'Courier New', monospace;
+        font-size: 9px;
+        letter-spacing: 0.1em;
+        padding: 4px 10px;
+        cursor: pointer;
+        transition: border-color 0.15s, color 0.15s;
+    }
+
+        .sx-close:hover {
+            border-color: rgba(30, 120, 255, 0.5);
+            color: #5ba3ff;
+        }
+</style>
+
+<script>
+    (function() {
+        function initBlob() {
+            const canvas = document.getElementById('sx-blob-canvas');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            let w, h;
+
+            function resize() {
+                w = canvas.width = canvas.offsetWidth;
+                h = canvas.height = canvas.offsetHeight;
+            }
+
+            resize();
+            window.addEventListener('resize', resize);
+
+            function draw(t) {
+                ctx.clearRect(0, 0, w, h);
+
+                const cx = w / 2, cy = h / 2;
+
+                // double-pulse heartbeat rhythm
+                const beat = t / 1200;  // was 600, higher = slower
+                const p1 = Math.max(0, Math.sin(beat * Math.PI * 2));
+                const p2 = Math.max(0, Math.sin((beat - 0.12) * Math.PI * 2));
+                const pulse = Math.pow(p1, 3) * 0.6 + Math.pow(p2, 3) * 0.4;
+
+                // outer glow
+                const r2 = Math.min(w, h) * 0.65 + pulse * 30;  // was 0.42
+                const g2 = ctx.createRadialGradient(cx, cy, 0, cx, cy, r2);
+                g2.addColorStop(0, `rgba(40,120,255,${0.22 + pulse * 0.12})`);
+                g2.addColorStop(0.4, `rgba(20,80,220,${0.10 + pulse * 0.06})`);
+                g2.addColorStop(1, 'rgba(10,30,120,0)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, r2, 0, Math.PI * 2);
+                ctx.fillStyle = g2;
+                ctx.fill();
+
+                // core blob
+               
+                const r1 = Math.min(w, h) * 0.28 + pulse * 18;  // was 0.18
+                const g1 = ctx.createRadialGradient(cx, cy, 0, cx, cy, r1);
+                g1.addColorStop(0, `rgba(100,170,255,${0.55 + pulse * 0.3})`);
+                g1.addColorStop(0.5, `rgba(50,120,255,${0.35 + pulse * 0.2})`);
+                g1.addColorStop(1, 'rgba(20,60,200,0)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, r1, 0, Math.PI * 2);
+                ctx.fillStyle = g1;
+                ctx.fill();
+
+                // bright center dot
+                const rc = 12 + pulse * 6;
+                const gc = ctx.createRadialGradient(cx, cy, 0, cx, cy, rc);
+                gc.addColorStop(0, `rgba(200,230,255,${0.7 + pulse * 0.3})`);
+                gc.addColorStop(1, 'rgba(100,160,255,0)');
+                ctx.beginPath();
+                ctx.arc(cx, cy, rc, 0, Math.PI * 2);
+                ctx.fillStyle = gc;
+                ctx.fill();
+
+                requestAnimationFrame(draw);
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        // with this:
+        function tryInitBlob() {
+            if (document.getElementById('sx-blob-canvas')) {
+                initBlob();
+            } else {
+                setTimeout(tryInitBlob, 100);
+            }
+        }
+        tryInitBlob();
+    })();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

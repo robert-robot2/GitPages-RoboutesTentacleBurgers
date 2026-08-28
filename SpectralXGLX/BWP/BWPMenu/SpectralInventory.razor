@@ -1,0 +1,241 @@
+@using SpectralXGLX.BWP
+
+@if (ActiveCharacter != null && ActiveCharacter.CharIsAlive)
+{
+    <div style="
+        position: absolute;
+        inset: 0;
+        z-index: 55;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        pointer-events: all;
+        font-family: 'Courier New', monospace;">
+
+        <div style="
+            position: relative;
+            width: clamp(320px, 90vw, 520px);
+            min-height: clamp(400px, 70vh, 650px);
+            max-height: 90vh;
+            overflow-y: auto;
+            background-image: url('/iAssets/GothicFrame05.png');
+            background-size: 100% 100%;
+            border: 2px solid @ActiveCharacter.CharInvColor;
+            box-shadow: 0 0 24px @ActiveCharacter.CharInvColor;
+            border-radius: 8px;
+            padding: clamp(12px, 3vw, 28px) clamp(14px, 3.5vw, 32px);
+            color: @ActiveCharacter.CharInvColor;
+            box-sizing: border-box;">
+
+            @* Class + Level *@
+            <div style="
+                font-size: clamp(1rem, 3.5vw, 1.4rem);
+                letter-spacing: 0.1em;
+                text-shadow: 0 0 12px @ActiveCharacter.CharInvColor;
+                margin-bottom: 2px;">
+                @ActiveCharacter.CharClassName
+            </div>
+
+            <div style="
+                font-size: clamp(0.75rem, 2.5vw, 1rem);
+                letter-spacing: 0.08em;
+                margin-bottom: 4px;">
+                Level:
+                <span style="text-shadow: 0 0 12px @ActiveCharacter.CharInvColor;">
+                    @ActiveCharacter.CharLevel
+                </span>
+            </div>
+
+            @* XP *@
+            <div style="font-size: clamp(0.7rem, 2vw, 0.9rem); margin-bottom: 16px;">
+                Total XP:
+                <span style="
+                    display: inline-block;
+                    background: rgba(0,0,0,0.5);
+                    border: 1px solid #555;
+                    border-radius: 4px;
+                    padding: 2px 10px;
+                    margin-left: 6px;
+                    text-shadow: 0 0 12px @ActiveCharacter.CharInvColor;">
+                    @ActiveCharacter.CharXP
+                </span>
+
+                <span style="
+                    font-size: clamp(0.6rem, 1.5vw, 0.72rem);
+                    color: rgba(255,255,255,0.35);
+                    margin-left: 8px;">
+                    / @Level?.GetXPThreshold(ActiveCharacter) next level
+                </span>
+            </div>
+
+            @* Stats *@
+            @StatRow("Constitution", ActiveCharacter.CharHitPoints.ToString(), null)
+            @StatRow("Strength", ActiveCharacter.CharStrength.ToString(), "Strength")
+            @StatRow("Alacrity", ActiveCharacter.CharAlacrity.ToString(), "Alacrity")
+            @StatRow("Celerity", ActiveCharacter.CharCelerity.ToString(), "Celerity")
+            @StatRow("Limenity", ActiveCharacter.CharLimenity.ToString(), "Limenity")
+            @StatRow("Intelligence", ActiveCharacter.CharIntelligence.ToString(), "Intelligence")
+
+            @StatRow(
+                ActiveCharacter.CharResourceName,
+                $"{ActiveCharacter.CharResourceValue}/{ActiveCharacter.CharMaxResourceValue}",
+                "uniqueS1")
+
+            @StatRow(
+                ActiveCharacter.CharRegenLabel,
+                ActiveCharacter.CharRegenValue.ToString(),
+                "uniqueS2")
+
+            @StatRow(
+                "Life Regen",
+                ActiveCharacter.CharLifeRegen.ToString(),
+                "Life Regen")
+
+            @StatRow(
+                "Stat Points",
+                ActiveCharacter.CharStatPoints.ToString(),
+                null)
+
+            @* Hunger *@
+            <div style="
+                margin-top: 14px;
+                font-size: clamp(0.65rem, 2vw, 0.8rem);
+                margin-bottom: 4px;
+                text-shadow: 0 0 8px @ActiveCharacter.CharEnergyColor;">
+                Hunger
+            </div>
+
+            <div style="
+                position: relative;
+                width: 100%;
+                height: clamp(20px, 4vw, 26px);
+                background: rgba(0,0,0,0.6);
+                border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 3px;
+                overflow: hidden;
+                margin-bottom: 16px;">
+
+                <div style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%;
+                    width: @HungerPercent%;
+                    background: @ActiveCharacter.CharEnergyColor;
+                    box-shadow: 0 0 8px @ActiveCharacter.CharEnergyColor;
+                    transition: width .2s;">
+                </div>
+
+                <div style="
+                    position: absolute;
+                    inset: 0;
+                    background-image: url('/iAssets/GothicFrame03.png');
+                    background-size: cover;
+                    opacity: .45;
+                    pointer-events: none;">
+                </div>
+
+                <div style="
+                    position: absolute;
+                    inset: 0;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: clamp(0.6rem, 1.8vw, 0.72rem);
+                    color: white;
+                    z-index: 3;
+                    text-shadow: 0 0 4px #000;">
+                    @ActiveCharacter.CharHungerCurrent /
+                    @ActiveCharacter.CharHungerFull
+                </div>
+            </div>
+
+            @* Close *@
+            <button style="
+                width: 100%;
+                padding: clamp(6px, 2vw, 10px);
+                font-family: 'Courier New', monospace;
+                font-size: clamp(0.65rem, 2vw, 0.8rem);
+                letter-spacing: .1em;
+                background: rgba(0,0,0,.6);
+                color: @ActiveCharacter.CharInvColor;
+                border: 1px solid @ActiveCharacter.CharInvColor;
+                border-radius: 3px;
+                cursor: pointer;
+                text-shadow: 0 0 8px @ActiveCharacter.CharInvColor;"
+                    @onclick="OnClosePressed">
+
+                ✕ CLOSE [ I ]
+            </button>
+
+        </div>
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public ISpectralCharacter? ActiveCharacter { get; set; }
+
+    [Parameter]
+    public SpectralLevel? Level { get; set; }
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    private int HungerPercent =>
+        ActiveCharacter == null || ActiveCharacter.CharHungerFull == 0
+            ? 0
+            : (int)((float)ActiveCharacter.CharHungerCurrent /
+                    ActiveCharacter.CharHungerFull * 100f);
+
+    private void AllocateStat(string stat)
+    {
+        if (Level == null || ActiveCharacter == null)
+            return;
+
+        Level.AllocateStat(ActiveCharacter, stat);
+    }
+
+    private async Task OnClosePressed()
+        => await OnClose.InvokeAsync();
+
+    private RenderFragment StatRow(string label, string value, string? allocKey) =>
+        @<div style="
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: clamp(0.65rem, 2vw, 0.85rem);
+            margin-bottom: 5px;
+            text-shadow: 0 0 8px @ActiveCharacter!.CharInvColor;">
+
+            <span style="min-width: clamp(90px, 22vw, 130px); color: @ActiveCharacter!.CharInvColor;">
+                @label:
+            </span>
+
+            <span style="min-width: clamp(40px, 10vw, 60px); color: white;">
+                @value
+            </span>
+
+            @if (allocKey != null && ActiveCharacter!.CharStatPoints > 0)
+            {
+                <button style="
+                    margin-left: 8px;
+                    padding: 2px 8px;
+                    font-size: clamp(0.6rem, 1.8vw, 0.75rem);
+                    background: rgba(0,0,0,.5);
+                    color: @ActiveCharacter.CharInvColor;
+                    border: 1px solid @ActiveCharacter.CharInvColor;
+                    border-radius: 3px;
+                    cursor: pointer;"
+                        @onclick="() => AllocateStat(allocKey)">
+                    +
+                </button>
+            }
+            else
+            {
+                <span style="width: 30px;"></span>
+            }
+
+        </div>;
+}

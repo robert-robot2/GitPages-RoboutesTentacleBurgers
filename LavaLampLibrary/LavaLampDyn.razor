@@ -1,0 +1,95 @@
+﻿<svg width="100" height="200" viewBox="0 0 84 128" xmlns="http://www.w3.org/2000/svg">
+
+
+    <defs>
+
+
+       <!-- ADD THIS FILTER INSIDE <defs> -->
+<filter id="redOrangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+  <feGaussianBlur stdDeviation="6" result="blur"/>
+  <feColorMatrix
+    in="blur"
+    type="matrix"
+    values="
+      1 0 0 0 0
+      0.45 0 0 0 0
+      0 0 0 0 0
+      0 0 0 0.9 0"/>
+  <feMerge>
+    <feMergeNode/>
+    <feMergeNode in="SourceGraphic"/>
+  </feMerge>
+</filter>
+
+        <mask id="glassMask" maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="84" height="128" fill="black" />
+            <image href="/iAssets/SCLavaLampglass01.png" x="0" y="0" width="84" height="128" />
+        </mask>
+
+
+
+        <!-- Fluid metaball filter -->
+        <filter id="fluid" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse" fill-opacity=".035">
+            <feGaussianBlur stdDeviation="8" result="blur" />
+            <feColorMatrix in="blur" mode="matrix"
+                           values="1 0 0 0 0
+                                   0 1 0 0 0
+                                   0 0 1 0 0
+                                   0 0 0 18 -7"
+                           result="metaball" />
+            <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="1" seed="2" result="noise">
+                <animate attributeName="seed" dur="6s" from="0" to="100" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="metaball" in2="noise" scale="2" />
+        </filter>
+    </defs>
+
+    <!-- Background image -->
+    <image href="/iAssets/SCLavaLamp05.png" x="0" y="0" width="84" height="128" preserveAspectRatio="none" filter="url(#redOrangeGlow)" opacity="1" />
+
+
+    <!-- Glass image on top - CHANGE THE opacity VALUE HERE (0.0 to 1.0) -->
+    <image href="/iAssets/SCLavaLampglass01.png" x="0" y="0" width="84" height="128" preserveAspectRatio="none" opacity=".4" filter="url(#redOrangeGlow)" style="z-index:4" />
+
+
+    <g filter="url(#fluid) url(#redOrangeGlow)" mask="url(#glassMask)" opacity=".7">
+        <image href="/iAssets/SCLavaLampglass01.png" x="0" y="0" width="84" height="128" preserveAspectRatio="none" opacity=".3" filter="url(#redOrangeGlow)" style="z-index:4" />
+
+        <circle cx="47" cy="70" r="14" fill="#ff4d4d">
+            <animate attributeName="cy" values="90;45;90" dur="6s" repeatCount="indefinite" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" calcMode="spline" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.9 1.2;1 1" dur="6s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="55" cy="75" r="9" fill="#ff6b6b">
+            <animate attributeName="cy" values="90;40;90" dur="5s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;1.1 0.9;1 1" dur="5s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="40" cy="80" r="11" fill="#ff2e2e">
+            <animate attributeName="cy" values="90;50;90" dur="7s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.85 1.15;1 1" dur="7s" repeatCount="indefinite" />
+        </circle>
+    </g>
+   
+</svg>
+
+
+
+
+            @*
+
+
+                <!-- Lava blobs inside glass -->
+    <g filter="url(#fluid) url(#redOrangeGlow)" opacity=".5">
+        <circle cx="120" cy="80" r="28" fill="#ff4d4d">
+            <animate attributeName="cy" values="190;150;190" dur="6s" repeatCount="indefinite" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" calcMode="spline" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.9 1.2;1 1" dur="6s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="120" cy="90" r="18" fill="#ff6b6b">
+            <animate attributeName="cy" values="170;200;170" dur="5s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;1.1 0.9;1 1" dur="5s" repeatCount="indefinite" />
+        </circle>
+        <circle cx="115" cy="110" r="22" fill="#ff2e2e">
+            <animate attributeName="cy" values="180;140;180" dur="7s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.85 1.15;1 1" dur="7s" repeatCount="indefinite" />
+        </circle>
+    </g>
+            *@

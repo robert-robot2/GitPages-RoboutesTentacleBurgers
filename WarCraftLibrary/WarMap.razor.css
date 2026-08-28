@@ -1,0 +1,631 @@
+﻿
+/* ===== VIEWPORT ===== */
+.war-viewport {
+    position: relative;
+    margin: 20px auto;
+    width: 1024px;
+    height: 768px;
+    background: rgba(0,0,0,0.8);
+    border: 4px solid #8B4513;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    overflow: hidden;
+    outline: none; /* Remove focus outline */
+    /* ✅ PART 1: Disable text selection on drag */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    z-index:2;
+}
+
+img {
+    -webkit-user-drag: none;
+    -khtml-user-drag: none;
+    -moz-user-drag: none;
+    -o-user-drag: none;
+    user-drag: none;
+    pointer-events: auto; /* Keep clicks working */
+}
+.war-map {
+    position: absolute; /* ← Positioned relative to .war-viewport */
+    width: 4096px;
+    height: 4096px;
+    /* INLINE STYLE: left: -CameraX, top: -CameraY */
+    /* This is what scrolls */
+}
+
+.war-bg {
+    position: absolute;
+    width: 4096px;
+    height: 4096px;
+    pointer-events: none;
+}
+
+/* ===== MINIMAP ===== */
+.war-minimap {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+    z-index: 1000;
+}
+.minimap-border {
+    position: relative;
+    width: 164px;
+    height: 164px;
+    border: 2px solid #FFD700;
+    background: #000;
+    box-shadow: 0 0 10px rgba(0,0,0,0.9);
+}
+
+.minimap-camera {
+    position: absolute;
+    border: 1px solid #FFF;
+    background: rgba(255,255,255,0.2);
+    pointer-events: none;
+}
+
+/* ===== DEBUG ===== */
+.debug-info {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(0,0,0,0.8);
+    color: #0F0;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    border: 1px solid #0F0;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+.debug-grid {
+    position: absolute;
+    width: 4096px;
+    height: 4096px;
+    pointer-events: none;
+}
+
+.game-menu-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 1000;
+}
+
+
+
+
+.selection-circle {
+    border: 2px solid lime;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(0,255,0,0.8);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.selection-box {
+    border: 2px solid cyan;
+    box-shadow: 0 0 6px rgba(0,255,255,0.8);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 5;
+}
+
+/* ===== CARRYING INDICATORS ===== */
+.carrying-indicator {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,.1);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 8px rgba(255, 215, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.carrying-indicatorL {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    width: 20px;
+    height: 20px;
+    background: rgba(0,0,0,.1);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 8px rgba(139, 69, 19, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.ghost-valid {
+    animation: pulse-valid 1s infinite;
+}
+
+.ghost-invalid {
+    animation: pulse-invalid 0.5s infinite;
+}
+
+@keyframes pulse-valid {
+    0%, 100% {
+        opacity: 0.7;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+@keyframes pulse-invalid {
+    0%, 100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+
+
+.menu-btn {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    z-index: 2000;
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.7);
+    color: #ffd700;
+    border: 1px solid #aa8800;
+    border-radius: 4px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+    .menu-btn:hover {
+        background: rgba(40, 40, 40, 0.9);
+    }
+
+
+
+
+/* ===== CASTLE UPGRADE BUTTON ===== */
+.cmd-upgrade-castle {
+    background: linear-gradient(180deg, #4B0082 0%, #2E0854 100%);
+    border-color: #9370DB;
+}
+
+    .cmd-upgrade-castle:hover:not(:disabled) {
+        background: linear-gradient(180deg, #6A0DAD 0%, #4B0082 100%);
+        border-color: #BA55D3;
+        box-shadow: 0 0 15px rgba(186, 85, 211, 0.6);
+    }
+
+    .cmd-upgrade-castle:disabled {
+        opacity: 0.4;
+    }
+
+
+/* ===== MINIMAP SELECTED UNITS ===== */
+.minimap-selected-unit {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #0F0;
+    border: 1px solid #FFF;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 10;
+    box-shadow: 0 0 4px rgba(0, 255, 0, 0.8);
+    animation: pulse-minimap 1s infinite;
+}
+
+@keyframes pulse-minimap {
+    0%, 100% {
+        opacity: 0.8;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.3);
+    }
+}
+
+
+.DiabloRedGlowWarMap {
+    font-family: 'Diablo', sans-serif;
+    font-size: 1rem;
+    color: #39ff14;
+    letter-spacing: 0.5px;
+}
+
+
+/* ===== TILE RENDERING ===== */
+.tile {
+    image-rendering: pixelated; /* Keep pixel art crisp */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+}
+
+/* ===== PHASE 4: BUILDING ANIMATION EFFECTS ===== */
+
+/* Construction overlay (already exists, but updated) */
+.construction-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: rgba(0, 0, 0, 0.8);
+    color: #FFD700;
+    text-align: center;
+    padding: 4px;
+    font-size: 11px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* Smoke effect (medium damage) */
+.smoke-effect {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    font-size: 20px;
+    animation: smoke-rise 2s ease-in-out infinite;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+@keyframes smoke-rise {
+    0% {
+        transform: translateY(0) scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translateY(-8px) scale(1.2);
+        opacity: 0.4;
+    }
+
+    100% {
+        transform: translateY(-16px) scale(1.4);
+        opacity: 0;
+    }
+}
+
+/* Fire effect (heavy damage) */
+.fire-effect {
+    position: absolute;
+    top: 5px;
+    left: 15px;
+    font-size: 24px;
+    animation: fire-flicker 0.5s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes fire-flicker {
+    0%, 100% {
+        transform: scale(1) rotate(-5deg);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.15) rotate(5deg);
+        opacity: 0.8;
+    }
+}
+
+/* Destroyed overlay */
+.destroyed-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 0, 0, 0.9);
+    color: #FFF;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-size: 14px;
+    border: 2px solid #F00;
+    pointer-events: none;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+}
+
+/* Selection box (update if needed) */
+.selection-box {
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 3px solid #0F0;
+    pointer-events: none;
+    animation: selection-pulse 1s ease-in-out infinite;
+}
+
+@keyframes selection-pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+
+/* ===== MINIMAP ENTITY DOTS ===== */
+
+/* Player Buildings (green squares) */
+.minimap-player-building {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #0F0;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    pointer-events: none;
+    z-index: 9;
+}
+
+/* Player Units (green circles) */
+.minimap-player-unit {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #0F0;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9;
+}
+
+
+/* ===== PART 2: RALLY POINT FLAG ===== */
+.rally-flag {
+    animation: rally-pulse 2s ease-in-out infinite;
+}
+
+@keyframes rally-pulse {
+    0%, 100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 0.8;
+    }
+}
+
+/* ===== GAME END OVERLAY ===== */
+.game-end-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.game-end-panel {
+    background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
+    border: 4px solid #8B4513;
+    border-radius: 12px;
+    padding: 40px;
+    max-width: 600px;
+    width: 90%;
+    box-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-50px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.game-end-title {
+    font-family: 'Cinzel', serif;
+    font-size: 36px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.8);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+    .game-end-title.victory {
+        color: #FFD700;
+        text-shadow: 0 0 20px #FFD700, 0 0 40px #FFA500;
+    }
+
+    .game-end-title.defeat {
+        color: #FF4500;
+        text-shadow: 0 0 20px #FF0000, 0 0 40px #8B0000;
+    }
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+
+
+
+
+
+
+
+
+.game-end-stats {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #666;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+    .game-end-stats h3 {
+        color: #FFD700;
+        font-family: 'Cinzel', serif;
+        font-size: 24px;
+        text-align: center;
+        margin-bottom: 15px;
+        border-bottom: 2px solid #8B4513;
+        padding-bottom: 10px;
+    }
+
+/* ✅ SCROLLABLE CONTAINER */
+.stats-scroll-container {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+    .stats-scroll-container::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .stats-scroll-container::-webkit-scrollbar-track {
+        background: rgba(0, 0, 0, 0.3);
+        border-radius: 4px;
+    }
+
+    .stats-scroll-container::-webkit-scrollbar-thumb {
+        background: #8B4513;
+        border-radius: 4px;
+    }
+
+        .stats-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #A0522D;
+        }
+
+/* ✅ TWO COLUMN LAYOUT */
+.stats-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.stats-column {
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 6px;
+    padding: 15px;
+}
+
+.column-header {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 8px;
+    border-radius: 4px;
+}
+
+    .column-header.player {
+        color: #0F0;
+        background: rgba(0, 255, 0, 0.15);
+        border: 2px solid #0F0;
+    }
+
+    .column-header.enemy {
+        color: #F00;
+        background: rgba(255, 0, 0, 0.15);
+        border: 2px solid #F00;
+    }
+
+/* ✅ STAT ROWS */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 10px;
+    margin-bottom: 5px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    border-left: 3px solid transparent;
+    transition: all 0.2s;
+}
+
+    .stat-row:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-left-color: #FFD700;
+    }
+
+.stat-label {
+    color: #AAA;
+    font-size: 13px;
+}
+
+.stat-value {
+    color: #0F0;
+    font-weight: bold;
+    font-size: 14px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+}
+
+    .stat-value.enemy {
+        color: #FF6347;
+        text-shadow: 0 0 5px rgba(255, 99, 71, 0.5);
+    }
+
+/* ✅ MATCH INFO (Below columns) */
+.match-info {
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #8B4513;
+    display: flex;
+    justify-content: space-around;
+}
+
+    .match-info .stat-row {
+        background: rgba(255, 215, 0, 0.1);
+        border-left-color: #FFD700;
+    }
+
+    .match-info .stat-value {
+        color: #FFD700;
+        text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+    }

@@ -1,0 +1,155 @@
+@implements IDisposable
+
+<div style="
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(20,0,0,0.85) 0%, rgba(0,0,0,0.96) 100%);
+    pointer-events: all;
+    font-family: 'Courier New', monospace;">
+
+    @* ── Title Text ───────────────────────────────────────────────── *@
+    <div style="
+        font-size: 3.5rem;
+        font-family: 'Diablo', 'Courier New', monospace;
+        font-weight: normal;
+        letter-spacing: 0.08em;
+        color: #cc2200;
+        text-shadow: 0 0 18px #ff4400, 0 0 40px #aa1100, 0 0 80px #660000;
+        margin-bottom: 0px;
+        text-transform: none;
+        text-align: center;">
+        Blood Wyrm Protocol
+    </div>
+
+    @* ── Animated Fire Title Sprite ───────────────────────────────── *@
+    <div style="
+        overflow: hidden;
+        width: @((int)(FrameW * ScaleX))px;
+        height: @((int)(FrameH * ScaleY))px;
+        margin-top: -78px;
+        margin-bottom: 32px;">
+        <img src="/iAssets/DiabloTitle005.png"
+             style="@GetSpriteStyle()"
+             alt="" />
+    </div>
+
+    @* ── Menu Buttons ─────────────────────────────────────────────── *@
+    <div style="
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        align-items: center;
+        width: 260px;">
+        <button style="@ButtonStyle()"
+                @onclick="OnSinglePlayerPressed"
+                @onmouseenter="() => _hovered = 0"
+                @onmouseleave="() => _hovered = -1">
+            Single Player
+        </button>
+
+        <button style="@ButtonStyle()"
+                @onclick="OnOptionsPressed"
+                @onmouseenter="() => _hovered = 1"
+                @onmouseleave="() => _hovered = -1">
+            Options
+        </button>
+
+        <button style="@ButtonStyle()"
+                @onclick="OnControlsPressed"
+                @onmouseenter="() => _hovered = 2"
+                @onmouseleave="() => _hovered = -1">
+            Controls
+        </button>
+
+        <button style="@ButtonStyle()"
+                @onclick="OnQuitPressed"
+                @onmouseenter="() => _hovered = 3"
+                @onmouseleave="() => _hovered = -1">
+            Exit Game
+        </button>
+
+    </div>
+
+    @* ── Footer hint ─────────────────────────────────────────────── *@
+    <div style="
+        position: absolute;
+        bottom: 18px;
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.2);
+        letter-spacing: 0.12em;">
+        PRESS 5 TO CLOSE
+    </div>
+
+</div>
+
+@code {
+
+    // ── Parameters ────────────────────────────────────────────────
+    [Parameter] public EventCallback OnSinglePlayer { get; set; }
+    [Parameter] public EventCallback OnOptions { get; set; }
+    [Parameter] public EventCallback OnControls { get; set; }
+    [Parameter] public EventCallback OnQuit { get; set; }
+
+    // ── Fire Sprite Animation ─────────────────────────────────────
+    private const int FrameW = 552;
+    private const int TotalFrames = 10;
+    private const int FrameDurationMs = 100;
+
+    // Displayed frame height — crop to flame area only
+    private const int FrameH = 216;
+    private const double ScaleX = 0.85;
+    private const double ScaleY = 0.28;
+
+    private int _frame = 0;
+    private System.Timers.Timer? _frameTimer;
+    private int _hovered = -1;
+
+    protected override void OnInitialized()
+    {
+        _frameTimer = new System.Timers.Timer(FrameDurationMs);
+        _frameTimer.Elapsed += (_, __) =>
+        {
+            _frame = (_frame + 1) % TotalFrames;
+            InvokeAsync(StateHasChanged);
+        };
+        _frameTimer.AutoReset = true;
+        _frameTimer.Start();
+    }
+
+    private string GetSpriteStyle()
+    {
+        int offsetY = _frame * FrameH;
+        return $"width:{FrameW}px; height:{FrameH}px; " +
+               $"object-fit:none; object-position:0px -{offsetY}px; " +
+               $"transform:scale({ScaleX.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}," +
+               $"{ScaleY.ToString("F2", System.Globalization.CultureInfo.InvariantCulture)}); " +
+               $"transform-origin:top left; display:block;";
+    }
+
+  private string ButtonStyle() =>
+    $"width:100%; padding:10px 8px; font-size:1.4rem; " +
+    $"font-family:'Diablo','Courier New',monospace; letter-spacing:0.14em; " +
+    $"background:transparent; " +
+  $"color:#cc2200; " +
+  $"text-shadow:0 0 12px #ff4400, 0 0 40px #aa1100; " +
+    $"border:none; outline:none; " +
+    $"cursor:pointer; text-align:center; " +
+    $"transition:color 0.15s ease, text-shadow 0.15s ease;";
+
+    // ── Button Handlers ───────────────────────────────────────────
+    private async Task OnSinglePlayerPressed() => await OnSinglePlayer.InvokeAsync();
+    private async Task OnOptionsPressed() => await OnOptions.InvokeAsync();
+    private async Task OnControlsPressed() => await OnControls.InvokeAsync();
+    private async Task OnQuitPressed() => await OnQuit.InvokeAsync();
+
+    public void Dispose()
+    {
+        _frameTimer?.Stop();
+        _frameTimer?.Dispose();
+    }
+}

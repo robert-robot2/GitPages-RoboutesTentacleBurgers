@@ -1,0 +1,30 @@
+
+
+
+
+
+
+
+
+@* MoleculeDisplay.razor - Displays current molecule being built *@
+@using ChemCalc.ChemEngine
+
+<div class="molecule-display">
+    @if (CurrentMolecule != null && !CurrentMolecule.IsEmpty())
+    {
+        <div class="molecule-header">Current Molecule</div>
+        <div class="molecule-formula">@CurrentMolecule.GetFormulaWithState()</div>
+        <div class="molecule-mass">@CurrentMolecule.GetFormattedMolarMass()</div>
+    }
+    else
+    {
+        <div class="molecule-placeholder">
+            <span>Build a molecule by selecting elements</span>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public MoleculeBuilder CurrentMolecule { get; set; }
+}

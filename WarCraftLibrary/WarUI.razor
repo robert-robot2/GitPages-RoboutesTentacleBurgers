@@ -1,0 +1,670 @@
+﻿@using WarCraftLibrary
+@inject WarGameService Game
+
+<!-- Resource Display (Top) -->
+<div class="resource-panel">
+    <div class="resource-item">
+        <img src="/wc1sprites/ui/Gold001.png" alt="Gold" />
+        <span class="DiabloRedGlowWarUI">@Game.PlayerGold</span>
+    </div>
+    <div class="resource-item">
+        <img src="/wc1sprites/ui/Woood001.png" alt="Lumber" />
+        <span class="DiabloRedGlowWarUI">@Game.PlayerLumber</span>
+    </div>
+    <div class="resource-item">
+        <span class="DiabloRedGlowWarUI">??</span>
+        <span class="DiabloRedGlowWarUI">@Game.PlayerCurrentPop/@Game.PlayerMaxPop</span>
+        <span class="DiabloRedGlowWarUI" style="font-size: 11px;">(Max: @WarGameService.AbsoluteMaxPop)</span>
+    </div>
+</div>
+
+<!-- Command Panel (Bottom-Center) - NEW COMPACT DESIGN -->
+@if (IsVisible)
+{
+    <div class="command-panel">
+        <!-- LEFT SECTION: Selection Info -->
+        <div class="command-panel-left">
+            @{
+                RaceType displayRace = RaceType.Human;
+                if (WarRegistry.SelectedBuilding != null)
+                    displayRace = WarRegistry.SelectedBuilding.Race;
+                else if (WarRegistry.SelectedUnits.Count > 0)
+                    displayRace = WarRegistry.SelectedUnits[0].Race;
+                else
+                    displayRace = Game.PlayerFaction?.Race ?? RaceType.Human;
+
+                var workerName = displayRace == RaceType.Human ? "Peasant" : "Peon";
+            }
+
+            <!-- SELECTED BUILDING -->
+            @if (WarRegistry.SelectedBuilding != null)
+            {
+                var buildSect = WarRegistry.SelectedBuilding;
+                <div class="selection-info-left">
+                    <div class="selection-portrait">
+                        <img src="@GetBuildingIcon(buildSect)" alt="@buildSect.PlaceholderName" />
+                    </div>
+                    <div class="selection-name DiabloRedGlowWarUI">@buildSect.PlaceholderName</div>
+                    <div class="hp-bar-compact">
+                        <div class="hp-fill" style="width: @((buildSect.HP * 100 / buildSect.MaxHP))%"></div>
+                    </div>
+                    <div class="hp-text DiabloRedGlowWarUI">HP: @buildSect.HP/@buildSect.MaxHP</div>
+                    @if (!buildSect.IsConstructed)
+                    {
+                        <div class="construction-text DiabloRedGlowWarUI">Building... @(buildSect.ConstructionTimeRemaining / 60)s</div>
+                    }
+                </div>
+            }
+
+            <!-- MULTIPLE UNITS SELECTED -->
+            @if (WarRegistry.SelectedUnits.Count > 1)
+            {
+                <div class="selection-info-left">
+                    <div class="selection-name DiabloRedGlowWarUI">@WarRegistry.SelectedUnits.Count Units</div>
+                    <div class="multi-unit-portraits">
+                        @foreach (var unitSect in WarRegistry.SelectedUnits)
+                        {
+                            <div class="portrait-mini" title="@unitSect.PlaceholderName"
+                                 @onclick="() => SelectSingleUnitFromMulti(unitSect)"
+                                 @onclick:stopPropagation="true"
+                                 style="cursor: pointer;">
+                                <img src="@GetUnitIcon(unitSect)" alt="@unitSect.PlaceholderName" />
+                                <div class="hp-bar-mini">
+                                    <div class="hp-fill" style="width: @((unitSect.HP * 100 / unitSect.MaxHP))%"></div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <!-- SINGLE UNIT SELECTED -->
+            @if (WarRegistry.SelectedUnits.Count == 1)
+            {
+                var unitSectS = WarRegistry.SelectedUnits[0];
+                <div class="selection-info-left">
+                    <div class="selection-portrait">
+                        <img src="@GetUnitIcon(unitSectS)" alt="@unitSectS.PlaceholderName" />
+                    </div>
+                    <div class="selection-name DiabloRedGlowWarUI">@unitSectS.PlaceholderName</div>
+                    <div class="hp-bar-compact">
+                        <div class="hp-fill" style="width: @((unitSectS.HP * 100 / unitSectS.MaxHP))%"></div>
+                    </div>
+                    <div class="hp-text DiabloRedGlowWarUI">HP: @unitSectS.HP/@unitSectS.MaxHP</div>
+                    @if (unitSectS.CarryingGold > 0)
+                    {
+                        <div class="carrying-text DiabloRedGlowWarUI">?? @unitSectS.CarryingGold gold</div>
+                    }
+                    @if (unitSectS.CarryingLumber > 0)
+                    {
+                        <div class="carrying-text DiabloRedGlowWarUI">?? @unitSectS.CarryingLumber lumber</div>
+                    }
+                </div>
+            }
+
+            <!-- RESOURCE NODE SELECTED -->
+            @if (WarRegistry.SelectedGoldMine != null)
+            {
+                var mine = WarRegistry.SelectedGoldMine;
+                <div class="selection-info-left">
+                    <div class="selection-name DiabloRedGlowWarUI">?? Gold Mine</div>
+                    <div class="resource-amount DiabloRedGlowWarUI">@mine.GoldRemaining Gold</div>
+                    <div class="hp-bar-compact">
+                        <div class="hp-fill" style="width: @((mine.GoldRemaining * 100 / 50000))%; background-color: #FFD700;"></div>
+                    </div>
+                </div>
+            }
+
+            @if (WarRegistry.SelectedTree != null)
+            {
+                var tree = WarRegistry.SelectedTree;
+                <div class="selection-info-left">
+                    <div class="selection-name DiabloRedGlowWarUI">?? Tree</div>
+                    <div class="resource-amount DiabloRedGlowWarUI">@tree.LumberRemaining Lumber</div>
+                    <div class="hp-bar-compact">
+                        <div class="hp-fill" style="width: @((tree.LumberRemaining * 100 / 500))%; background-color: #8B4513;"></div>
+                    </div>
+                </div>
+            }
+
+            <!-- NOTHING SELECTED -->
+            @if (WarRegistry.SelectedBuilding == null && WarRegistry.SelectedUnits.Count == 0 &&
+                    WarRegistry.SelectedGoldMine == null && WarRegistry.SelectedTree == null)
+            {
+                <div class="selection-info-left">
+                    <div class="selection-name DiabloRedGlowWarUI" style="color:#888;">No Selection</div>
+                </div>
+            }
+        </div>
+
+        <!-- RIGHT SECTION: Commands & Stats -->
+        <div class="command-panel-right">
+            @{
+                var unit = WarRegistry.SelectedUnits.FirstOrDefault();
+                var building = WarRegistry.SelectedBuilding;
+            }
+
+            <!-- ROW 1: UNIT STATISTICS -->
+            @if (unit != null)
+            {
+                <div class="command-row stats-row">
+                    <span class="DiabloRedGlowWarUI">State: @unit.State</span>
+                    <span class="DiabloRedGlowWarUI">Damage: @unit.AttackDamage</span>
+                    <span class="DiabloRedGlowWarUI">Range: @unit.AttackRange</span>
+                    @if (unit.AttackTarget != null)
+                    {
+                        <span class="DiabloRedGlowWarUI">?? Attacking: @unit.AttackTarget.PlaceholderName</span>
+                    }
+                </div>
+            }
+
+            <!-- ROW 2: BUILDINGS/UPGRADES (Horizontal Scroll) -->
+            @if (unit is Peasant || building != null)
+            {
+                <div class="command-row">
+                    <div class="command-scroll-container">
+                        <!-- PEASANT BUILD MENU -->
+                        @if (unit is Peasant && unit.OwnerPlayerIndex == 0)
+                        {
+                        
+                            var farmIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/FarmTiny001.png" : "/wc1sprites/icons/OrcFarmTiny001.png";
+                            var farmName = displayRace == RaceType.Human ? "Farm" : "Pig Farm";
+                            var barracksIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Barrackstiny001.png" : "/wc1sprites/icons/OrcBTiny001.png";
+                            var lumberIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/LumberHumantiny001.png" : "/wc1sprites/icons/LumberOrctiny001.png";
+                            var archeryIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Archerytiny001.png" : "/wc1sprites/icons/AxeBuildingtiny001.png";
+                            var blacksmithIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/HumanBStiny001.png" : "/wc1sprites/icons/OrcBStiny001.png";
+                            var stonetowericon = displayRace == RaceType.Human ? "/wc1sprites/icons/TinyHumanStoneTower001.png" : "/wc1sprites/icons/TinyOrcStoneTower001.png";
+                            var woodtowericon = displayRace == RaceType.Human ? "/wc1sprites/icons/TinyHumanWoodTower002.png" : "/wc1sprites/icons/TinyOrcWoodTower002.png";
+                            var roadicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/Road001.png" : "/wc1sprites/buildings/Road001.png";
+                            var woodwallicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/WoodenWall001.png" : "/wc1sprites/buildings/OrcWoodenWall001.png";
+                            var stonewallicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/StoneWall001.png" : "/wc1sprites/buildings/OrcStoneWall001.png";
+                            var Priesticon = displayRace == RaceType.Human ? "/wc1sprites/icons/ChurchIcon001.png" : "/wc1sprites/icons/CultistHutIcon001.png";
+                            var stablesIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/StablesIcon001.png" : "/wc1sprites/icons/PensIcon001.png";
+                            var knightsHoldIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/KnightsHoldIcon001.png" : "/wc1sprites/icons/RaiderLairIcon001.png";
+
+                            <button class="cmd-btn-compact" @onclick="BuildFarm" @onclick:stopPropagation="true" title="Farm - 500g 250w">
+                                <img src="@farmIcon" />
+                                <span class="DiabloRedGlowWarUI">@farmName</span>
+                            </button>
+                            <button class="cmd-btn-compact" @onclick="BuildLumberMill" @onclick:stopPropagation="true" title="Lumber Mill - 600g 450w">
+                                <img src="@lumberIcon" />
+                                <span class="DiabloRedGlowWarUI">Lumber Mill</span>
+                            </button>
+                            <button class="cmd-btn-compact" @onclick="BuildBarracks" @onclick:stopPropagation="true" title="Barracks - 700g 450w">
+                                <img src="@barracksIcon" />
+                                <span class="DiabloRedGlowWarUI">Barracks</span>
+                            </button>
+                            <button class="cmd-btn-compact" @onclick="BuildArcheryRange" @onclick:stopPropagation="true" title="Archery Range - 800g 400w">
+                                <img src="@archeryIcon" />
+                                <span class="DiabloRedGlowWarUI">Archery</span>
+                            </button>
+                            <button class="cmd-btn-compact" @onclick="BuildBlacksmith" @onclick:stopPropagation="true" title="Blacksmith - 800g 450w">
+                                <img src="@blacksmithIcon" />
+                                <span class="DiabloRedGlowWarUI">Blacksmith</span>
+                            </button>
+                            @if (displayRace == RaceType.Human)
+                            {
+                                <button class="cmd-btn-compact" @onclick="BuildChurch" @onclick:stopPropagation="true" title="Church - 800g 450w">
+                                    <img src="@Priesticon" />
+                                    <span class="DiabloRedGlowWarUI">Church</span>
+                                </button>
+                            }
+                            @if (displayRace == RaceType.Orc)
+                            {
+                                <button class="cmd-btn-compact" @onclick="BuildCultistHut" @onclick:stopPropagation="true" title="Cultist Hut - 800g 450w">
+                                    <img src="@Priesticon" />
+                                    <span class="DiabloRedGlowWarUI">Cultist Hut</span>
+                                </button>
+                            }
+                            <!-- STABLES/PEN (TIER 1) -->
+                            @if (displayRace == RaceType.Human)
+                            {
+                                <button class="cmd-btn-compact" @onclick="BuildStables" @onclick:stopPropagation="true" title="Stables - 400g 200w">
+                                    <img src="@stablesIcon" />
+                                    <span class="DiabloRedGlowWarUI">Stables</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="cmd-btn-compact" @onclick="BuildPen" @onclick:stopPropagation="true" title="Pen - 400g 200w">
+                                    <img src="@stablesIcon" />
+                                    <span class="DiabloRedGlowWarUI">Pen</span>
+                                </button>
+                            }
+                            <!-- ✅ NEW: BUILD TOWN HALL (REQUIRES CASTLE) -->
+                            var hasCastleForTownHall = WarRegistry.Buildings.OfType<Castle>().Any(c => c.Race == Game.PlayerFaction?.Race && c.IsConstructed);
+                            var townHallIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/TownHallTiny001.png" : "/wc1sprites/icons/OrcSHTiny001.png";
+                            var townHallName = displayRace == RaceType.Human ? "Town Hall" : "Stronghold";
+
+                            <button class="cmd-btn-compact"
+                                    @onclick="BuildTownHall"
+                                    @onclick:stopPropagation="true"
+                                    disabled="@(!hasCastleForTownHall || Game.PlayerGold < 1200 || Game.PlayerLumber < 800)"
+                                    title="@townHallName - 1200g 800w @(!hasCastleForTownHall ? "(Needs Castle)" : "")">
+                                <img src="@townHallIcon" />
+                                <span class="DiabloRedGlowWarUI">@townHallName</span>
+                            </button>
+                            <!-- KNIGHTS HOLD / RAIDER LAIR (TIER 2 - REQUIRES CASTLE/FORTRESS) -->
+
+    var hasCastleForMount = WarRegistry.Buildings.OfType<Castle>().Any(c => c.Race == Game.PlayerFaction?.Race && c.IsConstructed);
+
+
+@if (displayRace == RaceType.Human)
+{
+    <button class="cmd-btn-compact" 
+            @onclick="BuildKnightsHold" 
+            @onclick:stopPropagation="true"
+            disabled="@(!hasCastleForMount || Game.PlayerGold < 800 || Game.PlayerLumber < 400)"
+            title="Knights Hold - 800g 400w @(!hasCastleForMount ? "(Needs Castle)" : "")">
+        <img src="@knightsHoldIcon" />
+        <span class="DiabloRedGlowWarUI">Knights Hold</span>
+    </button>
+}
+else
+{
+    <button class="cmd-btn-compact" 
+            @onclick="BuildRaiderLair" 
+            @onclick:stopPropagation="true"
+            disabled="@(!hasCastleForMount || Game.PlayerGold < 800 || Game.PlayerLumber < 400)"
+            title="Raider Lair - 800g 400w @(!hasCastleForMount ? "(Needs Fortress)" : "")">
+        <img src="@knightsHoldIcon" />
+        <span class="DiabloRedGlowWarUI">Raider Lair</span>
+    </button>
+}
+                       
+                            <button class="cmd-btn-compact" @onclick="BuildWoodTower" @onclick:stopPropagation="true" title="Wood Tower - 500g 300w">
+                                <img src="@woodtowericon" />
+    <span class="DiabloRedGlowWarUI">Wood Tower</span>
+</button>
+
+
+    var hasCastle = WarRegistry.Buildings.OfType<Castle>().Any(c => c.Race == Game.PlayerFaction?.Race && c.IsConstructed);
+
+
+<button class="cmd-btn-compact" @onclick="BuildStoneTower" @onclick:stopPropagation="true"
+        disabled="@(!hasCastle || Game.PlayerGold < 800 || Game.PlayerLumber < 500)"
+        title="Stone Tower - 800g 500w @(!hasCastle ? "(Needs Castle)" : "")">
+                                <img src="@stonetowericon" />
+    <span class="DiabloRedGlowWarUI">Stone Tower</span>
+</button>
+                            <button class="cmd-btn-compact" @onclick="BuildRoad" @onclick:stopPropagation="true" title="Road - 50g 25w">
+                                <img src="@roadicon" />
+                                <span class="DiabloRedGlowWarUI">Road</span>
+                            </button>
+                            <button class="cmd-btn-compact" @onclick="BuildWoodenWall" @onclick:stopPropagation="true" title="Wooden Wall - 100g 50w">
+                                <img src="@woodwallicon" />
+    <span class="DiabloRedGlowWarUI">Wood Wall</span>
+</button>
+
+
+    var hasCastleForWall = WarRegistry.Buildings.OfType<Castle>().Any(c => c.Race == Game.PlayerFaction?.Race && c.IsConstructed);
+
+
+<button class="cmd-btn-compact" @onclick="BuildStoneWall" @onclick:stopPropagation="true"
+        disabled="@(!hasCastleForWall || Game.PlayerGold < 200 || Game.PlayerLumber < 100)"
+        title="Stone Wall - 200g 100w @(!hasCastleForWall ? "(Needs Castle)" : "")">
+                                <img src="@stonewallicon" />
+    <span class="DiabloRedGlowWarUI">Stone Wall</span>
+</button>
+                        }
+
+                        <!-- BLACKSMITH UPGRADES -->
+                        @if (building is Blacksmith && building.IsConstructed && building.OwnerPlayerIndex == 0)
+                        {
+                            @if (Game.PlayerFaction!.MeleeDamageLevel < 3)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetMeleeDamageUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="UpgradeMeleeDamage" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Melee Damage Lv.@(Game.PlayerFaction.MeleeDamageLevel + 1) - @gold g @lumber w">
+                                    <span style="font-size:20px;">???</span>
+                                    <span class="DiabloRedGlowWarUI">Dmg Lv.@(Game.PlayerFaction.MeleeDamageLevel + 1)</span>
+                                </button>
+                            }
+                            @if (Game.PlayerFaction!.MeleeArmorLevel < 3)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetMeleeArmorUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="UpgradeMeleeArmor" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Melee Armor Lv.@(Game.PlayerFaction.MeleeArmorLevel + 1) - @gold g @lumber w">
+                                    <span style="font-size:20px;">???</span>
+                                    <span class="DiabloRedGlowWarUI">Armor Lv.@(Game.PlayerFaction.MeleeArmorLevel + 1)</span>
+                                </button>
+                            }
+                        }
+
+                        <!-- LUMBER MILL UPGRADES -->
+                        @if (building is LumberMill && building.IsConstructed && building.OwnerPlayerIndex == 0)
+                        {
+                            @if (Game.PlayerFaction!.RangedDamageLevel < 3)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetRangedDamageUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="UpgradeRangedDamage" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Ranged Damage Lv.@(Game.PlayerFaction.RangedDamageLevel + 1) - @gold g @lumber w">
+                                    <span style="font-size:20px;">??</span>
+                                    <span class="DiabloRedGlowWarUI">Dmg Lv.@(Game.PlayerFaction.RangedDamageLevel + 1)</span>
+                                </button>
+                            }
+                            @if (Game.PlayerFaction!.RangedArmorLevel < 3)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetRangedArmorUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="UpgradeRangedArmor" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Ranged Armor Lv.@(Game.PlayerFaction.RangedArmorLevel + 1) - @gold g @lumber w">
+                                    <span style="font-size:20px;">???</span>
+                                    <span class="DiabloRedGlowWarUI">Armor Lv.@(Game.PlayerFaction.RangedArmorLevel + 1)</span>
+                                </button>
+                            }
+                        }
+
+                        <!-- KNIGHTS HOLD UPGRADES -->
+                        @if (building is KnightsHold && building.IsConstructed && building.OwnerPlayerIndex == 0)
+                        {
+                            @if (!Game.PlayerFaction!.HasMountedCombatUpgrade)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetMountedCombatUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="ResearchMountedCombat" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Mounted Combat - @gold g @lumber w">
+                                    <span style="font-size:20px;">🐴</span>
+                                    <span class="DiabloRedGlowWarUI">Mounted Combat</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="cmd-btn-compact" style="opacity:0.5; cursor:not-allowed;" title="Mounted Combat - Already Researched">
+                                    <span style="font-size:20px;">✅</span>
+                                    <span class="DiabloRedGlowWarUI">Mounted Combat</span>
+                                </div>
+                            }
+                        }
+
+                        <!-- RAIDER LAIR UPGRADES -->
+                        @if (building is RaiderLair && building.IsConstructed && building.OwnerPlayerIndex == 0)
+                        {
+                            @if (!Game.PlayerFaction!.HasMountedWarfareUpgrade)
+                            {
+                                var (gold, lumber) = Game.PlayerFaction.GetMountedWarfareUpgradeCost();
+                                <button class="cmd-btn-compact" @onclick="ResearchMountedWarfare" @onclick:stopPropagation="true"
+                                        disabled="@(Game.PlayerGold < gold || Game.PlayerLumber < lumber)"
+                                        title="Mounted Warfare - @gold g @lumber w">
+                                    <span style="font-size:20px;">🐺</span>
+                                    <span class="DiabloRedGlowWarUI">Mounted Warfare</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="cmd-btn-compact" style="opacity:0.5; cursor:not-allowed;" title="Mounted Warfare - Already Researched">
+                                    <span style="font-size:20px;">✅</span>
+                                    <span class="DiabloRedGlowWarUI">Mounted Warfare</span>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            }
+            <!-- ROW 0: ABILITY BAR (for spellcasters) -->
+            <!-- ROW 0B: MOUNT SKILL (for mountable infantry) -->
+            @if (unit != null && unit.CanMount && unit.OwnerPlayerIndex == 0)
+            {
+                <div class="command-row ability-bar">
+                    <button class="ability-btn ability-btn-ready"
+                            @onclick="() => ActivateMount(unit)"
+                            @onclick:stopPropagation="true"
+                            title="Mount @unit.MountType (Search 400px radius)">
+                        <span style="font-size: 24px;">🐴</span>
+                        <span class="DiabloRedGlowWarUI" style="font-size: 9px;">Mount</span>
+                    </button>
+                    <span class="DiabloRedGlowWarUI" style="font-size: 10px; margin-left: 8px;">
+                        Find @unit.MountType within 400px
+                    </span>
+                </div>
+            }
+            @if (unit != null && unit.MaxMana > 0 && unit.OwnerPlayerIndex == 0)
+            {
+                <div class="command-row ability-bar">
+                    <!-- Mana Bar -->
+                    <div style="flex: 1; display: flex; flex-direction: column; gap: 3px;">
+                        <span class="DiabloRedGlowWarUI" style="font-size: 10px;">Mana: @unit.Mana/@unit.MaxMana</span>
+                        <div class="mana-bar-compact">
+                            <div class="mana-fill" style="width: @((unit.Mana * 100 / unit.MaxMana))%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Ability Icon -->
+                    @if (unit.AbilityName != null)
+                    {
+                        var abilityIcon = unit.AbilityName switch
+                        {
+                            "Heal" => "⚕️",
+                            "Bloodlust" => "🩸",
+                            _ => "✨"
+                        };
+
+                        var canCast = unit.Mana >= unit.AbilityManaCost && unit.AbilityCooldown <= 0;
+                        var buttonClass = canCast ? "ability-btn-ready" : "ability-btn-cooldown";
+
+                        <button class="ability-btn @buttonClass"
+                                @onclick="() => CastAbility(unit)"
+                                @onclick:stopPropagation="true"
+                                disabled="@(!canCast)"
+                                title="@unit.AbilityName (@unit.AbilityManaCost mana)">
+                            <span style="font-size: 24px;">@abilityIcon</span>
+                            <span class="DiabloRedGlowWarUI" style="font-size: 9px;">@unit.AbilityName</span>
+                            @if (unit.AbilityCooldown > 0)
+                            {
+                                <span style="position: absolute; bottom: 2px; right: 2px; font-size: 8px; color: #F00;">@((unit.AbilityCooldown / 60.0).ToString("F1"))s</span>
+                            }
+                        </button>
+
+                        <!-- Auto-Cast Toggle -->
+                        <button class="autocast-toggle @(unit.AutoCastEnabled ? "autocast-on" : "autocast-off")"
+                                @onclick="() => ToggleAutoCast(unit)"
+                                @onclick:stopPropagation="true"
+                                title="Auto-Cast: @(unit.AutoCastEnabled ? "ON" : "OFF")">
+                            <span style="font-size: 10px;">Auto</span>
+                            <span style="font-size: 8px;">@(unit.AutoCastEnabled ? "ON" : "OFF")</span>
+                        </button>
+                    }
+
+               
+                </div>
+            }
+            <!-- ROW 3: TRAIN UNITS (Horizontal Scroll) -->
+            @if (building != null && building.IsConstructed && building.OwnerPlayerIndex == 0)
+            {
+                <div class="command-row">
+                    <div class="command-scroll-container">
+                        @{
+                            var workerIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Peasant001.png" : "/wc1sprites/icons/Peon001.png";
+                            var soldierIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Footmantiny001.png" : "/wc1sprites/icons/Grunttiny001.png";
+                            var soldierName = displayRace == RaceType.Human ? "Footman" : "Grunt";
+                            var brigandName = displayRace == RaceType.Human ? "Brigand" : "Ogre";
+                            var brigandIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/BriganTiny001.png" : "/wc1sprites/icons/OgredTiny001.png";
+                            var archerName = displayRace == RaceType.Human ? "Archer" : "Troll Axe";
+                            var archerIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Archertiny001.png" : "/wc1sprites/icons/AxeThrowertiny001.png";
+                            var castleIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/CastleTiny001.png" : "/wc1sprites/icons/OrcFortressTiny001.png";
+                            var cultistIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/PriestIcon001.png" : "/wc1sprites/icons/CultistIcon001.png";
+                            var HorseIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/NightmareIcon001.png" : "/wc1sprites/icons/HellHoundsIcon001.png";
+
+
+                        }
+
+                        <!-- TOWN HALL / CASTLE -->
+                        @if (building is TownHall townHall)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainPeasant(building)" @onclick:stopPropagation="true" title="@workerName - 400g">
+                                <img src="@workerIcon" />
+                                <span class="DiabloRedGlowWarUI">@workerName</span>
+                            </button>
+
+                            var hasBarracks = WarRegistry.Buildings.OfType<Barracks>().Any(b => b.Race == building.Race && b.IsConstructed);
+                            var hasArcheryRange = WarRegistry.Buildings.OfType<ArcheryRange>().Any(b => b.Race == building.Race && b.IsConstructed);
+                            var hasChurch = building.Race == RaceType.Human
+                            ? WarRegistry.Buildings.OfType<Church>().Any(b => b.Race == building.Race && b.IsConstructed)
+                            : WarRegistry.Buildings.OfType<CultistHut>().Any(b => b.Race == building.Race && b.IsConstructed);
+
+                            var canUpgrade = hasBarracks && hasArcheryRange && hasChurch;
+                            var missingRequirement = !hasBarracks ? "Barracks" : !hasArcheryRange ? "Archery" : !hasChurch ? (building.Race == RaceType.Human ? "Church" : "Cultist Hut") : "";
+                            var upgradeName = displayRace == RaceType.Human ? "Castle" : "Fortress";
+
+                            <button class="cmd-btn-compact" @onclick="() => UpgradeToCastle(townHall)" @onclick:stopPropagation="true"
+                                    disabled="@(!canUpgrade || Game.PlayerGold < 2000 || Game.PlayerLumber < 1000)"
+                                    title="Upgrade to @upgradeName - 2000g 1000w @(!canUpgrade ? $"(Needs {missingRequirement})" : "")">
+                                <img src="@castleIcon" />
+                                <span class="DiabloRedGlowWarUI">@upgradeName</span>
+                            </button>
+                        }
+
+                        @if (building is Castle)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainPeasant(building)" @onclick:stopPropagation="true" title="@workerName - 400g">
+                                <img src="@workerIcon" />
+                                <span class="DiabloRedGlowWarUI">@workerName</span>
+                            </button>
+                        }
+                        <!-- STABLES (TRAIN HORSES) -->
+                        @if (building is Stables)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainHorse(building)" @onclick:stopPropagation="true" title="Horse - 300g">
+                                <img src="@HorseIcon" />
+                                <span class="DiabloRedGlowWarUI">Horse</span>
+                            </button>
+                        }
+
+                        <!-- PEN (TRAIN WOLVES) -->
+                        @if (building is Pen)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainWolf(building)" @onclick:stopPropagation="true" title="Wolf - 300g">
+                                <img src="@HorseIcon" />
+                                <span class="DiabloRedGlowWarUI">Wolf</span>
+                            </button>
+                        }
+
+                        <!-- BARRACKS -->
+                        @if (building is Barracks)
+                        {
+                            var hasBlacksmith = WarRegistry.Buildings.OfType<Blacksmith>().Any(b => b.Race == building.Race && b.IsConstructed);
+                            <!-- Change to doesnt need need blacksmith for footman/Grunt -->
+                            <button class="cmd-btn-compact" @onclick="() => TrainFootman(building)" @onclick:stopPropagation="true"
+                                    title="@soldierName - 600g">
+                                <img src="@soldierIcon" />
+                                <span class="DiabloRedGlowWarUI">@soldierName</span>
+                            </button>
+
+                            <button class="cmd-btn-compact" @onclick="() => TrainAdvancedInfantry(building)" @onclick:stopPropagation="true"
+                                    disabled="@(!hasBlacksmith)" title="@brigandName - @(displayRace == RaceType.Human ? "750g 100w" : "800g 150w") @(!hasBlacksmith ? "(Needs Blacksmith)" : "")">
+                                <img src="@brigandIcon" />
+                                <span class="DiabloRedGlowWarUI">@brigandName</span>
+                            </button>
+                        }
+                        <!-- CHURCH -->
+                        @if (building is Church)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainPriest(building)" @onclick:stopPropagation="true" title="Priest - 1000g 50w">
+                                <img src="@cultistIcon" />
+                                <span class="DiabloRedGlowWarUI">Priest</span>
+                            </button>
+                        }
+
+                        <!-- CULTIST HUT -->
+                        @if (building is CultistHut)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainCultist(building)" @onclick:stopPropagation="true" title="Cultist - 1000g 50w">
+                                <img src="@cultistIcon" />
+                                <span class="DiabloRedGlowWarUI">Cultist</span>
+                            </button>
+                        }
+                        <!-- ARCHERY RANGE -->
+                        @if (building is ArcheryRange)
+                        {
+                            <button class="cmd-btn-compact" @onclick="() => TrainRangedUnit(building)" @onclick:stopPropagation="true" title="@archerName - 500g 50w">
+                                <img src="@archerIcon" />
+                                <span class="DiabloRedGlowWarUI">@archerName</span>
+                            </button>
+                        }
+                    </div>
+                </div>
+
+
+
+                <!-- PRODUCTION QUEUE -->
+                @if (building.ProductionQueue.Count > 0)
+                {
+                    <div class="production-queue-compact">
+                        @foreach (var order in building.ProductionQueue.Take(3))
+                        {
+                            <div class="queue-item-compact">
+                                <span class="DiabloRedGlowWarUI">@order.UnitType</span>
+                                <div class="queue-progress-compact">
+                                    <div class="queue-fill" style="width: @((order.TotalBuildTime - order.BuildTimeRemaining) * 100 / order.TotalBuildTime)%"></div>
+                                </div>
+                                <span class="DiabloRedGlowWarUI">@(order.BuildTimeRemaining / 60)s</span>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+
+            <!-- ROW 4: UNIT COMMANDS (Stance Controls for ALL units) -->
+            @if (WarRegistry.SelectedUnits.Count > 0 && WarRegistry.SelectedUnits.All(u => u.OwnerPlayerIndex == 0))
+            {
+                <div class="command-row">
+                    <div class="stance-controls-compact">
+                        <button class="stance-btn-compact @(WarRegistry.SelectedUnits.All(u => u.Stance == UnitStance.Passive) ? "active" : "")"
+                                @onclick="() => SetMultiUnitStance(UnitStance.Passive)" @onclick:stopPropagation="true" title="Passive">
+                            <span class="DiabloRedGlowWarUI">Pass</span>  <!-- ✅ GLOW STAYS -->
+                        </button>
+                        <button class="stance-btn-compact @(WarRegistry.SelectedUnits.All(u => u.Stance == UnitStance.Defensive) ? "active" : "")"
+                                @onclick="() => SetMultiUnitStance(UnitStance.Defensive)" @onclick:stopPropagation="true" title="Defensive">
+                            <span class="DiabloRedGlowWarUI">Def</span>  <!-- ✅ GLOW STAYS -->
+                        </button>
+                        <button class="stance-btn-compact @(WarRegistry.SelectedUnits.All(u => u.Stance == UnitStance.Aggressive) ? "active" : "")"
+                                @onclick="() => SetMultiUnitStance(UnitStance.Aggressive)" @onclick:stopPropagation="true" title="Aggressive">
+                            <span class="DiabloRedGlowWarUI">Agg</span>  <!-- ✅ GLOW STAYS -->
+                        </button>
+                        <button class="stance-btn-compact @(WarRegistry.SelectedUnits.All(u => u.Stance == UnitStance.Hold) ? "active" : "")"
+                                @onclick="() => SetMultiUnitStance(UnitStance.Hold)" @onclick:stopPropagation="true" title="Hold">
+                            <span class="DiabloRedGlowWarUI">Hold</span>  <!-- ✅ GLOW STAYS -->
+                        </button>
+                        <button class="stance-btn-compact @(WarRegistry.SelectedUnits.All(u => u.Stance == UnitStance.AttackMove) ? "active" : "")"
+                                @onclick="() => SetMultiUnitStance(UnitStance.AttackMove)" @onclick:stopPropagation="true" title="Attack Move">
+                            <span class="DiabloRedGlowWarUI">Move</span>  <!-- ✅ GLOW STAYS -->
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <!-- ROW 5: BUFF BAR -->
+            @if (unit != null && unit.HasProximityBuff)
+            {
+                <div class="command-row buff-bar">
+                    <span class="DiabloRedGlowWarUI">? Group Buff: @(unit.ProximityBuffDamage > 0 ? $"+{unit.ProximityBuffDamage}" : unit.ProximityBuffDamage) Attack</span>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- BUILD MODE INDICATOR -->
+@if (Game.IsBuildMode)
+{
+    <div class="build-mode-indicator">
+        <div class="DiabloRedGlowWarUI">Placing: @Game.BuildingToBuild</div>
+        <button class="cmd-button-cancel DiabloRedGlowWarUI" @onclick="Game.CancelBuildMode">Cancel (ESC)</button>
+    </div>
+}
+
+
+<!-- CAST MODE INDICATOR -->
+@if (Game.IsCastMode)
+{
+    <div class="cast-mode-indicator">
+        <div class="DiabloRedGlowWarUI">Casting: @Game.SpellToCast</div>
+        <div style="font-size: 11px; color: #AAA;">Right-click ally to cast • ESC to cancel</div>
+    </div>
+}
+
+
+

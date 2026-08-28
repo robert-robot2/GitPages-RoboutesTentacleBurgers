@@ -1,0 +1,456 @@
+@page "/AntigenHunter"
+@using AntigenHunterLibrary.Models
+@using AntigenHunterLibrary.Services
+@inject IJSRuntime JS
+
+<PageTitle>AntigenHunter</PageTitle>
+
+<div class="ah-root">
+
+    <div class="ah-header DiabloBlueGlow">
+        <div class="ah-header__logo"><span class="logo-icon">⚔️</span> AntigenHunter</div>
+        <div class="ah-header__subtitle">Antibody Affinity Maturation Simulator</div>
+        <div class="ah-header__tagline">Evolve antibodies against cancer targets — powered by simulated annealing</div>
+    </div>
+
+    <div class="ah-step DigitalBlueGlow">
+        <div class="ah-step__header">
+            <span class="ah-step__number">STEP 01</span>
+            <span class="ah-step__title">Antibody Sequence</span>
+            <span class="ah-step__icon">🧬</span>
+        </div>
+
+        <div class="ah-flex-wrap ah-mb-md">
+            <span class="ah-label" style="width:100%;margin-bottom:4px">Load Example Sequence:</span>
+            @foreach (var example in ExampleSequenceLibrary.All)
+            {
+                var ex = example;
+                <button class="ah-btn ah-btn--ghost ah-btn--sm" @onclick="() => LoadExample(ex)" type="button">
+                    @ex.AntibodyName (@ex.TargetKey)
+                </button>
+            }
+        </div>
+
+        <label class="ah-label" for="seq-input">Paste VH Sequence (single-letter amino acid codes)</label>
+        <textarea id="seq-input"
+                  class="ah-textarea"
+                  placeholder="EVQLVESGGGLVQPGGSLRLSCAAS..."
+                  @oninput="OnSequenceInput"
+                  spellcheck="false"
+                  rows="4">@_rawSequenceInput</textarea>
+
+        @if (!string.IsNullOrEmpty(_validationMessage))
+        {
+            <div class="ah-text-sm ah-mt-sm" style="color:@(_parseSuccess ? "var(--ah-green)" : "var(--ah-orange)")">
+                @(_parseSuccess ? "✅" : "⚠️") @_validationMessage
+            </div>
+        }
+
+        @if (_composition != null && _composition.TotalResidues > 0)
+        {
+            <div class="ah-flex-wrap ah-mt-sm">
+                <span class="ah-badge ah-badge--muted">@_composition.TotalResidues aa</span>
+                <span class="ah-badge ah-badge--cyan">Aromatic: @_composition.AromaticPctDisplay</span>
+                <span class="ah-badge @(_composition.NetCharge >= 0 ? "ah-badge--green" : "ah-badge--orange")">Charge: @_composition.NetChargeDisplay</span>
+            </div>
+        }
+
+        <div class="ah-btn-row">
+            <button class="ah-btn ah-btn--primary" @onclick="ParseSequence" type="button">▶ Parse Sequence</button>
+            <button class="ah-btn ah-btn--ghost" @onclick="ClearSequence" type="button">✕ Clear</button>
+        </div>
+
+        @if (_parsedSequence != null)
+        {
+            <div class="ah-mt-md">
+                <div class="ah-label">Parsed Sequence with CDR Regions</div>
+                <div class="ah-sequence-display">
+                    @foreach (var res in _parsedSequence.Residues)
+                    {
+                        <span class="@res.CssClass" title="@res.Position: @res.Code">@res.Code</span>
+                    }
+                </div>
+                @if (_parsedSequence.CdrRegions.Any())
+                {
+                    <div class="ah-flex-wrap ah-mt-sm">
+                        @foreach (var cdr in _parsedSequence.CdrRegions)
+                        {
+                            <span class="ah-badge ah-badge--cyan">@cdr.Name: @cdr.Sequence</span>
+                        }
+                    </div>
+                }
+                <div class="ah-flex-wrap ah-mt-sm">
+                    <span class="ah-badge ah-badge--muted">Length: @_parsedSequence.Length aa</span>
+                    <span class="ah-badge ah-badge--cyan">Aromatic: @_parsedSequence.AromaticFraction.ToString("P0")</span>
+                    <span class="ah-badge @(_parsedSequence.NetCharge >= 0 ? "ah-badge--green" : "ah-badge--orange")">Charge: @_parsedSequence.NetCharge</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="ah-step DigitalBlueGlow">
+        <div class="ah-step__header">
+            <span class="ah-step__number">STEP 02</span>
+            <span class="ah-step__title">Cancer Target</span>
+            <span class="ah-step__icon">🎯</span>
+        </div>
+
+        <label class="ah-label" for="target-select">Select Cancer Target</label>
+        <select id="target-select" class="ah-select" @onchange="OnTargetChanged">
+            <optgroup label="── Available Targets ──">
+                @foreach (var t in TargetProteinDatabase.ActiveTargets)
+                {
+                    <option value="@((int)t.TargetType)" selected="@(_config.SelectedTarget == t.TargetType)">
+                        @t.Name — @t.CancerTypes.First() [@t.DifficultyStars]
+                    </option>
+                }
+            </optgroup>
+            <optgroup label="── Coming Soon: Phase 2 ──">
+                @foreach (var t in TargetProteinDatabase.Phase2Targets)
+                {
+                    <option value="@((int)t.TargetType)" disabled>🔒 @t.Name</option>
+                }
+            </optgroup>
+        </select>
+
+        @if (_selectedTarget != null)
+        {
+            <div class="ah-target-card ah-mt-md">
+                <div class="ah-flex-between">
+                    <div class="ah-target-card__name">@_selectedTarget.Name</div>
+                    <span class="ah-difficulty ah-difficulty--@_selectedTarget.DifficultyClass">@_selectedTarget.DifficultyStars @_selectedTarget.DifficultyLabel</span>
+                </div>
+                <div class="ah-target-card__cancer">@_selectedTarget.FullProteinName — @_selectedTarget.CancerTypeDisplay</div>
+                <div class="ah-text-sm ah-mt-sm" style="color:var(--text-secondary)">@_selectedTarget.EpitopeDescription</div>
+                <div class="ah-mt-sm">
+                    <span class="ah-label">Key Epitope Contacts</span>
+                    <div class="ah-flex-wrap ah-mt-sm">
+                        @foreach (var epi in _selectedTarget.TopEpitopeResidues)
+                        {
+                            <span class="ah-badge ah-badge--cyan" title="@epi.Note">@epi.Name</span>
+                        }
+                    </div>
+                </div>
+                <div class="ah-mt-sm" style="border-top:1px solid var(--ah-border);padding-top:0.75rem">
+                    <span class="ah-label">🧠 Simulation Hint</span>
+                    <div class="ah-text-sm ah-mt-sm" style="color:var(--text-secondary);font-style:italic">@_selectedTarget.SimulationHint</div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="ah-step DigitalBlueGlow">
+        <div class="ah-step__header">
+            <span class="ah-step__number">STEP 03</span>
+            <span class="ah-step__title">Configure Simulation</span>
+            <span class="ah-step__icon">⚙️</span>
+        </div>
+
+        <div class="ah-config-grid">
+            <div class="ah-config-item">
+                <div class="ah-config-item__label">
+                    <label class="ah-label" for="rounds-input">Rounds of Evolution</label>
+                    <span class="ah-config-item__value">@_config.RoundsOfEvolution</span>
+                </div>
+                <input id="rounds-input" type="number" class="ah-input"
+                       min="@SimulationConfig.MinRounds" max="@SimulationConfig.MaxRounds"
+                       @bind="_config.RoundsOfEvolution" />
+            </div>
+            <div class="ah-config-item">
+                <div class="ah-config-item__label">
+                    <label class="ah-label" for="variants-input">Variants per Round</label>
+                    <span class="ah-config-item__value">@_config.VariantsPerRound</span>
+                </div>
+                <input id="variants-input" type="number" class="ah-input"
+                       min="@SimulationConfig.MinVariants" max="@SimulationConfig.MaxVariants"
+                       @bind="_config.VariantsPerRound" />
+            </div>
+            <div class="ah-config-item">
+                <div class="ah-config-item__label">
+                    <label class="ah-label" for="boldness-slider">Mutation Boldness</label>
+                    <span class="ah-config-item__value @_config.BoldnessCssClass">@_config.BoldnessLabel</span>
+                </div>
+                <input id="boldness-slider" type="range" class="ah-slider"
+                       min="0" max="1" step="0.05"
+                       @bind="_config.MutationBoldness" @bind:event="oninput" />
+                <div class="ah-boldness-labels">
+                    <span>Conservative</span><span>Balanced</span><span>Maximum</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="ah-text-xs ah-text-muted ah-mt-sm">Estimated time: @_config.EstimatedTimeLabel</div>
+
+        <button class="ah-btn ah-btn--cta ah-mt-md"
+                @onclick="RunSimulation"
+                disabled="@(_parsedSequence == null || _isRunning)"
+                type="button">
+            @if (_isRunning)
+            {
+                <span>🔬 Hunting... @_progressPercent%</span>
+            }
+            else
+            {
+                <span>🔬 BEGIN THE HUNT</span>
+            }
+        </button>
+
+        @if (_parsedSequence == null)
+        {
+            <div class="ah-text-xs ah-text-muted ah-mt-sm" style="text-align:center">Parse a sequence in Step 1 to enable the simulation</div>
+        }
+    </div>
+
+    <div class="ah-step DigitalBlueGlow">
+        <div class="ah-step__header">
+            <span class="ah-step__number">STEP 04</span>
+            <span class="ah-step__title">Results</span>
+            <span class="ah-step__icon">📊</span>
+        </div>
+
+        @if (_result != null && _result.IsComplete)
+        {
+            <div class="ah-animate-in">
+                <div class="ah-results-summary">
+                    <div class="ah-result-stat ah-result-stat--original">
+                        <div class="ah-result-stat__label">Original Affinity</div>
+                        <div class="ah-result-stat__value">@_result.StartingAffinityDisplay</div>
+                    </div>
+                    <div class="ah-result-stat ah-result-stat--best">
+                        <div class="ah-result-stat__label">Best Achieved</div>
+                        <div class="ah-result-stat__value">@_result.BestAffinityDisplay</div>
+                    </div>
+                    <div class="ah-result-stat ah-result-stat--improvement">
+                        <div class="ah-result-stat__label">Fold Improvement</div>
+                        <div class="ah-result-stat__value">@_result.FoldImprovementDisplay</div>
+                    </div>
+                </div>
+
+                <div class="ah-text-sm ah-mt-sm ah-mb-md" style="color:var(--text-secondary);font-style:italic">
+                    @_result.SummaryText
+                </div>
+
+                <div class="ah-mt-md">
+                    <div class="ah-label">🧬 Optimized Sequence</div>
+                    <div class="ah-sequence-display ah-mt-sm">
+                        @foreach (var res in _result.BestSequence.Residues)
+                        {
+                            <span class="@res.CssClass" title="@res.Position: @res.Code">@res.Code</span>
+                        }
+                    </div>
+                    @if (_result.BestSequence.CdrRegions.Any())
+                    {
+                        <div class="ah-flex-wrap ah-mt-sm">
+                            @foreach (var cdr in _result.BestSequence.CdrRegions)
+                            {
+                                <span class="ah-badge ah-badge--cyan">@cdr.Name: @cdr.Sequence</span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @{
+                    var diffs = _result.GetSequenceDiff();
+                }
+                @if (diffs.Any())
+                {
+                    <div class="ah-mt-md">
+                        <div class="ah-label">🔬 Key Changes from Original</div>
+                        <div class="ah-flex-wrap ah-mt-sm">
+                            @foreach (var (pos, from, to, region) in diffs.Take(10))
+                            {
+                                <span class="ah-badge ah-badge--cyan" title="@region">@from → @to @(pos + 1)</span>
+                            }
+                            @if (diffs.Count > 10)
+                            {
+                                <span class="ah-badge ah-badge--muted">+@(diffs.Count - 10) more</span>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <div class="ah-mt-md">
+                    <div class="ah-flex-wrap">
+                        <span class="ah-badge ah-badge--muted">⏱ @_result.Duration.TotalSeconds.ToString("F1")s</span>
+                        <span class="ah-badge ah-badge--muted">@_result.GenerationsCompleted rounds</span>
+                        <span class="ah-badge ah-badge--muted">@_result.TotalAcceptedMutations accepted mutations</span>
+                        <span class="ah-badge ah-badge--cyan">Most active: @_result.MostMutatedRegion</span>
+                        @if (_result.BestSingleMutation != null)
+                        {
+                            <span class="ah-badge ah-badge--gold">Best single: @_result.BestSingleMutation.Notation</span>
+                        }
+                    </div>
+                </div>
+
+                @if (_result.Generations.Any(g => g.HadAcceptedMutation))
+                {
+                    <div class="ah-mutation-log ah-mt-md">
+                        <div class="ah-mutation-log__header">
+                            <span>🔬 Mutation Log</span>
+                            <span class="ah-text-xs">@_result.TotalImprovingMutations improving / @_result.TotalAcceptedMutations accepted</span>
+                        </div>
+                        <div class="ah-mutation-log__body">
+                            @foreach (var gen in _result.Generations.Where(g => g.HadAcceptedMutation).OrderBy(g => g.GenerationNumber))
+                            {
+                                <div class="ah-mutation-row @(gen.GenerationNumber == _result.BestAffinityGeneration ? "ah-mutation-row--best" : "")">
+                                    <span class="ah-mutation-gen ah-text-mono">@gen.GenerationLabel</span>
+                                    <span class="ah-mutation-code ah-text-mono">@gen.AcceptedMutation?.Notation</span>
+                                    <span class="ah-mutation-score ah-text-mono">@gen.AffinityDisplayOut</span>
+                                    <span class="ah-mutation-cdr">@gen.AcceptedMutation?.RegionName</span>
+                                    <span>@(gen.GenerationNumber == _result.BestAffinityGeneration ? "⭐" : gen.IsImprovement ? "▲" : "~")</span>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <button class="ah-btn ah-btn--ghost ah-mt-md" @onclick="ResetResults" type="button">↩ Reset</button>
+            </div>
+        }
+        else if (_isRunning)
+        {
+            <div class="ah-progress">
+                <div class="ah-progress__label">
+                    <span>Running simulation...</span>
+                    <span>@_progressPercent%</span>
+                </div>
+                <div class="ah-progress__bar-track">
+                    <div class="ah-progress__bar-fill" style="width:@_progressPercent%"></div>
+                </div>
+                <div class="ah-status">
+                    <span class="ah-status__dot ah-status__dot--active"></span>
+                    <span>@_statusMessage</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="ah-empty">
+                <div class="ah-empty__icon">📊</div>
+                <div class="ah-empty__text">Results will appear here after the simulation runs</div>
+            </div>
+        }
+    </div>
+
+</div>
+
+@code {
+    private readonly SequenceParser    _parser  = new();
+    private readonly SimulationService _service = new();
+
+    private string               _rawSequenceInput  = string.Empty;
+    private AntibodySequence?    _parsedSequence;
+    private SimulationConfig     _config            = new();
+    private SimulationRunResult? _result;
+    private TargetProtein?       _selectedTarget;
+
+    private bool   _isRunning         = false;
+    private int    _progressPercent   = 0;
+    private string _statusMessage     = string.Empty;
+    private string _validationMessage = string.Empty;
+    private bool   _parseSuccess      = false;
+    private int?   _selectedPosition;
+    private SequenceCompositionSummary? _composition;
+
+    private System.Threading.CancellationTokenSource? _cts;
+
+    protected override void OnInitialized()
+    {
+        _selectedTarget = TargetProteinDatabase.Get(_config.SelectedTarget);
+    }
+
+    private void OnSequenceInput(ChangeEventArgs e)
+    {
+        _rawSequenceInput = e.Value?.ToString() ?? string.Empty;
+        _composition      = SequenceParser.GetLiveComposition(_rawSequenceInput);
+    }
+
+    private void ParseSequence()
+    {
+        var result         = _parser.Parse(_rawSequenceInput);
+        _parseSuccess      = result.Success;
+        _validationMessage = result.Message;
+        _parsedSequence    = result.Success ? result.Sequence : null;
+        _selectedPosition  = null;
+    }
+
+    private void LoadExample(ExampleSequenceEntry example)
+    {
+        _rawSequenceInput  = example.VHSequence;
+        _composition       = SequenceParser.GetLiveComposition(_rawSequenceInput);
+        _parsedSequence    = AntibodySequence.FromExample(example);
+        _parseSuccess      = true;
+        _validationMessage = $"Loaded {example.AntibodyName} ({example.VHSequence.Length} residues).";
+        _selectedPosition  = null;
+
+        if (Enum.TryParse<CancerTargetType>(example.TargetKey, out var t))
+        {
+            _config.SelectedTarget = t;
+            _selectedTarget        = TargetProteinDatabase.Get(t);
+        }
+    }
+
+    private void ClearSequence()
+    {
+        _rawSequenceInput  = string.Empty;
+        _parsedSequence    = null;
+        _validationMessage = string.Empty;
+        _composition       = null;
+        _selectedPosition  = null;
+    }
+
+    private void OnTargetChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int intVal))
+        {
+            var parsed             = (CancerTargetType)intVal;
+            _config.SelectedTarget = parsed;
+            _selectedTarget        = TargetProteinDatabase.Get(parsed);
+        }
+    }
+
+    private void OnPositionSelected(int position)
+    {
+        _selectedPosition = _selectedPosition == position ? null : position;
+    }
+
+    private async Task RunSimulation()
+    {
+        if (_parsedSequence == null || _isRunning) return;
+
+        var target = TargetProteinDatabase.Get(_config.SelectedTarget);
+        if (target == null) return;
+
+        _isRunning       = true;
+        _progressPercent = 0;
+        _statusMessage   = "Initializing...";
+        _result          = null;
+        _cts             = new System.Threading.CancellationTokenSource();
+        StateHasChanged();
+
+        _result = await _service.RunAsync(
+            _parsedSequence,
+            target,
+            _config,
+            progress =>
+            {
+                _progressPercent = progress.ProgressPercent;
+                _statusMessage   = progress.StatusMessage;
+                InvokeAsync(StateHasChanged);
+            },
+            _cts.Token);
+
+        _isRunning       = false;
+        _progressPercent = 100;
+        StateHasChanged();
+    }
+
+    private void ResetResults()
+    {
+        _cts?.Cancel();
+        _result          = null;
+        _isRunning       = false;
+        _progressPercent = 0;
+        _statusMessage   = string.Empty;
+    }
+}

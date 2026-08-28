@@ -1,0 +1,37 @@
+@using ChemCalc.ChemEngine
+@* Displays the current chemical equation being built *@
+
+<div class="equation-display">
+    @if (!string.IsNullOrEmpty(EquationString))
+    {
+        <div class="equation-content">
+            @EquationString
+        </div>
+    }
+    else if (Equation != null && (Equation.Reactants.Count > 0 || Equation.Products.Count > 0))
+    {
+        <div class="equation-content">
+            @Equation.GetEquationString()
+        </div>
+        @if (!string.IsNullOrEmpty(Equation.GetReactionTypeString()) && Equation.Type != ReactionType.Unknown)
+        {
+            <div class="equation-type">
+                Type: @Equation.GetReactionTypeString()
+            </div>
+        }
+    }
+    else
+    {
+        <div class="equation-placeholder">
+            Chemical Equations Display
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public ChemicalEquation Equation { get; set; }
+
+    [Parameter]
+    public string EquationString { get; set; }
+}

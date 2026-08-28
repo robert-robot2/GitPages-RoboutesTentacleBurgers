@@ -1,0 +1,494 @@
+﻿/* ===== RESOURCE PANEL ===== */
+.resource-panel {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 20px;
+    background: rgba(0,0,0,0.9);
+    padding: 10px 20px;
+    border: 2px solid #8B4513;
+    border-radius: 5px;
+    z-index: 1000;
+}
+
+.resource-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #FFD700;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+    .resource-item img {
+        width: 20px;
+        height: 20px;
+    }
+
+/* ===== COMMAND PANEL (NEW COMPACT 800x200) ===== */
+.command-panel {
+    position: absolute;
+    bottom: 10px;
+    left: 42%;
+    transform: translateX(-50%);
+    width: 800px;
+    height: 200px;
+    background: url('/wc1sprites/ui/WarUI001.png');
+    background-size: cover;
+    background-position: center;
+    border: 3px solid #8B4513;
+    border-radius: 8px;
+    box-shadow: 0 0 20px 5px rgba(255,165,0,0.6);
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+}
+
+/* ===== LEFT SECTION (25%) ===== */
+.command-panel-left {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    border-right: 2px solid #666;
+    padding-right: 10px;
+}
+
+.selection-info-left {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.selection-portrait {
+    width: 50%;
+    aspect-ratio: 1;
+    background: rgba(0,0,0,0.5);
+    border: 2px solid #666;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+    .selection-portrait img {
+        width: 90%;
+        height: 90%;
+        object-fit: contain;
+    }
+
+.selection-name {
+    color: #FFD700;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.hp-bar-compact {
+    width: 100%;
+    height: 10px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #0F0 0%, #0A0 100%);
+    transition: width 0.3s;
+}
+
+.hp-text {
+    color: #FFF;
+    font-size: 11px;
+    text-align: center;
+}
+
+.construction-text, .carrying-text, .resource-amount {
+    color: #AAA;
+    font-size: 10px;
+    text-align: center;
+}
+
+/* ===== MULTI-UNIT PORTRAITS ===== */
+.multi-unit-portraits {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    max-height: 120px;
+    overflow-y: auto;
+}
+
+.portrait-mini {
+    aspect-ratio: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid #666;
+    border-radius: 3px;
+    position: relative;
+    overflow: hidden;
+}
+
+    .portrait-mini img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .portrait-mini:hover {
+        border-color: #FFD700;
+    }
+
+.hp-bar-mini {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #222;
+}
+
+/* ===== RIGHT SECTION (75%) ===== */
+.command-panel-right {
+    width: 75%;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    overflow-y: auto;
+}
+
+/* ===== COMMAND ROWS ===== */
+.command-row {
+    min-height: 30px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.stats-row {
+    background: rgba(0,0,0,0.3);
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    color: #DDD;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+/* ===== HORIZONTAL SCROLLING ===== */
+.command-scroll-container {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 3px 0;
+    flex: 1;
+}
+
+    .command-scroll-container::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .command-scroll-container::-webkit-scrollbar-track {
+        background: rgba(0,0,0,0.3);
+        border-radius: 3px;
+    }
+
+    .command-scroll-container::-webkit-scrollbar-thumb {
+        background: #666;
+        border-radius: 3px;
+    }
+
+        .command-scroll-container::-webkit-scrollbar-thumb:hover {
+            background: #888;
+        }
+
+/* ===== COMPACT COMMAND BUTTONS ===== */
+.cmd-btn-compact {
+    min-width: 60px;
+    height: 60px;
+    background: linear-gradient(180deg, #3A3A3A 0%, #2A2A2A 100%);
+    border: 2px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 4px;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
+
+    .cmd-btn-compact:hover:not(:disabled) {
+        border-color: #FFD700;
+        transform: scale(1.05);
+        background: linear-gradient(180deg, #4A4A4A 0%, #3A3A 3A 100%);
+    }
+
+    .cmd-btn-compact:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
+    .cmd-btn-compact img {
+        width: 32px;
+        height: 32px;
+        object-fit: contain;
+    }
+
+    .cmd-btn-compact span {
+        font-size: 9px;
+        color: #FFF;
+        text-align: center;
+        white-space: nowrap;
+    }
+/* ===== STANCE CONTROLS (COMPACT) ===== */
+/* ===== STANCE CONTROLS (COMPACT) ===== */
+/* ===== STANCE CONTROLS (COMPACT) ===== */
+.stance-controls-compact {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+}
+
+.stance-btn-compact {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    background: linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%);
+    border: 2px solid #555;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    padding: 2px;
+}
+
+    .stance-btn-compact:hover {
+        border-color: #FFD700;
+        transform: scale(1.1);
+    }
+
+    .stance-btn-compact.active {
+        border-color: #0F0;
+        background: linear-gradient(180deg, #004400 0%, #002200 100%);
+    }
+
+    /* ✅ THIS KEEPS THE GLOW BUT FIXES THE SIZE */
+    .stance-btn-compact span.DiabloRedGlowWarUI {
+        font-size: 7px !important;
+        font-weight: bold;
+        white-space: nowrap;
+        line-height: 1;
+    }
+/* ===== PRODUCTION QUEUE (COMPACT) ===== */
+.production-queue-compact {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    font-size: 10px;
+    max-height: 50px;
+    overflow-y: auto;
+}
+
+.queue-item-compact {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    background: rgba(0,0,0,0.4);
+    padding: 3px 6px;
+    border-radius: 3px;
+    color: #FFF;
+}
+
+    .queue-item-compact span:first-child {
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+.queue-progress-compact {
+    flex: 2;
+    height: 6px;
+    background: #222;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.queue-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700 0%, #FFA500 100%);
+    transition: width 0.1s linear;
+}
+/* ===== BUFF BAR ===== */
+.buff-bar {
+    background: rgba(0,128,0,0.2);
+    border: 1px solid #0F0;
+    border-radius: 4px;
+    padding: 5px 8px;
+    color: #0F0;
+    font-size: 11px;
+    font-weight: bold;
+}
+/* ===== BUILD MODE INDICATOR ===== */
+.build-mode-indicator {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,128,0,0.95);
+    padding: 12px 24px;
+    border: 2px solid #0F0;
+    color: #FFF;
+    border-radius: 5px;
+    font-size: 14px;
+    z-index: 1001;
+}
+
+.cmd-button-cancel {
+    padding: 6px 12px;
+    background: #8B0000;
+    border: 2px solid #FF0000;
+    color: #FFF;
+    cursor: pointer;
+    margin-top: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+    .cmd-button-cancel:hover {
+        background: #A00000;
+    }
+/* ===== SCROLLBARS ===== */
+.command-panel-right::-webkit-scrollbar,
+.multi-unit-portraits::-webkit-scrollbar {
+    width: 6px;
+}
+
+.command-panel-right::-webkit-scrollbar-track,
+.multi-unit-portraits::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+.command-panel-right::-webkit-scrollbar-thumb,
+.multi-unit-portraits::-webkit-scrollbar-thumb {
+    background: #666;
+    border-radius: 3px;
+}
+
+    .command-panel-right::-webkit-scrollbar-thumb:hover,
+    .multi-unit-portraits::-webkit-scrollbar-thumb:hover {
+        background: #888;
+    }
+
+
+
+.DiabloRedGlowWarUI {
+    font-family: 'Diablo', sans-serif;
+    font-size: 1rem;
+    color: #39ff14;
+    letter-spacing: 0.5px;
+}
+
+/* ===== ABILITY BAR ===== */
+.ability-bar {
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid #8B4513;
+    border-radius: 4px;
+    padding: 6px 8px;
+    gap: 8px;
+}
+
+.mana-bar-compact {
+    width: 100%;
+    height: 8px;
+    background: #222;
+    border: 1px solid #555;
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.mana-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00BFFF 0%, #0080FF 100%);
+    transition: width 0.3s;
+}
+
+/* ===== ABILITY BUTTON ===== */
+.ability-btn {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%);
+    border: 2px solid #666;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.ability-btn-ready {
+    border-color: #0F0;
+    box-shadow: 0 0 10px rgba(0, 255, 0, 0.5);
+}
+
+    .ability-btn-ready:hover {
+        transform: scale(1.1);
+        border-color: #FFD700;
+        box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+    }
+
+.ability-btn-cooldown {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.ability-btn:disabled {
+    cursor: not-allowed;
+}
+
+/* ===== AUTO-CAST TOGGLE ===== */
+.autocast-toggle {
+    width: 50px;
+    height: 60px;
+    border: 2px solid #666;
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    transition: all 0.2s;
+}
+
+.autocast-on {
+    background: linear-gradient(180deg, #006600 0%, #003300 100%);
+    border-color: #0F0;
+}
+
+    .autocast-on:hover {
+        border-color: #FFD700;
+    }
+
+.autocast-off {
+    background: linear-gradient(180deg, #2A2A2A 0%, #1A1A1A 100%);
+    border-color: #666;
+}
+
+    .autocast-off:hover {
+        border-color: #FFF;
+    }

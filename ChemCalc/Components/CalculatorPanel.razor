@@ -1,0 +1,85 @@
+@using ChemCalc.MathLibrary
+
+@* Calculator Panel - 4 columns × 15 rows horizontal layout *@
+
+<div class="calculator-panel">
+    <div class="calculator-display">
+        <div class="calc-mode-indicator">
+            @if (IsChemMode)
+            {
+                <span style="color: #ffcc00;">CHEM</span>
+            }
+            else
+            {
+                @State.GetAngleModeDisplay()
+            }
+        </div>
+        <div class="calc-memory-indicator">@(State.HasMemory ? "M" : "")</div>
+        <div class="calc-display-value">@State.DisplayValue</div>
+    </div>
+
+    <div class="calculator-grid">
+        @foreach (var btn in Buttons)
+        {
+            var isNumber = int.TryParse(btn, out _);
+            var cssClass = isNumber ? "calc-btn number-btn" : "calc-btn";
+
+            // Highlight + and = buttons in CHEM mode
+            if (IsChemMode && (btn == "+" || btn == "="))
+            {
+                cssClass += " chem-mode-active";
+            }
+
+            <button class="@cssClass" @onclick="() => Press(btn)">
+                @GetButtonLabel(btn)
+            </button>
+        }
+    </div>
+</div>
+
+@code {
+    private CalculatorState State = new CalculatorState();
+    private ExpressionParser Parser;
+
+    // 4 columns × 15 rows = 60 buttons (horizontal layout)
+    private string[] Buttons = new[]
+    {
+        // Row 1
+        "1", "2", "3", "+",
+        // Row 2
+        "4", "5", "6", "-",
+        // Row 3
+        "7", "8", "9", "*",
+        // Row 4
+        "AC", "0", "DEL", "=",
+        // Row 5
+        "(", ")", ".", "/",
+        // Row 6
+        "^", "%", "√", "+/-",
+        // Row 7
+        "sin", "cos", "tan", "π",
+        // Row 8
+        "asin", "acos", "atan", "e",
+        // Row 9
+        "x²", "x³", "∛", "1/x",
+        // Row 10
+        "10ˣ", "eˣ", "log", "ln",
+        // Row 11
+        "|x|", "n!", "nCr", "nPr",
+        // Row 12
+        "Ans", "Ran", "Rnd", "EXP",
+        // Row 13
+        "MC", "MR", "MS", "M+",
+        // Row 14
+        "M-", "DEG", "RAD", "",
+        // Row 15
+        "", "", "", ""
+    };
+
+    protected override void OnInitialized()
+    {
+        Parser = new ExpressionParser(State);
+    }
+
+    // Press method will be in CalculatorPanel.razor.cs
+}

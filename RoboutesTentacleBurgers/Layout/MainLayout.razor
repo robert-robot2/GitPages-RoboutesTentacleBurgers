@@ -1,0 +1,682 @@
+﻿@inject IJSRuntime JSRuntime
+@inherits LayoutComponentBase
+
+@IAppStyles.GetCss()
+@ICalcStyles.GetCss()
+@IChemCalcStyles.GetCss()
+@IClockStyles.GetCss()
+@IFontsStyles.GetCss()
+@IPotionStyles.GetCss()
+
+@inject string Env
+@implements IDisposable
+
+<!-- ═══ SPECTRAL ENGINE INIT LOADER ═══-->
+<div id="spectral-engine-init">
+    <div class="sei-box">
+        <div class="sei-text">Initializing SpectralX Engine<span class="sei-dots"></span></div>
+        <div class="sei-sub" id="sei-status">Loading WebGL2...</div>
+    </div>
+</div>
+ 
+
+<div class="top-row DiabloBlueGlow">
+    <div class="top-left">
+        <button class="hamburger-btn" @onclick="ToggleDrawer" title="Menu">
+            <span class="bar"></span>
+            <span class="bar"></span>
+            <span class="bar"></span>
+        </button>
+        <div class="title-stack">
+            <div style="position:relative;display:inline-block;">
+                <canvas id="tentacle-title" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;"></canvas>
+                <a class="DiabloBlueGlow site-title" href="" style="font-size:125%;position:relative;z-index:1;">Roboutes Tentacle Burgers</a>
+            </div>
+            <span class="mobile-clock">@shortTime</span>
+        </div>
+    </div>
+    <div class="top-right">
+        <div class="clock-display">@currentTime</div>
+        <div style="flex: 1;"></div>
+        <div class="dots-menu">
+            <button class="dots-btn" @onclick="ToggleMenu">⋮</button>
+            @if (menuOpen)
+            {
+                <div class="dots-dropdown">
+                    <label style="cursor:pointer; display:flex; align-items:center; gap:0.5rem;">
+                        <input type="color" id="rgbPicker" value="#00aaff">
+                        Pick Theme
+                    </label>
+                    <button class="dots-item" disabled>Settings</button>
+                    <button class="dots-item" disabled>Log Out</button>
+                </div>
+            }
+        </div>
+        <a href="authentication/login" class="mobile-login-circle" title="Login">👤</a>
+        <div class="desktop-only">
+            <LoginDisplay />
+        </div>
+    </div>
+</div>
+
+<div class="page">
+<main>
+     <article class="">
+            @Body
+        </article>
+    </main>
+
+
+    @if (drawerOpen)
+    {
+        <div class="drawer-backdrop" @onclick="ToggleDrawer"></div>
+    }
+    <nav class="slide-drawer @(drawerOpen ? "open" : "")">
+        <Inventory />
+    </nav>
+</div>
+
+<script>
+        (function(){
+      const cv=document.getElementById('tentacle-title');
+      if(!cv)return;
+      const ctx=cv.getContext('2d');
+      const dpr=devicePixelRatio||1;
+      let W,H;
+      function resize(){
+        const r=cv.getBoundingClientRect();
+        W=cv.width=r.width*dpr;
+        H=cv.height=r.height*dpr;
+      }
+      resize();
+
+      const tentacles=[];
+      const COUNT=18;
+      for(let i=0;i<COUNT;i++){
+        const segs=[];
+        for(let s=0;s<18;s++)segs.push({x:0,y:0});
+        tentacles.push({
+          baseX: 0.45 + (i/COUNT)*0.3,
+          phase:Math.random()*Math.PI*2,
+          phaseSpd:0.012+Math.random()*0.01,
+          segs,
+          len:(0.08+Math.random()*0.06),
+        });
+      }
+
+      let t=0;
+      function draw(){
+        resize();
+        ctx.clearRect(0,0,W,H);
+        t+=0.016;
+
+        tentacles.forEach(ten=>{
+          ten.phase+=ten.phaseSpd;
+          const bx=ten.baseX*W;
+          const by=H*0.55;
+          const totalLen=ten.len*W;
+          const segLen=totalLen/ten.segs.length;
+
+          ten.segs.forEach((seg,i)=>{
+            const prog=i/ten.segs.length;
+            const wave1=Math.sin(t*1.2+ten.phase+prog*3.5)*H*0.28*prog;
+            const wave2=Math.sin(t*0.7+ten.phase*1.3+prog*2.2)*H*0.18*prog;
+            seg.x=bx+Math.cos(ten.phase*0.4+prog*1.2)*segLen*i*0.9;
+            seg.y=by+wave1+wave2;
+          });
+
+          ctx.beginPath();
+          ctx.moveTo(ten.segs[0].x,ten.segs[0].y);
+          for(let s=1;s<ten.segs.length-1;s++){
+            const mx=(ten.segs[s].x+ten.segs[s+1].x)/2;
+            const my=(ten.segs[s].y+ten.segs[s+1].y)/2;
+            ctx.quadraticCurveTo(ten.segs[s].x,ten.segs[s].y,mx,my);
+          }
+
+          const prog_tip=ten.segs.length-1;
+          ctx.lineTo(ten.segs[prog_tip].x,ten.segs[prog_tip].y);
+
+          ctx.strokeStyle='rgba(255,255,255,0.85)';
+          ctx.lineWidth=(2.5-(ten.baseX*1.2))*dpr;
+          ctx.shadowColor='#ffffff';
+          ctx.shadowBlur=10*dpr;
+          ctx.lineCap='round';
+          ctx.lineJoin='round';
+          ctx.stroke();
+          ctx.shadowBlur=0;
+        });
+
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+
+
+
+
+
+</script>
+
+
+
+
+
+<canvas id="nova" style="position:fixed;top:0;left:0;
+width:100vw;height:100vh;z-index:0;pointer-events:none;"></canvas>
+<script>
+    (function(){
+    const c=document.getElementById('nova');
+    const x=c.getContext('2d');
+    let W,H;
+    function resize(){
+      const r=c.getBoundingClientRect();
+      W=c.width=r.width*devicePixelRatio||r.width;
+      H=c.height=r.height*devicePixelRatio||r.height;
+    }
+    resize();
+
+    const dpr=devicePixelRatio||1;
+    const stars=[];
+    const shooters=[];
+    const moons=[];
+    const aliens=[];
+    const galaxies=[];
+    const nebulae=[];
+    const dustClouds=[];
+
+    for(let i=0;i<500;i++) stars.push({
+      x:Math.random()*W,y:Math.random()*H,
+      r:(Math.random()*1.6+0.2)*dpr,
+      speed:(Math.random()*0.15+0.01)*dpr,
+      alpha:Math.random()*0.7+0.2,
+      twinkle:Math.random()*Math.PI*2,
+      ts:Math.random()*0.025+0.005,
+      color:['#ffffff','#ffffff','#ffffff','#ffffff','#ffffff','#7dd8ff','#ffddaa','#39ff14','#ff9955','#ccaaff'][Math.floor(Math.random()*10)]
+    });
+
+    const galaxyDefs=[
+      {cx:0.12,cy:0.18,rx:180,ry:70,angle:-0.3,arms:5,color1:'#6633ff',color2:'#ff44cc',color3:'#aaddff'},
+      {cx:0.82,cy:0.22,rx:220,ry:80,angle:0.5,arms:4,color1:'#ff6622',color2:'#ffaa00',color3:'#ffffff'},
+      {cx:0.45,cy:0.08,rx:150,ry:55,angle:0.1,arms:6,color1:'#00ddff',color2:'#0066ff',color3:'#ffffff'},
+      {cx:0.72,cy:0.75,rx:200,ry:65,angle:-0.6,arms:5,color1:'#ff2266',color2:'#aa00ff',color3:'#ffccff'},
+      {cx:0.22,cy:0.7,rx:170,ry:60,angle:0.4,arms:4,color1:'#00ffaa',color2:'#0088ff',color3:'#ffffff'},
+      {cx:0.55,cy:0.5,rx:140,ry:50,angle:-0.2,arms:5,color1:'#ffcc00',color2:'#ff6600',color3:'#ffffff'},
+      {cx:0.9,cy:0.55,rx:130,ry:45,angle:0.7,arms:3,color1:'#88ffdd',color2:'#00ccff',color3:'#ffffff'},
+      {cx:0.03,cy:0.45,rx:110,ry:40,angle:-0.5,arms:4,color1:'#ff88aa',color2:'#ff00ff',color3:'#ffffff'},
+    ];
+
+    for(let i=0;i<7;i++){
+      const def=galaxyDefs[i%galaxyDefs.length];
+      const gstars=[];
+      const N=280+Math.floor(Math.random()*150);
+      for(let j=0;j<N;j++){
+        const arm=Math.floor(Math.random()*def.arms);
+        const t=Math.random();
+        const spiral=arm*(Math.PI*2/def.arms)+t*3.5+def.angle;
+        const dist=(0.05+t*0.95)*(def.rx*dpr*0.5);
+        const scatter=(Math.random()-0.5)*35*dpr*t;
+        const scatter2=(Math.random()-0.5)*18*dpr*t;
+        gstars.push({
+          dx:Math.cos(spiral)*dist+scatter,
+          dy:Math.sin(spiral)*dist*(def.ry/def.rx)+scatter2,
+          r:(Math.random()*1.5+0.3)*dpr,
+          alpha:Math.random()*0.8+0.2,
+          twinkle:Math.random()*Math.PI*2,
+          ts:Math.random()*0.02+0.003,
+          color:Math.random()<0.33?def.color1:Math.random()<0.5?def.color2:def.color3
+        });
+      }
+      galaxies.push({
+        x:def.cx*W,y:def.cy*H,
+        rx:def.rx*dpr,ry:def.ry*dpr,
+        angle:def.angle,
+        rot:0,rotSpeed:(Math.random()*0.0003+0.00005)*(Math.random()<0.5?1:-1),
+        color1:def.color1,color2:def.color2,color3:def.color3,
+        stars:gstars,
+        coreR:12*dpr,
+        coreAlpha:0.9
+      });
+    }
+
+    for(let i=0;i<6;i++){
+      nebulae.push({
+        x:(0.1+Math.random()*0.8)*W,
+        y:(0.1+Math.random()*0.8)*H,
+        rx:(80+Math.random()*160)*dpr,
+        ry:(50+Math.random()*100)*dpr,
+        angle:Math.random()*Math.PI,
+        alpha:0.025+Math.random()*0.045,
+        color:['#3300ff','#ff0066','#00ffcc','#ff6600','#aa00ff','#0088ff'][i]
+      });
+    }
+
+    for(let i=0;i<4;i++){
+      dustClouds.push({
+        x:(0.05+Math.random()*0.9)*W,
+        y:(0.05+Math.random()*0.9)*H,
+        r:(120+Math.random()*200)*dpr,
+        alpha:0.015+Math.random()*0.03,
+        color:['#6622ff','#ff4400','#00aaff','#ff2288'][i]
+      });
+    }
+
+    const moonDefs=[
+      {ox:0.2,oy:0.15,size:18,color:'#ddccbb',craterColor:'#aaa090',speed:0.0008},
+      {ox:0.78,oy:0.12,size:14,color:'#ccddee',craterColor:'#99aabb',speed:0.0012},
+      {ox:0.6,oy:0.85,size:22,color:'#bbbbcc',craterColor:'#888899',speed:0.0006},
+      {ox:0.1,oy:0.6,size:12,color:'#ddddd0',craterColor:'#aaaaaa',speed:0.0015},
+      {ox:0.88,oy:0.7,size:16,color:'#ccbbcc',craterColor:'#998899',speed:0.001},
+    ];
+    moonDefs.forEach(m=>{
+      moons.push({
+        x:m.ox*W,y:m.oy*H,
+        size:m.size*dpr,
+        color:m.color,
+        craterColor:m.craterColor,
+        orbitR:(60+Math.random()*40)*dpr,
+        orbitAngle:Math.random()*Math.PI*2,
+        orbitSpeed:m.speed,
+        craters:[
+          {dx:0.3,dy:-0.2,r:0.22},
+          {dx:-0.25,dy:0.3,r:0.18},
+          {dx:0.1,dy:0.35,r:0.14},
+          {dx:-0.35,dy:-0.1,r:0.1},
+        ]
+      });
+    });
+
+    const alienTypes=['saucer','jellyfish','orb','crab','spike'];
+    for(let i=0;i<8;i++){
+      aliens.push({
+        x:(0.05+Math.random()*0.9)*W,
+        y:(0.1+Math.random()*0.8)*H,
+        size:(14+Math.random()*18)*dpr,
+        type:alienTypes[Math.floor(Math.random()*alienTypes.length)],
+        color:['#39ff14','#00ffff','#ff00ff','#ff6600','#ffff00'][Math.floor(Math.random()*5)],
+        vx:(Math.random()-0.5)*0.8*dpr,
+        vy:(Math.random()-0.5)*0.4*dpr,
+        angle:0,
+        aSpeed:(Math.random()-0.5)*0.02,
+        t:Math.random()*Math.PI*2,
+        pulse:Math.random()*Math.PI*2,
+        pulseSpeed:Math.random()*0.04+0.02,
+        lights:Array.from({length:5},(_,k)=>({angle:k/5*Math.PI*2,color:Math.random()<0.5?'#ff0000':'#ffffff'}))
+      });
+    }
+
+    setInterval(()=>{
+      shooters.push({
+        x:Math.random()*W,y:Math.random()*H*0.6,
+        len:(80+Math.random()*120)*dpr,
+        speed:(7+Math.random()*8)*dpr,
+        alpha:1,
+        angle:Math.PI/4+(Math.random()-0.5)*0.5
+      });
+    },2500+Math.random()*2000);
+
+    function drawMoon(m){
+      m.orbitAngle+=m.orbitSpeed;
+      const mx=m.x+Math.cos(m.orbitAngle)*m.orbitR;
+      const my=m.y+Math.sin(m.orbitAngle)*m.orbitR*0.4;
+      x.save();
+      x.beginPath();
+      x.arc(mx,my,m.size,0,Math.PI*2);
+      x.fillStyle=m.color;
+      x.fill();
+      const shad=x.createRadialGradient(mx-m.size*0.3,my-m.size*0.3,m.size*0.1,mx,my,m.size);
+      shad.addColorStop(0,'rgba(255,255,255,0.15)');
+      shad.addColorStop(0.6,'rgba(0,0,0,0)');
+      shad.addColorStop(1,'rgba(0,0,0,0.6)');
+      x.fillStyle=shad;
+      x.beginPath();
+      x.arc(mx,my,m.size,0,Math.PI*2);
+      x.fill();
+      m.craters.forEach(cr=>{
+        x.beginPath();
+        x.arc(mx+cr.dx*m.size,my+cr.dy*m.size,cr.r*m.size,0,Math.PI*2);
+        x.fillStyle=m.craterColor;
+        x.globalAlpha=0.5;
+        x.fill();
+        x.globalAlpha=1;
+      });
+      x.restore();
+    }
+
+    function drawAlien(a){
+      a.t+=0.012;
+      a.pulse+=a.pulseSpeed;
+      a.angle+=a.aSpeed;
+      a.x+=a.vx; a.y+=a.vy;
+      if(a.x<-a.size*3)a.x=W+a.size; if(a.x>W+a.size*3)a.x=-a.size;
+      if(a.y<-a.size*3)a.y=H+a.size; if(a.y>H+a.size*3)a.y=-a.size;
+      const bob=Math.sin(a.t)*a.size*0.2;
+      const px=a.x, py=a.y+bob;
+      const glow=0.5+0.4*Math.sin(a.pulse);
+      x.save();
+      x.translate(px,py);
+      x.rotate(a.angle);
+      if(a.type==='saucer'){
+        x.save();
+        x.scale(1,0.38);
+        x.beginPath();
+        x.ellipse(0,0,a.size,a.size,0,0,Math.PI*2);
+        x.fillStyle=a.color;
+        x.globalAlpha=0.85*glow;
+        x.fill();
+        x.restore();
+        x.beginPath();
+        x.ellipse(0,-a.size*0.22,a.size*0.55,a.size*0.38,0,0,Math.PI*2);
+        x.fillStyle='rgba(200,255,255,0.7)';
+        x.globalAlpha=0.5;
+        x.fill();
+        x.globalAlpha=1;
+        a.lights.forEach(l=>{
+          x.beginPath();
+          x.arc(Math.cos(l.angle)*a.size*0.72,Math.sin(l.angle)*a.size*0.12,2.5*dpr,0,Math.PI*2);
+          x.fillStyle=l.color;
+          x.globalAlpha=0.7+0.3*Math.sin(a.pulse+l.angle);
+          x.fill();
+        });
+      } else if(a.type==='jellyfish'){
+        x.globalAlpha=0.7*glow;
+        x.beginPath();
+        x.ellipse(0,-a.size*0.2,a.size*0.7,a.size*0.55,0,Math.PI,0,true);
+        x.fillStyle=a.color;
+        x.fill();
+        for(let t=0;t<5;t++){
+          const tx=(t-2)*a.size*0.25;
+          x.beginPath();
+          x.moveTo(tx,0);
+          x.quadraticCurveTo(tx+Math.sin(a.t+t)*a.size*0.25,a.size*0.6,tx,a.size*(0.7+Math.sin(a.t+t*1.3)*0.25));
+          x.strokeStyle=a.color;
+          x.lineWidth=2*dpr;
+          x.globalAlpha=0.5;
+          x.stroke();
+        }
+      } else if(a.type==='orb'){
+        x.beginPath();
+        x.arc(0,0,a.size,0,Math.PI*2);
+        x.fillStyle=a.color;
+        x.globalAlpha=0.3*glow;
+        x.fill();
+        x.beginPath();
+        x.arc(0,0,a.size*0.55,0,Math.PI*2);
+        x.fillStyle='rgba(255,255,255,0.9)';
+        x.globalAlpha=0.6*glow;
+        x.fill();
+        for(let r=0;r<3;r++){
+          x.beginPath();
+          x.ellipse(0,0,a.size*(0.7+r*0.2),a.size*0.12,a.t+r,0,Math.PI*2);
+          x.strokeStyle=a.color;
+          x.lineWidth=1.5*dpr;
+          x.globalAlpha=0.4;
+          x.stroke();
+        }
+      } else if(a.type==='crab'){
+        x.globalAlpha=0.9;
+        x.fillStyle=a.color;
+        x.beginPath();
+        x.ellipse(0,0,a.size*0.7,a.size*0.5,0,0,Math.PI*2);
+        x.fill();
+        for(let l=0;l<3;l++){
+          const sign=l%2===0?1:-1;
+          x.save();
+          x.rotate(sign*(0.4+l*0.25));
+          x.beginPath();
+          x.moveTo(a.size*0.6,0);
+          x.lineTo(a.size*(1.0+l*0.15),sign*a.size*(0.2+l*0.12));
+          x.strokeStyle=a.color;
+          x.lineWidth=3*dpr;
+          x.globalAlpha=0.7;
+          x.stroke();
+          x.restore();
+          x.save();
+          x.rotate(-sign*(0.4+l*0.25));
+          x.beginPath();
+          x.moveTo(-a.size*0.6,0);
+          x.lineTo(-a.size*(1.0+l*0.15),sign*a.size*(0.2+l*0.12));
+          x.strokeStyle=a.color;
+          x.lineWidth=3*dpr;
+          x.globalAlpha=0.7;
+          x.stroke();
+          x.restore();
+        }
+        x.beginPath();
+        x.arc(-a.size*0.2,-a.size*0.1,a.size*0.12,0,Math.PI*2);
+        x.arc(a.size*0.2,-a.size*0.1,a.size*0.12,0,Math.PI*2);
+        x.fillStyle='#ffffff';
+        x.globalAlpha=0.9;
+        x.fill();
+      } else {
+        x.globalAlpha=0.8*glow;
+        x.fillStyle=a.color;
+        x.beginPath();
+        x.arc(0,0,a.size*0.4,0,Math.PI*2);
+        x.fill();
+        for(let sp=0;sp<8;sp++){
+          const ang=sp/8*Math.PI*2+a.t*0.3;
+          const len=a.size*(0.7+Math.sin(a.t*2+sp)*0.25);
+          x.beginPath();
+          x.moveTo(Math.cos(ang)*a.size*0.38,Math.sin(ang)*a.size*0.38);
+          x.lineTo(Math.cos(ang)*len,Math.sin(ang)*len);
+          x.strokeStyle=a.color;
+          x.lineWidth=2.5*dpr;
+          x.globalAlpha=0.6;
+          x.stroke();
+        }
+      }
+      x.restore();
+    }
+
+    function drawGalaxy(g){
+      g.rot+=g.rotSpeed;
+      x.save();
+      x.translate(g.x,g.y);
+      x.rotate(g.rot);
+      g.stars.forEach(s=>{
+        s.twinkle+=s.ts;
+        x.globalAlpha=s.alpha*(0.6+0.4*Math.sin(s.twinkle));
+        x.fillStyle=s.color;
+        x.beginPath();
+        x.arc(s.dx,s.dy,s.r,0,Math.PI*2);
+        x.fill();
+      });
+      const coreGrad=x.createRadialGradient(0,0,0,0,0,g.coreR*2.5);
+      coreGrad.addColorStop(0,'rgba(255,255,255,0.95)');
+      coreGrad.addColorStop(0.3,g.color1+'cc');
+      coreGrad.addColorStop(0.7,g.color2+'44');
+      coreGrad.addColorStop(1,'rgba(0,0,0,0)');
+      x.globalAlpha=g.coreAlpha;
+      x.fillStyle=coreGrad;
+      x.beginPath();
+      x.arc(0,0,g.coreR*2.5,0,Math.PI*2);
+      x.fill();
+      x.restore();
+    }
+
+    function draw(){
+      x.clearRect(0,0,W,H);
+
+   
+
+      dustClouds.forEach(d=>{
+        const g=x.createRadialGradient(d.x,d.y,0,d.x,d.y,d.r);
+        g.addColorStop(0,d.color+'55');
+        g.addColorStop(0.4,d.color+'22');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        x.globalAlpha=d.alpha*2;
+        x.fillStyle=g;
+        x.beginPath();
+        x.arc(d.x,d.y,d.r,0,Math.PI*2);
+        x.fill();
+        x.globalAlpha=1;
+      });
+
+      nebulae.forEach(n=>{
+        x.save();
+        x.translate(n.x,n.y);
+        x.rotate(n.angle);
+        const g=x.createRadialGradient(0,0,0,0,0,n.rx);
+        g.addColorStop(0,n.color+'66');
+        g.addColorStop(0.5,n.color+'22');
+        g.addColorStop(1,'rgba(0,0,0,0)');
+        x.globalAlpha=n.alpha*3;
+        x.fillStyle=g;
+        x.scale(1,n.ry/n.rx);
+        x.beginPath();
+        x.arc(0,0,n.rx,0,Math.PI*2);
+        x.fill();
+        x.restore();
+        x.globalAlpha=1;
+      });
+
+      galaxies.forEach(drawGalaxy);
+
+      stars.forEach(s=>{
+        s.twinkle+=s.ts;
+        s.y+=s.speed;
+        if(s.y>H){s.y=0;s.x=Math.random()*W;}
+        x.globalAlpha=s.alpha*(0.7+0.3*Math.sin(s.twinkle));
+        x.fillStyle=s.color;
+        x.beginPath();
+        x.arc(s.x,s.y,s.r,0,Math.PI*2);
+        x.fill();
+        if(s.r>1.5*dpr&&Math.sin(s.twinkle)>0.5){
+          x.globalAlpha*=0.5;
+          x.beginPath();
+          x.moveTo(s.x-s.r*3,s.y);x.lineTo(s.x+s.r*3,s.y);
+          x.moveTo(s.x,s.y-s.r*3);x.lineTo(s.x,s.y+s.r*3);
+          x.strokeStyle=s.color;
+          x.lineWidth=0.5*dpr;
+          x.stroke();
+        }
+      });
+      x.globalAlpha=1;
+
+      moons.forEach(drawMoon);
+      aliens.forEach(drawAlien);
+      x.globalAlpha=1;
+
+      for(let i=shooters.length-1;i>=0;i--){
+        const s=shooters[i];
+        const ex=s.x+Math.cos(s.angle)*s.len;
+        const ey=s.y+Math.sin(s.angle)*s.len;
+        x.save();
+        x.globalAlpha=s.alpha;
+        const g=x.createLinearGradient(s.x,s.y,ex,ey);
+        g.addColorStop(0,'rgba(255,255,255,0)');
+        g.addColorStop(0.5,'rgba(180,230,255,0.8)');
+        g.addColorStop(1,'rgba(57,255,20,1)');
+        x.strokeStyle=g;
+        x.lineWidth=2*dpr;
+        x.beginPath();x.moveTo(s.x,s.y);x.lineTo(ex,ey);x.stroke();
+        x.restore();
+        s.x+=Math.cos(s.angle)*s.speed;
+        s.y+=Math.sin(s.angle)*s.speed;
+        s.alpha-=0.018;
+        if(s.alpha<=0.02)shooters.splice(i,1);
+      }
+
+      requestAnimationFrame(draw);
+    }
+    draw();
+    })();
+</script>
+
+
+@code {
+
+    private bool drawerOpen = false;
+    private void ToggleDrawer() => drawerOpen = !drawerOpen;
+    private bool menuOpen = false;
+
+    private async Task ToggleMenu()
+    {
+        menuOpen = !menuOpen;
+        if (menuOpen)
+        {
+            await Task.Delay(50); // wait for Blazor to render dropdown
+            await JSRuntime.InvokeVoidAsync("initPicker");
+        }
+    }
+
+
+    private string currentTime = "";
+    private System.Timers.Timer? clockTimer;
+
+    protected override void OnInitialized()
+    {
+        clockTimer = new System.Timers.Timer(1000); // 1 second interval
+        clockTimer.Elapsed += (_, __) => UpdateTime();
+        clockTimer.AutoReset = true;
+        clockTimer.Enabled = true;
+    }
+    private string shortTime = "";
+
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Give WebGL scene pages a head start to call ready() themselves.
+            // If they don't within 800ms, we dismiss the loader.
+            await Task.Delay(800);
+            await JSRuntime.InvokeVoidAsync("SpectralEngineLoader.ready");
+        }
+    }
+    
+
+    private void UpdateTime()
+    {
+        try
+        {
+            var utcNow = DateTime.UtcNow;
+            var easternZone = TimeZoneInfo.FindSystemTimeZoneById("Eastern Standard Time");
+            var easternTime = TimeZoneInfo.ConvertTimeFromUtc(utcNow, easternZone);
+            currentTime = easternTime.ToString("dddd, MMMM dd yyyy — hh:mm:ss tt");
+            shortTime = easternTime.ToString("h:mm tt");
+        }
+        catch
+        {
+            var utcNow = DateTime.UtcNow;
+            bool isDst = utcNow.Month >= 3 && utcNow.Month <= 11;
+            var easternTime = utcNow.AddHours(isDst ? -4 : -5);
+            currentTime = easternTime.ToString("dddd, MMMM dd yyyy — hh:mm:ss tt");
+            shortTime = easternTime.ToString("h:mm tt");
+        }
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        clockTimer?.Dispose();
+    }
+}
+<script>
+    // Apply saved theme color on page load (no picker needed yet)
+    function applyColor(color) {
+        document.documentElement.style.setProperty("--primary-color", color);
+        document.documentElement.style.setProperty("--text-glow", color);
+        document.documentElement.style.setProperty("--bg-bottom", color);
+        document.documentElement.style.setProperty("--bg-top", color);
+        document.documentElement.style.setProperty("--text-color", "#ffffff");
+    }
+
+    // Apply theme immediately — no picker access needed here
+    const savedTheme = localStorage.getItem("themeColor") || "#00aaff";
+    applyColor(savedTheme);
+
+    function initPicker() {
+        const picker = document.getElementById("rgbPicker");
+        if (!picker) return;
+
+        picker.value = localStorage.getItem("themeColor") || "#00aaff";
+
+        picker.addEventListener("input", (e) => {
+            const color = e.target.value;
+            applyColor(color);
+            localStorage.setItem("themeColor", color);
+        });
+    }
+</script>

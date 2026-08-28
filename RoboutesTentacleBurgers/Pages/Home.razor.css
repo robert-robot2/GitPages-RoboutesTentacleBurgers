@@ -1,0 +1,23 @@
+﻿
+
+
+
+/* === HOME FULLSCREEN === */
+#Home-Container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: black;
+}
+
+#Home-Container:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+}
+
+#Home-Container:fullscreen .Home-Viewport {
+    width: 100vw !important;
+    height: 100vh !important;
+}

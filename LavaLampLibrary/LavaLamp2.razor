@@ -1,0 +1,248 @@
+@page "/LavaLamp2"
+<PageTitle>LavaLamp</PageTitle>
+
+<div class="DiabloBlueGlow" style="font-size:150%">LavaLamp</div>
+
+
+
+
+
+<!-- ?? Lava Lamp Version 3 OFFICIAL -->
+<h3 class="DiabloBlueGlow">Lava Lamp Color Controls</h3>
+
+<div class="DiabloBlueGlow" style="margin-bottom:10px">
+    <label for="baseColorPicker">Base Color:</label>
+    <input type="color" id="baseColorPicker" @bind="BaseColor" style="margin-left:10px" />
+</div>
+
+<div class="DiabloBlueGlow" style="margin-bottom:10px">
+    <label for="glassColorPicker">Glass Color:</label>
+    <input type="color" id="glassColorPicker" @bind="GlassColor" style="margin-left:10px" />
+</div>
+
+<div class="DiabloBlueGlow" style="margin-bottom:10px">
+    <label for="liquidColorPicker">Liquid Color:</label>
+    <input type="color" id="liquidColorPicker" @bind="LiquidColor" style="margin-left:10px" />
+</div>
+
+<div class="DiabloBlueGlow" style="margin-bottom:10px">
+    <label for="bubbleColorPicker">Bubble Color:</label>
+    <input type="color" id="bubbleColorPicker" @bind="BubbleColor" style="margin-left:10px" />
+</div>
+
+
+<svg width="300" height="600" viewBox="0 0 332 528" xmlns="http://www.w3.org/2000/svg">
+
+
+    <defs>
+
+
+        <!-- color glow filter -->
+
+        <filter id="redOrangeGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="6" result="blur" />
+            <feColorMatrix in="blur"
+                           type="matrix"
+                           values="@GetGlowMatrix(BaseColor)" />
+            <feMerge>
+                <feMergeNode />
+                <feMergeNode in="SourceGraphic" />
+            </feMerge>
+        </filter>
+
+
+
+        <!-- glass mask filter -->
+        <!-- Intentional. Do not touch. -->
+        <!-- Intentional. Do not touch. -->
+
+
+
+        <mask id="glassMask" maskUnits="userSpaceOnUse">
+            <rect x="0" y="0" width="332" height="528" fill="black" />
+            <image href="/iAssets/SCLavaLampglass01.png" x="0" y="0" width="332" height="528" />
+        </mask>
+
+
+
+        <!-- Fluid metaball filter -->
+
+
+        <filter id="fluid" x="-50%" y="-50%" width="200%" height="200%" filterUnits="userSpaceOnUse" fill-opacity=".035">
+            <feGaussianBlur stdDeviation="8" result="blur" />
+            <feColorMatrix in="blur" mode="matrix"
+                           values="1 0 0 0 0
+                                   0 1 0 0 0
+                                   0 0 1 0 0
+                                   0 0 0 18 -7"
+                           result="metaball" />
+            <feTurbulence type="turbulence" baseFrequency="0.02" numOctaves="1" seed="2" result="noise">
+                <animate attributeName="seed" dur="6s" from="0" to="100" repeatCount="indefinite" />
+            </feTurbulence>
+            <feDisplacementMap in="metaball" in2="noise" scale="2" />
+        </filter>
+    </defs>
+
+    <!-- Background image -->
+    <image href="/iAssets/ZergMechLamp001.png" x="0" y="0" width="332" height="528" preserveAspectRatio="none" filter="url(#redOrangeGlow)" opacity="1" />
+
+
+
+    <!-- Glass image -->
+
+    <g style="mix-blend-mode:screen; opacity:0.4">
+        <rect x="0" y="0" width="332" height="528" fill="@GlassColor" mask="url(#glassMask)" />
+        <image href="/iAssets/ZergMechLampG001.png" x="0" y="0" width="332" height="528" preserveAspectRatio="none" mask="url(#glassMask)" />
+    </g>
+
+
+
+
+    <!-- Fluid Glass image -->
+
+
+    <g filter="url(#fluid) url(#redOrangeGlow)">
+        <circle cx="166" cy="264" r="120" fill="@LiquidColor" mask="url(#glassMask)" opacity="0.5" />
+        <image href="/iAssets/ZergMechLampG001.png" x="0" y="0" width="332" height="528" preserveAspectRatio="none" opacity=".425" />
+    </g>
+
+
+    <!-- Globules -->
+
+
+    <g filter="url(#fluid) url(#redOrangeGlow)" opacity=".4">
+
+        <!-- Medium bubbles -->
+        <circle cx="190" cy="250" r="14" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="6s" repeatCount="indefinite" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" calcMode="spline" />
+            <animate attributeName="cx" values="190;182;190;198;190" dur="6s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.9 1.2;1 1" dur="6s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="170" cy="280" r="9" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="5s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="170;162;170;178;170" dur="5s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;1.1 0.9;1 1" dur="5s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="210" cy="300" r="11" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="7s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="210;202;210;218;210" dur="7s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.85 1.15;1 1" dur="7s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="145" cy="200" r="16" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="9s" repeatCount="indefinite" keySplines="0.4 0 0.6 1;0.4 0 0.6 1" calcMode="spline" />
+            <animate attributeName="cx" values="145;138;145;152;145" dur="9s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.88 1.22;1 1" dur="9s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="200" cy="180" r="12" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="8s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="200;192;200;208;200" dur="8s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.92 1.18;1 1" dur="8s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="230" cy="220" r="10" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="10s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="230;222;230;238;230" dur="10s" repeatCount="indefinite" />
+            <animateTransform attributeName="transform" type="scale" values="1 1;0.95 1.1;1 1" dur="10s" repeatCount="indefinite" />
+        </circle>
+
+        <!-- Small bubbles -->
+        <circle cx="160" cy="260" r="4" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="4s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="160;157;160;163;160" dur="4s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="220" cy="270" r="3" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="3.5s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="220;217;220;223;220" dur="3.5s" repeatCount="indefinite" />
+        </circle>
+
+        <circle cx="180" cy="190" r="5" fill="@BubbleColor">
+            <animate attributeName="cy" values="140;310;140" dur="4.5s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="180;177;180;183;180" dur="4.5s" repeatCount="indefinite" />
+        </circle>
+
+        <!-- Big, slow blobby bubbles inside trapezoid -->
+        <circle r="20" fill="@BubbleColor" opacity="0.7">
+            <animate attributeName="cy" values="140;360;140" dur="12s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="160;148;160;172;160" dur="12s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="25" fill="@BubbleColor" opacity="0.6">
+            <animate attributeName="cy" values="140;360;140" dur="15s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="180;165;180;195;180" dur="15s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="18" fill="@BubbleColor" opacity="0.8">
+            <animate attributeName="cy" values="140;360;140" dur="14s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="170;158;170;182;170" dur="14s" repeatCount="indefinite" />
+        </circle>
+
+        <!-- Super fat, extremely slow bubbles in trapezoid -->
+        <circle r="40" fill="@BubbleColor" opacity="0.6">
+            <animate attributeName="cy" values="140;360;140" dur="30s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="160;150;160;170;160" dur="30s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="50" fill="@BubbleColor" opacity="0.5">
+            <animate attributeName="cy" values="140;360;140" dur="35s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="170;160;170;180;170" dur="35s" repeatCount="indefinite" />
+        </circle>
+
+        <circle r="45" fill="@BubbleColor" opacity="0.55">
+            <animate attributeName="cy" values="140;360;140" dur="32s" repeatCount="indefinite" />
+            <animate attributeName="cx" values="180;165;180;195;180" dur="32s" repeatCount="indefinite" />
+        </circle>
+
+    </g>
+
+
+
+
+</svg>
+
+
+
+
+
+
+
+@code {
+    // Default colors
+    private string BaseColor { get; set; } = "#ff9900";    // Base / glow
+    private string GlassColor { get; set; } = "#ffffff";   // Glass overlay
+    private string LiquidColor { get; set; } = "#ff4d4d";  // Lava blobs
+    private string BubbleColor { get; set; } = "#ff8080";  // Bubbles
+
+    // Convert hex to RGB fractions for feColorMatrix
+    private string GetGlowMatrix(string hex)
+    {
+        int r = Convert.ToInt32(hex.Substring(1, 2), 16);
+        int g = Convert.ToInt32(hex.Substring(3, 2), 16);
+        int b = Convert.ToInt32(hex.Substring(5, 2), 16);
+
+        double rf = r / 255.0;
+        double gf = g / 255.0;
+        double bf = b / 255.0;
+
+        return $@"
+            {rf} 0 0 0 0
+            {gf} 0 0 0 0
+            {bf} 0 0 0 0
+            0 0 0 0.9 0";
+    }
+}
+
+
+
+
+
+
+
+
+
+
+

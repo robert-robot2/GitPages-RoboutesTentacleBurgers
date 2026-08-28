@@ -1,0 +1,265 @@
+@using SpectralXGLX.Services
+
+<div style="
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(ellipse at center, rgba(20,0,0,0.85) 0%, rgba(0,0,0,0.96) 100%);
+    pointer-events: all;
+    font-family: 'Courier New', monospace;
+    overflow-y: auto;">
+
+    @* ── Title ────────────────────────────────────────────────────── *@
+    <div style="
+        font-size: 3.5rem;
+        font-family: 'Diablo', 'Courier New', monospace;
+        font-weight: normal;
+        letter-spacing: 0.08em;
+        color: #cc2200;
+        text-shadow: 0 0 18px #ff4400, 0 0 40px #aa1100, 0 0 80px #660000;
+        margin-bottom: 0px;
+        text-transform: none;
+        text-align: center;">
+        Controls
+    </div>
+
+    @* ── Keybind Table ────────────────────────────────────────────── *@
+    <div style="
+        width: 360px;
+        max-height: 60vh;
+        overflow-y: auto;
+        background: rgba(0,0,0,0.45);
+        border: 1px solid rgba(204,34,0,0.25);
+        border-radius: 4px;
+        padding: 16px 20px;
+        margin-bottom: 16px;">
+
+        <div style="font-size:0.7rem; color:rgba(255,255,255,0.2);
+            letter-spacing:0.1em; margin-bottom:12px;
+            border-bottom:1px solid rgba(255,255,255,0.08); padding-bottom:8px;">
+            CLICK A FIELD THEN PRESS A KEY TO REBIND
+        </div>
+
+        @foreach (var (action, label, section) in _binds)
+        {
+            @* Section divider *@
+            @if (section != null)
+            {
+                <div style="font-size:0.65rem; color:rgba(255,100,0,0.5);
+                    letter-spacing:0.1em; margin:10px 0 6px;
+                    border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+                    @section
+                </div>
+            }
+
+            <div style="display:flex; align-items:center;
+                justify-content:space-between; margin-bottom:6px;">
+
+                <span style="font-size:0.78rem; color:rgba(255,255,255,0.65);
+                    letter-spacing:0.06em; min-width:130px;">
+                    @label
+                </span>
+
+                <input type="text"
+                       value="@KeybindConfig.GetBinding(action)"
+                       readonly
+                       tabindex="0"
+                       @onclick="@(() => _activeAction = action)"
+                       @onkeydown="CaptureKey"
+                       style="@InputStyle(action)" />
+            </div>
+        }
+
+        <div style="font-size:0.68rem; color:rgba(255,255,255,0.35);
+            letter-spacing:0.05em; margin:4px 0 10px; line-height:1.5;
+            padding:8px 10px; background:rgba(255,255,255,0.03);
+            border-left:2px solid rgba(204,34,0,0.3); border-radius:2px;">
+            Directional attacks are automatic — press <b>Move Left</b> or <b>Move Right</b> together with <b>Attack</b>/<b>Special Attack</b> to strike in that direction. These follow your Movement and Attack bindings above and can't be set separately. Mouse Handle Wheel To zoom in and out, Pan left and right of screen in non Ortho Lock to pan map.
+        </div>
+
+        @* ── Gamepad Section ─────────────────────────────────────── *@
+        <div style="font-size:0.65rem; color:rgba(255,100,0,0.5);
+            letter-spacing:0.1em; margin:10px 0 6px;
+            border-top:1px solid rgba(255,255,255,0.06); padding-top:8px;">
+            GAMEPAD
+        </div>
+
+        @* Read-only axis labels *@
+        <div style="display:flex; align-items:center;
+            justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:0.78rem; color:rgba(255,255,255,0.65);
+                letter-spacing:0.06em; min-width:130px;">
+                Move
+            </span>
+            <span style="width:100px; padding:4px 8px;
+                font-size:0.78rem; font-family:'Courier New',monospace;
+                text-align:center; letter-spacing:0.08em;
+                background:rgba(255,255,255,0.03);
+                color:rgba(255,255,255,0.25);
+                border:1px solid rgba(255,255,255,0.08);
+                border-radius:3px;">
+                Left Stick
+            </span>
+        </div>
+
+        <div style="display:flex; align-items:center;
+            justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:0.78rem; color:rgba(255,255,255,0.65);
+                letter-spacing:0.06em; min-width:130px;">
+                Look / Cam
+            </span>
+            <span style="width:100px; padding:4px 8px;
+                font-size:0.78rem; font-family:'Courier New',monospace;
+                text-align:center; letter-spacing:0.08em;
+                background:rgba(255,255,255,0.03);
+                color:rgba(255,255,255,0.25);
+                border:1px solid rgba(255,255,255,0.08);
+                border-radius:3px;">
+                Right Stick
+            </span>
+        </div>
+
+        @* Rebindable button rows *@
+        @foreach (var (action, label) in _gamepadBinds)
+        {
+            <div style="display:flex; align-items:center;
+                justify-content:space-between; margin-bottom:6px;">
+
+                <span style="font-size:0.78rem; color:rgba(255,255,255,0.65);
+                    letter-spacing:0.06em; min-width:130px;">
+                    @label
+                </span>
+
+                <select @onchange="@(e => SetGamepadBind(action, e.Value?.ToString() ?? string.Empty))"
+                        style="width:100px; padding:4px 8px;
+                    font-size:0.78rem; font-family:'Courier New',monospace;
+                    text-align:center; letter-spacing:0.08em;
+                    background:rgba(0,0,0,0.6);
+                    color:#ccc;
+                    border:1px solid rgba(255,255,255,0.12);
+                    border-radius:3px; cursor:pointer; outline:none;">
+                    @foreach (var btn in GamepadBindsConfig.AvailableButtons)
+                    {
+                        <option value="@btn"
+                                selected="@(GamepadBindsConfig.GetBinding(action) == btn)">
+                            @GamepadBindsConfig.GetButtonLabel(btn)
+                        </option>
+                    }
+                </select>
+            </div>
+        }
+
+        <div style="font-size:0.68rem; color:rgba(255,255,255,0.35);
+            letter-spacing:0.05em; margin:4px 0 10px; line-height:1.5;
+            padding:8px 10px; background:rgba(255,255,255,0.03);
+            border-left:2px solid rgba(204,34,0,0.3); border-radius:2px;">
+            Left stick moves your character. Right stick controls the camera in free cam mode. Button binds take effect immediately.
+        </div>
+
+    </div>
+
+    @* ── Back Button ──────────────────────────────────────────────── *@
+    <button style="
+        width: 260px; padding: 12px 8px;
+        font-size: 0.85rem;
+        font-family: 'Courier New', monospace;
+        letter-spacing: 0.12em;
+        background: rgba(0,0,0,0.6);
+        color: #ddd;
+        border: 1px solid #882200;
+        border-radius: 3px;
+        cursor: pointer;
+        text-align: center;
+        text-shadow: 0 0 8px #cc4400;
+        box-shadow: 0 0 10px #88220044;
+        margin-bottom: 24px;"
+            @onclick="OnRMainMenuPressed">
+        ← MAIN MENU
+    </button>
+
+    @* ── Footer ───────────────────────────────────────────────────── *@
+    <div style="
+        position: absolute;
+        bottom: 18px;
+        font-size: 0.7rem;
+        color: rgba(255,255,255,0.2);
+        letter-spacing: 0.12em;">
+        PRESS 5 TO CLOSE
+    </div>
+
+</div>
+
+@code {
+
+    [Parameter] public EventCallback OnRMainMenu { get; set; }
+
+    private string? _activeAction;
+
+    // ── Bind list: (actionKey, displayLabel, sectionHeader|null) ──
+    private static readonly (string action, string label, string? section)[] _binds = new[]
+    {
+        ("MoveUp",      "Move Up",          "MOVEMENT"),
+        ("MoveDown",    "Move Down",        (string?)null),
+        ("MoveLeft",    "Move Left",        (string?)null),
+        ("MoveRight",   "Move Right",       (string?)null),
+        ("Attack",      "Attack",           "COMBAT"),
+        ("SPAttack",    "Special Attack",   (string?)null),
+        ("Menu",        "Menu Toggle",      "UI"),
+        ("Inventory",   "Inventory",        (string?)null),
+        ("UIToggle",    "Hide Dev Panels",  (string?)null),
+        ("HUDToggle",    "Hide HUD Panels",  (string?)null),
+        ("Debug",       "Debug Overlay",    "DEBUG"),
+       
+    };
+
+    // Gamepad bind rows: (actionKey, displayLabel)
+    private static readonly (string action, string label)[] _gamepadBinds = new[]
+    {
+    ("Attack",   "Attack"),
+    ("SPAttack", "Special Attack"),
+    ("Menu",     "Menu Toggle"),
+    ("Inventory","Inventory"),
+};
+
+    private void SetGamepadBind(string action, string button)
+    {
+        if (string.IsNullOrEmpty(button)) return;
+        GamepadBindsConfig.SetBinding(action, button);
+    }
+
+       
+
+    private string InputStyle(string action) =>
+        $"width:100px; padding:4px 8px; " +
+        $"font-size:0.78rem; font-family:'Courier New',monospace; " +
+        $"text-align:center; letter-spacing:0.08em; " +
+        $"background:{(_activeAction == action ? "rgba(204,34,0,0.25)" : "rgba(255,255,255,0.05)")}; " +
+        $"color:{(_activeAction == action ? "#ff6633" : "#ccc")}; " +
+        $"border:1px solid {(_activeAction == action ? "#cc2200" : "rgba(255,255,255,0.12)")}; " +
+        $"border-radius:3px; cursor:pointer; outline:none;";
+
+    private void CaptureKey(KeyboardEventArgs e)
+    {
+        if (string.IsNullOrEmpty(_activeAction)) return;
+        if (e.Key is "Tab" or "F5" or "F12") return;
+
+        var newKey = KeybindConfig.BuildCanonicalKey(e);
+        var conflictingAction = KeybindConfig.GetAction(newKey);
+
+        if (conflictingAction != null && conflictingAction != _activeAction)
+        {
+            // Swap: give the conflicting action the key we're vacating
+            var oldKey = KeybindConfig.GetBinding(_activeAction);
+            KeybindConfig.SetBinding(conflictingAction, oldKey);
+        }
+
+        KeybindConfig.SetBinding(_activeAction, newKey);
+        _activeAction = null;
+    }
+
+    private async Task OnRMainMenuPressed() => await OnRMainMenu.InvokeAsync();
+}

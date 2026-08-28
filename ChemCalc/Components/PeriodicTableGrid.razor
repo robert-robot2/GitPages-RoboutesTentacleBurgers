@@ -1,0 +1,43 @@
+@using ChemCalc.Data
+
+@* Full periodic table grid with 18 columns x 9 rows *@
+
+<div class="periodic-table-grid">
+    @foreach (var element in AllElements)
+    {
+        <ElementCard Element="element"
+                     GridColumn="@element.Group"
+                     GridRow="@element.Period"
+                     OnElementSelected="OnElementClicked"
+                     IsHighlighted="@IsElementHighlighted(element)" />
+    }
+</div>
+
+@code {
+    private List<Element> AllElements = new List<Element>();
+
+    [Parameter]
+    public EventCallback<Element> OnElementSelected { get; set; }
+
+    [Parameter]
+    public ElementType? HighlightedType { get; set; }
+
+    protected override void OnInitialized()
+    {
+        // Load all 118 elements from periodic table
+        AllElements = PeriodicTable.GetAllElements();
+    }
+
+    private async Task OnElementClicked(Element element)
+    {
+        await OnElementSelected.InvokeAsync(element);
+    }
+
+    private bool IsElementHighlighted(Element element)
+    {
+        if (HighlightedType == null)
+            return false;
+
+        return element.ElementType == HighlightedType.Value;
+    }
+}

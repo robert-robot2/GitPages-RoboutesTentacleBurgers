@@ -1,0 +1,263 @@
+﻿@page "/snowglobe"
+@implements IDisposable
+@inject IJSRuntime JS
+
+<PageTitle>Snow Globe</PageTitle>
+
+<div class="sg-root">
+    <canvas id="snowGlobeCanvas" width="900" height="900"></canvas>
+    <div class="sg-controls">
+        <button class="sg-btn shake-btn" @onclick="ShakeGlobe">❄ Shake It</button>
+        <div class="sg-sliders">
+            <label>
+                Snow Density
+                <input type="range" min="50" max="600" @bind="SnowCount" @bind:event="oninput" @onchange="UpdateSnow" />
+                <span>@SnowCount</span>
+            </label>
+            <label>
+                Wind
+                <input type="range" min="-3" max="3" step="0.1" @bind="WindStrength" @bind:event="oninput" />
+                <span>@WindStrength.ToString("F1")</span>
+            </label>
+            <label>
+                Time of Day
+                <input type="range" min="0" max="23" @bind="TimeOfDay" @bind:event="oninput" @onchange="UpdateLighting" />
+                <span>@TimeOfDay:00</span>
+            </label>
+        </div>
+        <div class="sg-scene-select">
+            <span>Scene: </span>
+            @foreach (var scene in Scenes)
+            {
+                <button class="sg-btn scene-btn @(CurrentScene == scene ? "active" : "")"
+                        @onclick="() => ChangeScene(scene)">
+                    @scene
+                </button>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --globe-blue: #a8d4f5;
+        --snow-white: #eaf4ff;
+        --base-gold: #c8a96e;
+        --base-dark: #3a2a10;
+        --night-sky: #0a0e2a;
+        --dusk-sky: #ff7043;
+        --day-sky: #87ceeb;
+    }
+
+    *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        background: radial-gradient(ellipse at 50% 30%, #1a1a2e 0%, #0d0d1a 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Georgia', serif;
+        overflow: hidden;
+    }
+
+    .sg-root {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+        padding: 32px;
+        user-select: none;
+    }
+
+    #snowGlobeCanvas {
+        border-radius: 50%;
+        cursor: grab;
+        filter: drop-shadow(0 0 60px rgba(168,212,245,0.35)) drop-shadow(0 40px 80px rgba(0,0,0,0.8));
+        transition: filter 0.3s;
+        max-width: min(900px, 90vw);
+        max-height: min(900px, 90vw);
+        width: 100%;
+        height: auto;
+    }
+
+        #snowGlobeCanvas:active {
+            cursor: grabbing;
+        }
+
+    .sg-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        width: 100%;
+        max-width: 700px;
+        padding: 20px 28px;
+        background: rgba(255,255,255,0.04);
+        backdrop-filter: blur(12px);
+        border-radius: 20px;
+        border: 1px solid rgba(255,255,255,0.10);
+    }
+
+    .sg-btn {
+        background: linear-gradient(135deg, #2a4a7f, #1a2a5f);
+        border: 1px solid rgba(168,212,245,0.4);
+        color: #c8e8ff;
+        padding: 10px 24px;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        letter-spacing: 0.08em;
+        transition: all 0.2s;
+        font-family: inherit;
+    }
+
+        .sg-btn:hover {
+            background: linear-gradient(135deg, #3a6aaf, #2a4a8f);
+            border-color: rgba(168,212,245,0.8);
+            box-shadow: 0 0 20px rgba(168,212,245,0.3);
+            transform: translateY(-1px);
+        }
+
+    .shake-btn {
+        font-size: 16px;
+        padding: 12px 36px;
+        background: linear-gradient(135deg, #1a4a8f, #0a2a6f);
+        animation: pulse-glow 3s ease-in-out infinite;
+    }
+
+    @@keyframes pulse-glow {
+        0%, 100% {
+            box-shadow: 0 0 10px rgba(168,212,245,0.2);
+        }
+
+        50% {
+            box-shadow: 0 0 30px rgba(168,212,245,0.5), 0 0 60px rgba(168,212,245,0.2);
+        }
+    }
+
+    .sg-sliders {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px 32px;
+        width: 100%;
+        justify-content: center;
+    }
+
+        .sg-sliders label {
+            color: #a0c4e8;
+            font-size: 13px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 160px;
+        }
+
+        .sg-sliders span {
+            color: #c8e8ff;
+            font-size: 12px;
+            text-align: right;
+        }
+
+        .sg-sliders input[type=range] {
+            -webkit-appearance: none;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(168,212,245,0.25);
+            outline: none;
+            cursor: pointer;
+        }
+
+            .sg-sliders input[type=range]::-webkit-slider-thumb {
+                -webkit-appearance: none;
+                width: 16px;
+                height: 16px;
+                border-radius: 50%;
+                background: #a8d4f5;
+                box-shadow: 0 0 8px rgba(168,212,245,0.6);
+                cursor: pointer;
+            }
+
+    .sg-scene-select {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+        color: #a0c4e8;
+        font-size: 13px;
+    }
+
+    .scene-btn {
+        padding: 6px 16px;
+        font-size: 12px;
+    }
+
+        .scene-btn.active {
+            background: linear-gradient(135deg, #3a8adf, #2a5aaf);
+            border-color: #a8d4f5;
+            box-shadow: 0 0 15px rgba(168,212,245,0.4);
+        }
+</style>
+
+@code {
+    private int SnowCount = 250;
+    private float WindStrength = 0.3f;
+    private int TimeOfDay = 20;
+    private string CurrentScene = "Village";
+
+    private static readonly string[] Scenes = { "Village", "Forest", "Castle", "Arctic" };
+
+    private DotNetObjectReference<SnowGlobe>? _objRef;
+    private bool _initialized = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_initialized)
+        {
+            _initialized = true;
+            _objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("SnowGlobeEngine.init", "snowGlobeCanvas", _objRef, new
+            {
+                snowCount = SnowCount,
+                wind = WindStrength,
+                timeOfDay = TimeOfDay,
+                scene = CurrentScene
+            });
+        }
+    }
+
+    private async Task ShakeGlobe()
+    {
+        await JS.InvokeVoidAsync("SnowGlobeEngine.shake");
+    }
+
+    private async Task UpdateSnow()
+    {
+        await JS.InvokeVoidAsync("SnowGlobeEngine.setSnowCount", SnowCount);
+    }
+
+    private async Task UpdateLighting()
+    {
+        await JS.InvokeVoidAsync("SnowGlobeEngine.setTimeOfDay", TimeOfDay);
+    }
+
+    private async Task ChangeScene(string scene)
+    {
+        CurrentScene = scene;
+        await JS.InvokeVoidAsync("SnowGlobeEngine.setScene", scene);
+        StateHasChanged();
+    }
+
+    [JSInvokable]
+    public void OnWindUpdate(float wind) => WindStrength = wind;
+
+    public void Dispose()
+    {
+        _objRef?.Dispose();
+        _ = JS.InvokeVoidAsync("SnowGlobeEngine.destroy");
+    }
+}

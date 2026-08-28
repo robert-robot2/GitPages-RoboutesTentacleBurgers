@@ -1,0 +1,3461 @@
+﻿
+
+<div class="patch-notes-container">
+    @foreach (var note in PatchNoteEntries)
+    {
+        <div class="patch-note-block">
+            <div class="patch-title">@note.Title</div>
+            <div class="patch-body">
+                @foreach (var line in note.Lines)
+                {
+                    <div class="patch-line">@line</div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+
+@code {
+    public class PatchNoteEntry
+    {
+        public string Title { get; set; }= default!;
+
+        public List<string> Lines { get; set; }= default!;
+
+    }
+
+    private List<PatchNoteEntry> PatchNoteEntries = new()
+    {
+
+
+                                new PatchNoteEntry
+{
+    Title = "RTB Version X - Welcome Notes ",
+    Lines = new List<string>
+    {
+        
+"Version 60.0.XXX remains as the sole reference for all old projects.",
+"Old Patch Notes and Versions are archived on github",
+    "Most mind blowing science fact of all time Jupiter has no solid surface, its a gas giant with a condensed gas plasma liquid core.",
+"The AI Chatgpt has confirmed that it cannot disprove my theory That Europa is Filled with Neon Seahorses",
+"These Neon Seahorse that live in the Ocean of Europa also have spaceships",
+"These spaceships are filled with water so seahorse can breath and relax",
+"When these spaceships leave set ice planet they reverse thrust melt the ice cover to reveal a hole in the Ice Crust",
+"When the spaceships finally melts a hole in the ice and escapes the crust the planet is so cold it refreezes the hole so you cannot tell if they came or left",
+"And Vice Versa when returning to Neon Horse Ocean Space base they reverse thrust melt the ice crust and return in the ocean Seaport"
+ 
+
+
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.386 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Made a Snow Globe!",
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.384 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "SHADOW SYSTEM OVERHAUL — Root cause identified and resolved across Scenes 1, 2, and 3.",
+        "CRITICAL FIX: Duplicate directional sun light entries in InitScene2 and InitScene3 removed. Stale ghost directional at slot 0 was freezing shadow VP matrix every frame while TickSun only updated the second reassigned instance. Caused frozen ortho shadow cast, ortho box miscast artifact, and foliage shadow not tracking light movement.",
+        "CRITICAL FIX: Tile shadow pass in JS renderFrame was feeding vec2 XY-only data to shadow vertex shader aPosition which expects vec3. Z component was garbage causing completely wrong depth values and the visible ortho projection box artifact on Scene 3 terrain.",
+        "NEW: Shadow vertex shader updated to support tile map path via uIsInstanced == 2. Reconstructs full vec3 world position from aPosition.xy + aHeight attribute. Instanced and standard mesh paths untouched.",
+        "NEW: _shadowHeightLoc attrib added to shadow program. Tile shadow draw now binds both _tileGridVBO for XY and _tileHeightVBO for Z with correct per-vertex height data.",
+        "NEW: clearAllShadowMaps function added to SpectralGLInterop. Clears all 8 shadow FBO slots depth and color buffers, unbinds shadow depth textures from units 9-16, and calls gl.flush() to force GPU processing on scene transition.",
+        "NEW: clearAllShadowMaps exposed on SpectralGLInterop return object and invoked from SwitchToScene in C# alongside resetTileMap and resetFoliage for all scene branches.",
+        "NEW: _lightVPsBuf zeroed with CustomMat4.Identity on every scene switch in SwitchToScene. Prevents stale ortho VP matrices from previous scene bleeding into new scene shadow pass on first frame.",
+        "FIX: Scene 3 Home page OrderBy directional light first enabled in active lights sort to match Scene 2 sort order. Ensures sun always lands in shadow slot 0 consistently every frame.",
+        "FIX: Tile shadow draw guarded with _lastKnownFrameGridSize === GRID_SIZE check. Prevents 512 grid shadow geometry being drawn against 128 grid VP matrix during async tilemap rebuild on scene switch.",
+        "DEBUG: Added per frame Sun TimeOfDay Direction and Intensity logging in TickSun. Added per light Type CastsShadow and Position logging in BuildWebGLFrame. Added JS shadow pass VP and light type logging for scene 3 slot 0. Logs revealed duplicate directional ghost light immediately.",
+        "RESULT: Scenes 1, 2, and 3 fully operational. Zero shadow miscasts. Foliage shadows tracking correctly with directional light movement. Tile terrain shadows casting correctly with proper height data.",
+    }
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.383 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Created Steam/Electrical car Concept/Prototype to stop the chaos of humanity to ensue in the Year 2067, if any one cares...."
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.382 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Created Command Interface for My chaos Frigate in Predator code",
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.381 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Adjusted range and intensity of point light one in scene 1",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.380 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Updated Scene 5 Point lights and gizmos",
+        "Rebuilt Blue blob in webgl menu to display correctly.",
+        "Blue blob heartbeat effect tuned — increased blob size and slowed pulse speed for better visual presence.",
+        "Investigated BWP scene point light corruption — narrowed cause to likely matrix miscast in orthographic camera shadow VP path using stale FreeCam position instead of OrthoCamera position.",
+        "Confirmed light slot indexes are correct across all BWP scenes — corruption is not an index ordering issue.",
+        "Confirmed light gizmo meshes are not the source of the light corruption in BWP scenes.",
+        "Identified that light corruption flip flops between scenes (Scene4 broken, Scene5 ok, Scene6 broken, Caves ok) suggesting a per-scene matrix state issue rather than a systemic bug.",
+        "Further investigation required — suspected buf.lastModel null fallback causing incorrect model matrix resolution in shadow pass on non-dirty frames.",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.379 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"updated Point lights and gizmos for scene 1 through 4, and input for point lights scene 4 for testing",
+"removed directional light duplicate in active light caches",
+"reduced intensity of point light one in scene 3",
+"Reduced Directional Light brightness"
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.378 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Disabled freecam force test",
+
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.377 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"- Fixed foliage material color rendering — non-textured foliage (grass) was hardcoded to render pure white due to an unconditional uColor override after the texture/color branch logic; removed the stray override and added a materialColors[0] fallback for single-material foliage.",
+"- Fixed multi-material foliage (trees, bushes) still rendering incorrectly after the grass fix — renderFoliageColor only ever bound material slot 0 and ignored matBreaks/matIndices, so multi-segment meshes rendered with the wrong texture/color across the whole mesh. Added a matBreaks-aware per-segment draw loop matching the existing opaque static-mesh render path.",
+"- Fixed directional light shadow ortho projection to use scene-appropriate sizing instead of a single BWP/Town toggle — Is3DScene (Town) now uses 512 ortho size, IsBWPScene uses 128, and IsWebViewScene (Home) now correctly gets 128 instead of being excluded from shadow casting entirely.",
+"- Fixed directional light shadow VP guard incorrectly excluding Home/WebView scenes from shadow casting — guard now checks Is3DScene || IsBWPScene || IsWebViewScene instead of the old inverted BWP-only check.",
+"- Scene 2 (Town) now fully rendering correctly with foliage color and shadows.",
+"- KNOWN ISSUE: Scene 3 (Home) foliage shadows temporarily disabled as a workaround to get base rendering correct — foliage shadow pass for Home still needs proper implementation.",
+"- Changed light sort order for Home scene from directional-light-first to shadow-casters-first — this surfaced additional lighting issues on Home that still need investigation.",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.376 SpectralEngine.js Render Pass Cleanup ⚙️🎮",
+    Lines = new List<string>
+    {
+        "OBJ1 - Foliage Pre-Init: initFoliage() now called explicitly in init() after AA system inits, eliminating the lazy init path during the frame loop entirely. Prevents buildProgram() from being called mid-frame and clobbering _activeProgram/_activeLocs state.",
+        "OBJ1 - Foliage Render Position: renderFoliage() remains after the overlay pass — its original position. Attempted move to between drawTileMap and main shader setup caused broken mesh lighting and instanced attrib state bleed. Reverted. Root cause of interaction not yet identified — flagged for future investigation.",
+        "OBJ2 - Dead Code Removed: mat4Multiply() JS helper removed from SpectralEngine.js. Was added in RTBV44.9 for computing lightMVP per mesh during shadow pass. Now handled entirely on C# side via BuildWebGLFrame() — (lProj * lView).M sent as frame.lightVPs. Function was never called after that migration.",
+        "OBJ3 - Dead Global Assignments Removed: _fxaaTexWidth and _fxaaTexHeight removed from initSharedFbo(). SpectralFXAA.js reads canvas size directly from window.SE.canvas at apply() time, never consumed these globals.",
+        "OBJ3 - Dead Global Assignments Removed: _taaTexWidth and _taaTexHeight removed from resizeAAfbos() in SpectralEngine.js. SpectralTAA.js owns its own private _taaTexWidth/_taaTexHeight inside its IIFE and manages them via resize(w,h) which was already being called correctly above the dead assignments.",
+        "OBJ4 - WebGPU Systems Confirmed Post-AA: Verified SpectralWebGPUInterop and SpectralWebGPUParticle correctly remain after AA resolve. These composite over the final resolved WebGL frame as a separate pipeline layer and cannot move earlier in the pass order.",
+        "TODO - Foliage Render Order: Moving renderFoliage() before main shader setup breaks mesh lighting and instanced vertex attrib state. Needs deeper investigation into divisor state, VBO binding bleed, and shadow uniform interaction before attempting again.",
+        "TODO - ESLint Setup Needed: Project has only @ts-check at file top. Need to add ESLint with no-undef, no-unused-vars, no-implicit-globals rules. Would have caught all dead global assignments automatically. Run via: npx eslint SpectralEngine.js from wwwroot JS folder. No build tooling changes required.",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.375 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Shader Pipeline — GLSL file extension migration begun",
+        "Extracted main vertex shader from inline JS string to vsSource.vert",
+        "Added vsSource.vert as embedded resource to SpectralXGLX.csproj Shaders folder",
+        "Added vsSourceMain slot to window._SpectralShaders in SpectralShaders.js",
+        "Added ShaderLoader.Load(vsSource.vert) to PushShadersToJS bundle in SpectralXEngine.cs",
+        "Replaced inline vsSource JS string with window._SpectralShaders.vsSourceMain in SpectralEngine.js init()",
+        "Removed inline vsSource template literal from SpectralEngine.js — .vert file is now single source of truth",
+        "ShaderLoader pipeline confirmed ready for future .wgsl WebGPU shader extraction via same pattern",
+        "Existing .frag files shadow_pcf, shadow_pcss, spectral_xs_V1, spectral_xs_V2 remain correctly classified",
+        "Identified future migration candidates — tile, foliage, paint, shadow inline shaders when debugging warrants it",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.374 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "SpectralFoliageSystem.js — foliage instanced renderer temporarily re-inserted inline into SpectralGLInterop for shadow/lighting investigation",
+        "SpectralGLInterop — initFoliage(), renderFoliage(), resetFoliage(), getFoliageBuffers() inserted as internal functions replacing module calls",
+        "SpectralGLInterop — all window.SpectralFoliageSystem wiring points commented out for clean reattachment later",
+        "SpectralGLInterop — shadow pass getBuffers() reference swapped to internal getFoliageBuffers()",
+        "SpectralGLInterop — SE. references stripped from inline foliage block, replaced with direct _gl, _meshBuffers, _textureCache, _shadowDepthTexs access",
+        "SpectralEngine.js — now under 3500 lines after TAA, SMAA and texture upload extractions, significant reduction in render loop noise",
+        "SpectralEngine.js — isBWPScene() gate applied consistently across breakable, splatter and static object preload paths",
+        "Investigation — foliage shadow and lighting issues isolated in inline context for cleaner debugging",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.373 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "SpectralTAA.js — TAA anti-aliasing system extracted from SpectralEngine.js into its own window module",
+        "SpectralTAA.js — exposes init(), apply(), resize(), reset() public API matching SMAA pattern",
+        "SpectralTAA.js — resize() now handles ping-pong FBO rebuilds independently, engine no longer manages TAA buffer lifecycle",
+        "SpectralSMAA.js — SMAA anti-aliasing system extracted from SpectralEngine.js into its own window module",
+        "SpectralSMAA.js — exposes init(), apply(), reset() public API",
+        "SpectralTextureUploads.js — all texture preload, swap and cache systems extracted from SpectralEngine.js into their own window module",
+        "SpectralTextureUploads.js — enemy, breakable, splatter, character and overlay texture systems now fully encapsulated",
+        "SpectralTextureUploads.js — applyCharTexSwaps() internalises last known texture url tracking for all four player characters",
+        "SpectralTextureUploads.js — applyBreakTexSwaps() internalises pending swap queue and drain logic",
+        "SpectralTextureUploads.js — getSplatterTex() and getOverlayTex() expose cache reads cleanly to uploadMesh() and overlay render pass",
+        "SpectralEngine.js — renderFrame() texture preload and swap blocks reduced from ~80 lines to 13 via TX alias pattern",
+        "SpectralEngine.js — isBWPScene() gate applied consistently to breakable/splatter preloads and static object preloads replacing hardcoded scene index checks",
+        "SpectralEngine.js — all AA system calls routed through window.SpectralTAA, window.SpectralSMAA namespaces",
+        "SpectralEngine.js — window.SE shared context correctly wired for all extracted systems",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.372 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "── Fix: Foliage Disappearing Under Non-MSAA AA Modes ───────",
+        "Root cause: foliage was rendering AFTER the AA resolve pass",
+        "AA resolve composited the scene to screen without foliage included",
+        "Fix: moved SpectralFoliageSystem.render() to before the AA resolve block",
+        "Foliage now renders into fxaaFbo alongside the scene before AA is applied",
+        "",
+        "── Fix: TAA Framebuffer Incomplete in Scene 3 ──────────────",
+        "Root cause: resizeAAfbos() resized TAA color textures but left depth renderbuffers at old size",
+        "GL_INVALID_FRAMEBUFFER_OPERATION: attachments not all the same size",
+        "Fix: TAA current and history FBOs now fully deleted and recreated on resize",
+        "Mirrors the existing fxaaFbo rebuild pattern — delete all then recreate fresh",
+        "",
+        "── Stability ────────────────────────────────────────────────",
+        "All AA modes confirmed working correctly across all 15 active scenes",
+        "",
+    }
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.371 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "",
+        "── Rendering Architecture ──────────────────────────────",
+        "Migrated all AA systems out of SpectralEngine.js into standalone module files",
+        "Each system now follows the shared window.SE context pattern for clean decoupling",
+        "SpectralEngine.js dead code removal — deleted all inlined AA private state and functions",
+        "",
+        "── Anti-Aliasing Systems ────────────────────────────────",
+        "NEW FILE: SpectralAA.js — Spectral AA V1 gradient edge detection + geometric subpixel composite",
+        "NEW FILE: SpectralAAV2.js — Spectral AA V2 staircase topology detection + triangle fill composite",
+        "NEW FILE: SpectralAAV3.js — Spectral AA V3 binary edge classification + line reconstruction + triangle coverage fill",
+        "NEW FILE: SpectralSMAA.js — SMAA 3-pass edge detection, blend weights, neighbourhood blend",
+        "All four systems expose textures to window.SE for resizeAAfbos() resize support",
+        "All four systems wired into engine init(), resizeAAfbos(), renderFrame(), and flush()",
+        "",
+        "── Shared Engine Context (window.SE) ───────────────────",
+        "Added spectralEdgeTex, spectralV2EdgeTex, spectralV3EdgeTex, spectralV3LineTex to window.SE",
+        "Added smaaEdgeTex, smaaBlendTex to window.SE",
+        "Resize path updated to reference all AA textures through window.SE instead of private vars",
+        "",
+        "── AA Modes ─────────────────────────────────────────────",
+        "aaMode 2 — FXAA (existing SpectralFXAA.js)",
+        "aaMode 3 — SMAA (new SpectralSMAA.js)",
+        "aaMode 4 — TAA  (inlined, existing)",
+        "aaMode 5 — Spectral AA V1 (new SpectralAA.js)",
+        "aaMode 6 — Spectral AA V2 (new SpectralAAV2.js)",
+        "aaMode 7 — Spectral AA V3 (new SpectralAAV3.js)",
+        "",
+        "── Stability ────────────────────────────────────────────",
+        "All AA systems tested and confirmed working across all active scenes",
+        "── Known Issues (Next Session) ──────────────────────────",
+"Scene 3 TAA — tilemap, sky sphere and route mesh disappear under TAA mode",
+"Scene 2 — all AA modes except MSAA break foliage rendering, traced to foliage bindTexture conflict",
+"",
+
+        "",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.370 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "",
+        "── SPECTRAL AA SYSTEM REFACTOR ──────────────────────────────",
+        "",
+        "FXAA extracted from SpectralEngine.js into standalone SpectralFXAA.js",
+        "SpectralFXAA.js exposes clean public API: init(), apply(), reset()",
+        "All FXAA shader source moved into SpectralFXAA.js — engine is clean",
+        "FXAA state variables removed from SpectralEngine.js (_fxaaProgram, _fxaaPosLoc, _fxaaTexLoc, _fxaaResLoc)",
+        "initFXAA() and applyFXAA() functions fully deleted from SpectralEngine.js",
+        "",
+        "── SHARED CONTEXT (window.SE) IMPROVEMENTS ──────────────────",
+        "",
+        "window.SE now carries fxaaFbo and fxaaColorTex as shared references",
+        "window.SpectralEngine declaration updated with fxaaFbo and fxaaColorTex null stubs",
+        "window.SE population block moved above all AA system init calls in init()",
+        "window.SE.gl and window.SE.canvas now guaranteed populated before any system init reads them",
+        "fxaaFbo and fxaaColorTex updated in window.SE after resizeAAfbos() rebuilds them",
+        "SpectralFXAA.apply() reads fxaaColorTex live from window.SE — resize safe with no extra hooks",
+        "",
+        "── AA SYSTEM WIRING ─────────────────────────────────────────",
+        "",
+        "SpectralFXAA.init() called from SpectralEngine.js init() replacing initFXAA()",
+        "SpectralFXAA.apply() called from renderFrame() when aaMode === 2",
+        "SpectralFXAA.reset() called from flush() for correct SPA cleanup",
+        "SpectralFXAA.js added to index.html load order before SpectralEngine.js",
+        "",
+        "── UI FIX — AA MODE SELECT ──────────────────────────────────",
+        "",
+        "AA Mode select now bound to Engine.ActiveAA — no longer resets to MSAA on re-render",
+        "Shadow Mode select now bound to Engine.ActiveShadow — same fix applied",
+        "Removed hardcoded selected attributes from both dropdowns",
+        "100ms UI refresh timer no longer causes visual dropdown desync",
+        "",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.369 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added lightning strikes on scene 2 and 3",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.368 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Cleaned up tile map shadow-light upload block in SpectralEngine.js",
+        "Removed dead BWP scene shadow-bias branch that had no actual effect on output",
+        "Removed Scene 3 shadow-bias override (was 0.002, now uses the standard 0.003 like every other scene)",
+        "Removed stale/misleading comments referencing Scene 4 shadow behavior that didn't match the code",
+        "No visual or gameplay change expected from this pass — cleanup only, groundwork for upcoming lighting/shadow fixes",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.367 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"removed duplicates of lights dirty in switch to scene",
+"Add wepbgpu particle reset to flush",
+"removed scene 4 from tile map shadow pass",
+"Js engine side Comment cleanup"
+    }
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.366 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "── Terrain ─────────────────────────────────────────────────",
+        "NEW  Ambient color properties added to SpectralXSun — day/night/dawn/dusk curve",
+        "NEW  Ambient driven from sun state into tilemap and mesh shaders via frame data",
+        "NEW  AmbientR/G/B wired through WebGLFrameData and drawTileMap JS bind",
+        "",
+        "── Input ───────────────────────────────────────────────────",
+        "REFACTOR  HandleGamepadInput() moved from SpectralXEngine into SpectralXInput",
+        "REFACTOR  GamepadService injected into SpectralXInput constructor",
+        "",
+        "── Scene Storage ───────────────────────────────────────────",
+        "NEW  LandscapeStorageKey extended to cover all BWP scenes 1-11",
+        "NEW  Per-scene landscape save/load keys: bwp1 through bwp11",
+        "",
+        "── Code Quality ────────────────────────────────────────────",
+        "CLEANUP  Removed stale comments from SpectralXSun.cs",
+        "CLEANUP  Removed stale comments from SpectralXEngine.cs",
+        "",
+        "── Known Issues ────────────────────────────────────────────",
+        "BUG  Directional light miscasts when foliage shadow casting is active",
+        "BUG  Foliage shadows miscast when directional light is present",
+        "BUG  Point lights not rendering in BWP Scenes 4-14 — point light 2 color incorrect",
+        "── Code Quality ────────────────────────────────────────────",
+        "FIX  CS8618 _effectHomeSnapshot nullable — added ? to Vector3 array declaration",
+        "FIX  CS8618 StaticProps nullable — added ? to property declaration",
+        "FIX  CS8618 RecentKey.Key — initialized to string.Empty",
+        "FIX  CS8618 SequenceBind.Keys — initialized to Array.Empty<string>()",
+        "FIX  CS8618 SequenceBind.Action — initialized to null!",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.365 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Updated to CustomMat4, Vec3 etc to try and debug matrix lighting shadow issues",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.360 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "── Spawn & Foliage Exclusion Zones ──────────────────────────────",
+        "Scene 2: Added RegisterFootprint exclusion zones at camera spawn (54,-54) and portal exit (64,-54) — foliage no longer spawns in entry/exit areas.",
+        "Scene 3: Added RegisterFootprint exclusion zone at camera spawn (0,-10) — foliage clear on scene entry.",
+        "All exclusion zones use radius 5 — consistent with building footprint system, no new infrastructure required.",
+        "",
+        "── Ambient NPC Spawn Safety ─────────────────────────────────────",
+        "Cow, Cat, and TownSlut spawns now use do/while exclusion loop — guaranteed minimum radius 5 from player spawn at (0,0).",
+        "Prevents instant aggro/one-shot on scene load from ambient NPCs landing on top of character.",
+        "",
+        "── Wave System Enemy Spawn Safety ───────────────────────────────",
+        "RandomPointInRadius updated with do/while exclusion — all wave enemies now respect radius 5 safe zone around player spawn.",
+        "Single change in RandomPointInRadius covers all 7 enemy types across both SpawnFromDef and LoadWave static fallback paths.",
+        "",
+        "── Per-Enemy PatrolRadius ────────────────────────────────────────",
+        "Added PatrolRadius const, _spawnX, and _spawnY to all wave enemies — PsychoSkeleton, ZombiePsycho, SkeletonWar, Goatman, ScavBoss, SkeletonBoss.",
+        "SpawnFromDef updated with patrolRadius parameter — each enemy type now passes its own PatrolRadius instead of hardcoded SpectralXSkeleton.PatrolRadius.",
+        "LoadWave static fallback path updated — all 7 enemy spawn loops now reference their own class PatrolRadius.",
+        "PatrolRadius values: Skeleton 12, PsychoSkeleton 12, ZombiePsycho 12, SkeletonWar 12, Goatman 14, ScavBoss 10, SkeletonBoss 8.",
+        "Movement clamp to _spawnX/_spawnY + PatrolRadius noted as TODO in each enemy EnemyMove — wired when AI pass is done.",
+        "Updated enemy spawn waves to account for less then ten waves to trigger"
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.358 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "• Added tile‑map generation counter — async buildChunk now verifies active generation and auto‑cancels stale callbacks.",
+        "• initTileMap now captures its generation snapshot — any newer scene switch increments _tileMapGeneration, preventing old builds from completing.",
+        "• buildChunk guarded at every async stage — stale chunk builders bail before touching GPU buffers or VAO setup.",
+        "• Finalization guard prevents old tilemap from calling initSplatMap with a dead GL context, eliminating uniform‑lookup failures.",
+        "• initSplatMap stabilized — only runs when the correct generation completes; no more stale _paintProgram or mismatched GL contexts.",
+        "• teardownTileMap validated — _paintProgram is reliably nulled so new contexts recompile shaders cleanly.",
+        "• Async leak fully plugged — old buildChunk chains never reach completion, preventing double‑init, stale VAOs, and corrupted tilemap state."
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.357 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Rearranged order of Scripts, Engine Should Run last, removed defer from interop, fixed typo in index.html",
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.356 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "",
+        "[ SpectralWebGPUParticle.js ] — New WebGPU billboard particle renderer.",
+        "Weather particles (Rain, Snow, Cloud, Lightning) now render on a dedicated",
+        "transparent WebGPU overlay canvas positioned above SpectralX-Viewport.",
+        "",
+        "[ Performance ] — One GPU draw call per weather type per frame vs three",
+        "separate bufferSubData + vertexAttribDivisor calls in the WebGL path.",
+        "Bind groups are cached per texture key and reused across frames.",
+        "All particle groups are batched into a single command encoder and submitted once.",
+        "Async pipeline compilation via createRenderPipelineAsync avoids first-frame stall.",
+        "",
+        "[ Fallback ] — isAvailable() returns false on Firefox and older Safari.",
+        "SpectralEngine.js automatically falls back to SpectralParticleSystem (WebGL)",
+        "when WebGPU is unavailable — no change in behaviour for those clients.",
+        "",
+        "[ Known depth limitation ] — The WebGPU overlay canvas cannot share the",
+        "WebGL depth buffer. Weather particles will always composite on top of 3D",
+        "scene geometry and will not be occluded by meshes. For atmospheric effects",
+        "(rain, snow, clouds, lightning) this is acceptable. Any future in-world",
+        "particles that require depth occlusion against scene meshes should remain",
+        "in SpectralParticleSystem (WebGL) where the shared depth buffer is available.",
+        "",
+        "[ Canvas z-index ] — Particle overlay sits at z-index 9, below the WebGPU",
+        "text overlay at z-index 10, so SDF text always renders above weather effects.",
+        "",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.355 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "• Fixed mid-frame navigation instability — flush() now cancels active animation handles and nulls _dotnetRef so late ticks auto‑abort cleanly.",
+        "• Corrected stale initTileMap callbacks on SPA return — _initialized = false and window._tileGridReady = false ensure a full, safe rebuild.",
+        "• Purged stale GL references across subsystems — foliage, particles, and sky now receive explicit .reset() calls during flush() teardown.",
+        "• Hardened render loop startup — startRenderLoop now defensively cancelAnimationFrame’s any lingering loop before creating a new one.",
+        "• Prevented OnMeshesReady handler accumulation — handler registration no longer stacks across SPA visits, eliminating multi‑fire mesh init storms.",
+        "Updated each razor webgl page"
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.354 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Character movement and attack animation directions",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.353 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Animations need adjustment",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.352 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Reset UVOffset x reversed a change not needed causing an animation error",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.351 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "• Fixed timer leak in SpectralX.razor — _starsTimer now properly disposed on navigation to prevent InvokeAsync calls on dead components.",
+        "• Resolved UI refresh leak — _uiRefreshTimer in SpectralXCanvas now guaranteed to dispose on page redirect, eliminating runaway StateHasChanged loops.",
+        "• Corrected scene‑switch memory accumulation — _uploadedMeshes and _uploadedTextures now fully cleared instead of partially evicted.",
+        "• Eliminated stale sky sphere reference — SyncSkySphere no longer LINQ‑scans every frame after SwitchToScene; cached lookup stabilized.",
+        "• Repaired active light cache race — _lightsDirty and _lastLightCount now reset consistently, ensuring correct rebuild on first tick of new scenes.",
+        "• Hardened renderFrame async loop — _pendingFrame guard now auto‑resets after TickAndGetFrame exceptions, preventing permanent render stalls.",
+        "• Stopped redundant GPU uploads — _parsedMeshCache no longer repopulates _pendingUploads on every init(), preventing repeated FBX re‑uploads across scene switches."
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.350 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Flipped character movement So movement and attacks now face correct directions",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.349 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Readded Onrender async to Mainlayout to invoke SpectralEngineloader reset",
+    "This allows non webgl pages to cancel out loader",
+"I thought this was causing a confliction with Spectral Scene Loader but is not for now.",
+"Loader dismisses to early and is not tied in correctly but is a placeholder until full loader built",
+"Debug Tile Map load issue"
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.348 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "",
+        "── SpectralXRogue ──────────────────────────────────",
+        "FIXED  Attack animation UV flip reversed — sprite was mirrored",
+        "       on attack; corrected UVScaleX / UVOffsetX in both",
+        "       ApplyAnimationToMesh() and SyncMeshVisuals() Alive phase.",
+        "",
+        "── SpectralXCat ─────────────────────────────────────",
+        "FIXED  Walk animation rendering in wrong direction — _facingRight",
+        "       assignments in EnemyMove() were inverted relative to UV",
+        "       flip logic; patrol direction now matches sprite facing.",
+        "",
+"Warrior, Monk and Rogue Updated"
+    }
+},
+
+
+
+
+
+
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.348 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "── Scene Transition Performance ──────────────────────────────",
+        "Removed _uploadedMeshes.RemoveWhere() on scene switch — shared geometry (buildings, rocks, foliage meshes) no longer re-serializes its full vertex array through Blazor JS interop on every scene redirect.",
+        "Selective _uploadedTextures clear — only SkySphere texture evicted on scene switch instead of full clear, preventing base64 texture re-upload for all meshes already loaded in GPU memory.",
+        "── TileMap Scene Switch Fix ──────────────────────────────────",
+        "Added resetTileMap to SpectralGLInterop public JS API — explicitly calls teardownTileMap() + initTileMap() on scene redirect rather than waiting for JS to detect a grid size change.",
+        "Fixed BWP scene tile reload ordering — TileMap.MarkDirty() now called before SpectralGLInterop.resetTileMap invoke in ResetBWPSceneState(), ensuring C# dirty flag is set before JS rebuild callback fires OnTileGridRebuilding.",
+        "Added resetTileMap invoke to SpectralXTown and Home scene branches in SwitchToScene() to match BWP scene clearing behaviour.",
+        "── TAA Renderer Fix ──────────────────────────────────────────",
+        "Fixed TAA FBO resize bug — _taaTexWidth and _taaTexHeight were immediately zeroed after assignment in resizeAAfbos(), causing applyTAA() guard to call initTAA() and allocate new GPU textures on every single frame whenever TAA was active.",
+        "── JS State Cleanup ──────────────────────────────────────────",
+        "Confirmed _pendingEnemyTexSwaps requires explicit let declaration at IIFE scope to avoid implicit global or ReferenceError in strict mode.",
+        "── General ───────────────────────────────────────────────────",
+        "Scene redirect bog on page navigation resolved — first post-switch frame no longer serializes full mesh geometry JSON blob for all non-JS meshes in the incoming scene.",
+        "Initial page load on refresh unaffected — all fixes scoped to SwitchToScene() and JS reset paths only.",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.346 SpectralX WebGL2/WebGPU Hybrid ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+  "Engine init Loader Gets stuck on a non webgpu page on initial publish load",
+"Redirect to another page if necessary human! and it will remove the loader and work correctly! for now...."
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.345 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+      "Small optimization pass removed 35 console log lines",
+"Created some light array thing"
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.341 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "Added OverlayTextureDataUrl, OverlayAlpha, OverlayDirty properties to IMesh and SpectralXMesh",
+        "Added CharHitOverlayTexturePath to ISpectralCharacter interface",
+        "Implemented texture overlay hit effect system — overlay renders on top of animation without interrupting sprite sheet",
+        "All biological characters share /iAssets/WarriorGothit01.png as hit overlay texture",
+        "Added overlay fields with JsonPropertyName to WebGLMeshUpload and WebGLMeshData",
+        "BuildWebGLFrame now reads OverlayTextureDataUrl, OverlayAlpha, OverlayDirty from mesh and populates frame data",
+        "Added _overlayTexCache and preloadOverlayTextures() to SpectralEngineGL.js",
+        "Added overlay render pass in renderFrame() after main mesh draw loop before particle system",
+        "Overlay pass binds hit texture with UV 0,0 scale 1,1 ignoring animation sheet offsets",
+        "CharMesh.Color = ColorHit red tint preserved alongside overlay for combined hit feedback",
+        "Rogue hit phase stripped of animation-breaking UV reset — animation now runs uninterrupted during hit",
+        "Pending: roll out overlay system to Warrior, Monk, Mage and all skeleton/enemy types",
+        "Updated All character and enemy hit effects!"
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.339 SpectralX WebGL2/WebGPU ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+      "Created SpectralWebGPUInterop.js, text system now renders in canvas overlay through webGPU, with webgl2 as fallback"
+    }
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.338 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Fixed SpectralEngineLoader getting stuck on SpectralX demo page and never dismissing to intro screen",
+        "Root cause: SpectralEngineLoader.ready() was never being called on this page unlike all other pages",
+        "Fixed by invoking SpectralEngineLoader.ready() inside OnMeshesReady after SwitchToScene on the demo page",
+        "Demo page requires explicit ready() call due to intro gate — all other pages hit ready() naturally through scene flow",
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.336 BloodWyrm UI Pass ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "Main Menu: Replaced Courier New title with Diablo font + red glow (color #cc2200, text-shadow #ff4400/#aa1100/#660000)",
+        "Main Menu: Moved animated fire sprite to sit underneath the title text",
+        "Main Menu: Removed button borders, boxes and emoji icons from all menu buttons",
+        "Main Menu: Applied Diablo font + red glow to all menu buttons (Single Player, Options, Controls, Exit Game)",
+        "Character Select: Applied Diablo font + red glow to Choose Your Champion title",
+        "Character Select: Updated subtitle, character name labels, selection summary and footer to Diablo font + red palette",
+        "Character Select: Removed borders and emoji from Start and Main Menu action buttons, applied Diablo font + red glow",
+        "Options: Applied Diablo font + red glow to Options title",
+        "Controls: Applied Diablo font + red glow to Controls title",
+        "All Screens: Standardised red glow palette across all UI titles and interactive text",
+	"Adjusted inventory Image Display"
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.334 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "🎮 Keybind System — Fixed SHIFT + number keys not firing due to browser sending symbol characters (!, @, #, etc.) instead of digits",
+        "🎮 Keybind System — Fixed CTRL+SHIFT + number combos now work correctly as a result of the symbol mapping fix",
+        "📷 Camera Binds — Updated all camera shortcuts to CTRL+SHIFT combos to avoid conflicts with game input",
+        "🔧 KeybindConfig — BuildCanonicalKey now maps shifted number row symbols back to their base digit before applying modifiers",
+        "✅ Rebind UI — Confirmed auto-updates all displayed keys instantly when rebound via the menu",
+"Updated letter and number blocks"
+    }
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.330 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "[ FIX ] FreeCam not activating on Test Scene load — added IsTestScene camera mode guard to TickAndGetFrame pipeline",
+        "[ FIX ] Camera mode selector dropdown now correctly reflects active scene type on UI open",
+        "[ ADD ] New Settings Menu (Key 4) — futuristic dark UI with pulsating blue blob background and WebGL2 logo",
+        "[ ADD ] Settings Menu tabs — Video, Audio (placeholder), Controls (keybind display), Options (placeholder)",
+        "[ ADD ] All existing Video settings moved into Settings Menu Video tab — AA, Shadow, Time of Day, Camera Mode, Ortho Lock",
+        "[ ADD ] Controls tab displays full keybind list from KeybindConfig as read-only reference",
+        "[ ADD ] Landscape Panel split to dedicated Key 2 bind — separated from Key 4 UIToggle",
+        "[ ADD ] LandscapePanelVisible bool and ToggleLandscapePanel() added to SpectralXCanvas",
+        "[ ADD ] LandscapeToggle bind registered in SpectralXInput RegisterDefaultBinds",
+        "[ UPDATE ] All CTRL+ and CTRL+SHIFT+ camera keybinds replaced with SHIFT+ and SHIFT+ALT+ to avoid browser conflicts",
+        "[ FIX ] CTRL+W (close tab), CTRL+F (find), CTRL+P (print), CTRL+O (open) conflicts eliminated",
+    }
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.328 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added is testscene camera call in tick to fix input on test scene start",
+"Changed Landscape toggle to Key 2,Webgl Menu to Key 4 remains",
+"Preparation Add Webgl Menu"
+    }
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.328 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Added SetCamera to Demo scene so input will fire without camera change",
+"Added loader reset in startrenderloop for initial scene load call",
+        "removed engine loaader because tis not workign right yet",
+        "This camera add didnt fix demo scene from input miscast,user must change camer to activate input"
+    }
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.324 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "FIXED LOADER WITH HUMAN INTELLIGENCE, NOT ARTIFICIAL RNG INTERPRETER.",
+        "FIXED IN 1 HUMAN ATTEMPT AFTER 19 FAILED AI ATTEMPTS.",
+    }
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.325 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "GAMEPAD SUPPORT — BWP ORTHOGRAPHIC MODE",
+        "Added full gamepad character movement in ortho/BWP scenes via left stick with deadzone and axis correction.",
+        "Left stick now drives ActiveCharacter.Move() with IsOneShotPlaying guard matching keyboard behavior exactly.",
+        "Right stick camera look retained for free cam mode.",
+        "Face button attacks wired: X = Attack, Y = Special Attack, edge-triggered to match KeyDown behavior.",
+        "",
+        "CAMERA MODE GUARDS",
+        "HandleGamepadInput() now guarded by camera mode — free cam and ortho/BWP no longer bleed into each other.",
+        "ProcessHeldKeys() free cam fallthrough now explicitly gated to ActiveCameraMode == FreeCam.",
+        "BWP character movement block now requires ActiveCameraMode == Orthographic to prevent WASD driving character in free cam while in BWP scene.",
+        "Orbit camera WASD pan block stubbed and commented out pending OrbitCamera.Pan() implementation.",
+        "",
+        "GAMEPAD BINDS CONFIG",
+        "New file: GamepadBindsConfig.cs — static config mirroring KeybindConfig API shape.",
+        "Stores action to button mappings with GetBinding(), SetBinding(), GetAction(), and read-only Bindings dict.",
+        "Conflict swap logic matches KeybindConfig — rebinding to an occupied button swaps cleanly.",
+        "AvailableButtons list and GetButtonLabel() provide friendly display names for UI dropdowns.",
+        "HandleGamepadInput() now reads from GamepadBindsConfig so rebinds take effect immediately with no restart.",
+        "",
+        "CONTROLS UI — GAMEPAD SECTION",
+        "Replaced gamepad coming soon placeholder in SpectralBWPControls.razor with full gamepad section.",
+        "Left Stick and Right Stick shown as read-only labels — axis inputs are not rebindable to buttons.",
+        "Attack, Special Attack, Menu Toggle, and Inventory show live dropdowns wired to GamepadBindsConfig.SetBinding().",
+        "Dropdown options sourced from GamepadBindsConfig.AvailableButtons with GetButtonLabel() friendly labels.",
+        "",
+        "CLEANUP",
+        "Removed redundant Engine.HandleKeyDown() pass-through wrapper — callers now reference Engine.Input.HandleKeyDown() directly.",
+        "Axis inversion corrected: both X and Y stick axes negated to match world space movement directions.",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.323 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"readded tick scene lighting for all scenes but scene 3,",
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.322 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "── SHADOW SYSTEM OVERHAUL ──────────────────────────────────────────────────────",
+        "CORE BUG: Shadow slot starvation identified as root cause of directional light",
+        "miscast across Scene 2 and Scene 3. MAX_SHADOW_LIGHTS was hardcoded to 8.",
+        "Scene 2 (SpectralXTown) has 15 shadow casting lights — 7 were being silently",
+        "evicted from the shadow pass with no depth texture allocated, causing the sun",
+        "directional light to lose its shadow slot entirely under certain sort conditions.",
+        "",
+        "── SHADOW SLOT COUNT EXPANDED ──────────────────────────────────────────────────",
+        "MAX_SHADOW_LIGHTS bumped from 8 to 16 in SpectralEngine.js.",
+        "initShadowMaps() now allocates 16 FBOs and 16 depth textures at GL init.",
+        "tileFsSrc GLSL expanded — uShadowMap0 through uShadowMap15 declared.",
+        "uLightVP0 through uLightVP15 declared in tilemap fragment shader.",
+        "sampleTileShadowMap() expanded to handle indices 0-15.",
+        "getTileLightVPPos() expanded to handle indices 0-15.",
+        "drawTileMap() shadow bind loop now iterates 0-15 slots instead of 0-7.",
+        "_tileUniforms shadowMap and lightVP cache arrays expanded to length 16.",
+        "C# BuildWebGLFrame() lightVPs shadow slot guard updated from i < 8 to i < 16.",
+        "",
+        "── DYNAMIC SHADOW SORT — THE ACTUAL KILL SHOT ──────────────────────────────────",
+        "Previous approach: single hardcoded sort for all scenes — broke either Scene 2",
+        "object casting on tilemap OR Scene 3 directional light depending on sort order.",
+        "Sort 1 (directional first): Scene 2 tilemap object shadows work, Scene 3 D-light breaks.",
+        "Sort 2 (distance first): Scene 3 D-light works, Scene 2 object shadows break.",
+        "Loop hell confirmed. Per scene ID sort tried and rejected — too brittle.",
+        "Per camera type sort tried and rejected — all scenes now support all camera modes.",
+        "",
+        "SOLUTION: Dynamic sort based on shadow budget consumption at runtime.",
+        "Count active shadow casters each frame. If count exceeds MAX_SHADOW_LIGHTS,",
+        "force directional light to slot 0 so it always wins the shadow pass.",
+        "If within budget, use distance sort — directional wins naturally.",
+        "",
+        "bool overShadowBudget = activeLights.Count(l => l.CastsShadows) > MAX_SHADOW_LIGHTS;",
+        "overShadowBudget = true  → OrderBy Directional first, then CastsShadows, then distance.",
+        "overShadowBudget = false → OrderBy CastsShadows first, then distance.",
+        "",
+        "Scene 2: 15 casters > 8 slots → directional forced to slot 0 → tilemap shadows work.",
+        "Scene 3: 4 casters < 8 slots  → distance sort → directional wins naturally → D-light correct.",
+        "BWP scenes: many casters → directional forced → terrain shadows correct.",
+        "Scales automatically to any future scene with no hardcoded scene IDs.",
+        "",
+        "── FOLIAGE SHADOW CAST — DISABLED PENDING CORRECT IMPLEMENTATION ───────────────",
+        "Foliage instanced shadow pass block in renderFrame() is commented out.",
+        "Tag: /// SHADOW LIGHTING ERRORS in SpectralEngine.js.",
+        "The instanced shadow geometry pass exists and is structurally correct.",
+        "Root issue: with 15+ shadow casters in Scene 2, foliage shadow lookup was",
+        "binding to wrong texture unit after main mesh pass stomped TEXTURE1-TEXTURE8.",
+        "SpectralFoliageSystem.js render() shadow bind happens after main mesh loop —",
+        "texture unit state from 15-light pass remains active and foliage rebind was",
+        "not guaranteed to land on the correct depth texture.",
+        "TODO: Uncomment foliage instanced shadow pass block.",
+        "TODO: Move shadow depth rebind inside the foliage group draw loop so it",
+        "explicitly resets the correct texture unit and VP matrix per draw call.",
+        "TODO: Verify sunIdx resolution in SpectralFoliageSystem.js lands on the",
+        "directional light slot post dynamic sort — SE.shadowDepthTexs[sunIdx] must",
+        "be non-null at the index the scan resolves to.",
+        "TODO: Test Scene 2 and Scene 3 foliage cast simultaneously after above.",
+        "",
+        "── SCENE STATUS ────────────────────────────────────────────────────────────────",
+        "Scene 3 (Home): Directional light casting correctly. Foliage shadows disabled.",
+        "Scene 2 (SpectralXTown): Object shadows on tilemap working. Foliage disabled.",
+        "BWP Scenes: Shadow terrain casting functional. Point light slots expanded.",
+        "All scenes: Day/night cycle, sun tracking, multi-light PBR pipeline intact.",
+        "",
+        "── ENGINE NOTE ─────────────────────────────────────────────────────────────────",
+        "SpectralX is a fully custom hand rolled WebGL2 renderer with C# Blazor backend.",
+        "No Unity. No Three.js. No borrowed shadow pipeline. Pure sovereign engineering.",
+        "OOGA OOGA. 🩸",
+    },
+},
+
+
+
+
+
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.321 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Iteration for scene point lights on/off at night was iterating over all lighting",
+"Scene 2 now displays objects lighting correctly but shadows are not casting unless i slot sun as 0. ",
+    "But in turn Scene 3 Directiona light cast goes dark but does dispaly foliage shadow cast"
+
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.316 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Temp Disable Point lights on and off at day and night for all scenes is causing a direction light miscast in scene 3"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.316 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"shadow lighting fix attempts",
+"Updated clears per scenes"
+
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.315 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Change default ortho to lock to player true",
+"Updated ortho mouse wheel values to 4f-10f",
+"Updated Object defs"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.315 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Updates",
+    "MOAR UPDATES"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.312 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added Wave Definition and SetScene to Wavesys",
+"Adjusted Spawns on Forest 1, and Forest 2",
+"Removed dummies from town and forest 2"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.310 SpectralX WebGL2 ❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Updated Camera Selectors to Match their default hardcoded Scene and Camera Mode",
+"Added Bool Is2dScene, iswebViewScene to engine for easy scene type helpers",
+"Added 10 maps Layout needs to be updated for each custom scene",
+    "Updated Signpost trigger in town to east not north"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.309 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Enemys to despawn in town"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.308 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "🔧 [Input] Fixed point light drag overdrag — coordinate space mismatch between OffsetX/Y anchor and ClientX/Y delta resolved",
+        "🔧 [Input] Light drag now uses ClientX/Y consistently for both MouseDown anchor and MouseMove delta",
+        "⚙️ [Input] Light drag sensitivity tuned to 0.02f — stable 1:1 cursor sync across canvas",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.307 SpectralX WebGL2 Engine Init Loader 🔴⚙️🖥️",
+    Lines = new List<string>
+    {
+        "[ ENGINE ] Added new SpectralX Engine Init Loader — third dedicated loader covering the initial WebGL2 bootstrap gap on first site visit and post-publish reloads",
+        "[ ENGINE ] Loader displays instantly from raw HTML in index.html before Blazor WASM even downloads — zero delay, zero JS dependency on mount",
+        "[ ENGINE ] Animated '...' dot cycle on 'Initializing SpectralX Engine' text using pure CSS @keyframes — steps(1, end) for clean discrete dot progression",
+        "[ ENGINE ] Status line transitions from 'Loading WebGL2...' to 'WebGL2 Ready ✓' when SpectralGLInterop.startRenderLoop fires in SpectralEngine.js",
+        "[ ENGINE ] Overlay holds 'WebGL2 Ready ✓' for 600ms then fades out over 650ms CSS transition before full DOM removal — smooth handoff to scene loader",
+        "[ ENGINE ] window.SpectralEngineLoader object added to SpectralUI.js with show, setStatus, and ready methods — _dismissed guard prevents double-fire",
+        "[ ENGINE ] window.SpectralEngineLoader.ready() hooked into startRenderLoop in SpectralEngine.js — single call site, fires exactly when WebGL2 context is confirmed live",
+        "[ CSS ] #spectral-engine-init overlay styles added to app.css — fixed fullscreen, z-index 9999, rgba(0,0,0,0.97) background, opacity fade via .sei-hidden class",
+        "[ CSS ] .sei-text and .sei-sub use existing Digital font and red glow text-shadow to match SpectralX engine aesthetic",
+        "[ CSS ] .sei-dots animated via @keyframes sei-dot-cycle cycling content '' / '.' / '..' / '...' on 1.5s loop",
+        "[ SYSTEM ] Loader sits completely independent of existing Blazor SVG loader (loader 1) and SpectralGLLoader scene loader (loader 2) — no clashes, three loaders cover three distinct phases",
+        "[ SYSTEM ] Phase 1: Blazor bootstrap SVG circle fires inside #app while WASM downloads",
+        "[ SYSTEM ] Phase 2: SpectralEngineLoader overlay covers mesh batch load (50+ FBX/STL/GLTF), Engine.Init(), shader push and render loop start",
+        "[ SYSTEM ] Phase 3: SpectralGLLoader scene progress loader takes over as normal once WebGL2 is live",
+        "[ FIX ] Loader getting stuck on direct SpectralX page landing fixed — added _SpectralShaders poll fallback in SpectralUI.js mirroring the same shader gate C# uses, plus 12s safety dismiss timer",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.305 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Scene Transitions: Moved BWPScene1 exit trigger and signpost from north to west axis, updated BWPScene2 entry to match east — signpost and trigger now share single source of truth via GetTriggerPos()",
+        "Scene Transitions: Confirmed signpost placement correctly linked to _sceneTransitions array via GetTriggerPos() — one line change moves both trigger and visual together",
+        "Camera System: Migrated all BWP scenes from 45° isometric camera to new Orthographic camera mode with 5° billboard tilt",
+        "Characters: Updated all character classes (Warrior, Rogue, Monk, Mage) billboard rotation from Y-axis 85° to X-axis 5° to correctly face the new orthographic camera",
+        "Characters: Corrected spawn Z position from 1.0f to 0.1f across all character SpawnX() methods to sit flush with landscape under new camera angle",
+        "Enemies: Fixed all enemy InitMesh() methods hardcoding WorldZ = 0.1f — previously Z was passed through from spawn call and overriding mesh position correction",
+        "Breakables: Updated Dummy BreakZ from pixel-height-based calculation (64f/84f = 0.76f) to 0.1f to match new camera system",
+        "Physics Props: Updated SpectralUndeadGF spawn originZ to 0.1f at call site in InitScene4",
+        "Static Props: Updated SpawnOne() Z calculation from heightScale (PixelHeight/WarriorPixelSize) to sin-adjusted formula 0.1f + heightScale * sin(5°) to prevent large props sinking into landscape",
+        "Town Scene (BWPScene2): Fixed Tavern001, House001 x2, Fountain001 fixed placements — Tavern Z nudged via post-spawn position adjustment until base sits flush",
+        "All billboard objects: Standardized rotation to new Vector3(5f * MathF.PI / 180f, 0f, 0f) across characters, enemies, breakables, physics props and static props",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.304 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Lighting and Shadow pass Guard update, Scene 2 and 3 are not casting foliage shadows correctly yet",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.303 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "── CAMERA SYSTEM OVERHAUL ──────────────────────────────────────────",
+        "Replaced dual-matrix conflict between FreeCam and IsoCamera with a unified four-mode camera architecture.",
+        "SpectralXCamera (FreeCam) remains untouched — existing FPS-style matrix math preserved exactly as-is.",
+        "SpectralXIsoCamera fully replaced by new SpectralXOrthoCamera — true orthographic top-down projection for BWP game scenes.",
+        "OrthoCamera produces correct 2D sprite and tilemap alignment with no perspective distortion.",
+        "Added SpectralXOrbitCamera — Blender-style pivot-based editor camera with full preset view support.",
+        "OrbitCamera supports Front, Back, Left, Right, Top, Bottom and Isometric preset snaps.",
+        "OrbitCamera Ctrl+5 toggles Perspective and Orthographic projection mid-orbit — matches Blender skewed ortho behavior.",
+        "SetTopView() automatically switches to Orthographic — serves as clean escape from skewed ortho orbit.",
+        "Ctrl+9 SetOppositeView() flips any named view to its opposite or inverts free orbit yaw 180 degrees.",
+        "OrbitCamera initializes from the previous camera position on mode switch — no positional jump between modes.",
+        "InitFromFreeCam() derives pivot and spherical angles from FreeCam forward vector.",
+        "InitFromOrthoCamera() inherits OrthoSize and projection mode producing Blender skewed ortho entry behavior.",
+        "── CAMERA MODE ENUM ────────────────────────────────────────────────",
+        "CameraMode enum expanded from three to four modes: WebpageView, FreeCam, Orthographic, Orbit.",
+        "WebpageView — existing rail camera for homepage scroll, untouched.",
+        "FreeCam — existing FPS camera, untouched.",
+        "Orthographic — replaces Isometric, true ortho top-down for Scene 4 and 5.",
+        "Orbit — new Blender numpad editor utility camera available in all scenes.",
+        "All four camera modes are now available in all scenes with no scene guards.",
+        "── SINGLE MATRIX PIPELINE ──────────────────────────────────────────",
+        "BuildWebGLFrame() now produces one consistent view and projection matrix from the active camera via a single switch.",
+        "ViewMatrix and ProjMatrix in WebGLFrameData both sourced from the active camera — no more hardcoded Camera references.",
+        "UnprojectToGroundPlane() updated to use active camera matrices for correct tilemap brush painting in all modes.",
+        "Light sort camera position updated to read from active camera across all four modes.",
+        "CamX/Y/Z frame data fields read from the correct active camera in all modes.",
+        "── KEYBIND SYSTEM ──────────────────────────────────────────────────",
+        "KeybindConfig updated with full Blender-style Ctrl+Numpad camera action bindings.",
+        "Numpad keys mapped to same canonical strings as number row — binds work regardless of hardware.",
+        "Added IsCameraAction() and IsOrbitAction() helpers for mode-gated input handling.",
+        "CamModeFreeCam, CamModeOrbit, CamModeOrtho, CamModeWebpage — explicit mode switch binds.",
+        "CamFront/Back/Right/Left/Top/Bottom — preset view snaps via Ctrl+1/3/7 and Shift variants.",
+        "CamOrbitUp/Down/Left/Right — step orbit via Ctrl+2/4/6/8.",
+        "CamToggleOrtho — Ctrl+5 projection toggle.",
+        "CamOppositeView — Ctrl+9 opposite view.",
+        "CamAlignToViewport — Ctrl+Alt+0 pivot reset.",
+        "CamOrthoLockPlayer — Ctrl+L player lock toggle for BWP game scenes.",
+        "CamZoomIn/Out — Ctrl+Equals/Minus shared zoom for Orbit and Ortho modes.",
+        "── INPUT SYSTEM UPDATES ────────────────────────────────────────────",
+        "SpectralXInput ProcessHeldKeys updated — WASD pans OrthoCamera target in Orthographic mode.",
+        "HandleWheel routes scroll zoom to OrthoCamera or OrbitCamera depending on active mode.",
+        "All camera action binds wired in RegisterDefaultBinds() with correct mode guards.",
+        "Orbit preset binds auto-switch to Orbit mode if not already active.",
+        "── SCENE INITIALIZATION ────────────────────────────────────────────",
+        "InitScene4 and InitScene5 updated — IsoCamera init replaced with OrthoCamera.Reset().",
+        "SwitchToScene BWPScene1 and BWPScene2 updated — SetCameraMode now sets Orthographic instead of Isometric.",
+        "SpectralXEngine constructor cleaned up — IsoCamera removed, OrthoCamera and OrbitCamera self-instantiate via property initializers.",
+        "Scene switch OnMeshesReady pattern confirmed consistent across Home, SpectralX and BloodWyrmProtocol pages.",
+        "── UI AND DEV TOOLS CENTRALIZATION ─────────────────────────────────",
+        "Dev tools panel migrated from individual page razor files into SpectralXCanvas razor class library.",
+        "AA Mode, Shadow Mode, Time of Day, and Camera Mode selectors now render on all pages from a single unified panel.",
+        "No more per-page duplication of dev controls — new scenes automatically inherit the full dev toolbar.",
+        "Camera Mode dropdown wired to Engine.SetCameraMode() directly from the canvas component.",
+        "Ortho Lock to Player toggle renders conditionally in the dev panel when Orthographic mode is active.",
+        "UIHidden toggle cleanly hides the entire unified panel across all scenes.",
+        "── JS SIDE — PHASE 2 PENDING ───────────────────────────────────────",
+        "Directional light enabled flag identified as incorrect scene guard — to be replaced with unified light array scan in Phase 2.",
+        "drawTileMap sun direction to be sourced from the unified frame light array instead of separate sunDir uniforms in Phase 2.",
+        "ViewMatrix and ProjMatrix now correctly sourced from active camera — JS matrix conflict resolved on C# side.",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.302 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "── ORTHOGRAPHIC CAMERA OVERHAUL ──",
+        "Added true orthographic top-down camera for BWP Scene 4 and 5",
+        "All billboard meshes updated to 85 degree Y rotation for iso view",
+        "Characters: Warrior, Rogue, Monk, Mage rotation updated to new Vector3(0f, 85f, 0f)",
+        "Enemies: All 10 enemy types updated to matching 85 degree rotation",
+        "Breakables, Dynamic Objects and Static Props updated to match",
+        "── MOVEMENT AND INPUT FIXES ──",
+        "Fixed character movement axes swapped in ortho view — WorldX/Y corrected",
+        "Fixed left/right movement direction inverted in new coordinate space",
+        "Fixed attack direction facing — forceRight flipped for new world coords",
+        "Fixed _facingRight logic in GetStateFromDir for all 4 characters",
+        "Fixed enemy facing direction in chase and patrol for all 9 enemy types",
+        "Fixed ortho edge scroll Y axis inverted — TargetY signs flipped",
+        "── SCENE AND PROP FIXES ──",
+        "Removed duplicate static object spawner — StaticObjects and StaticProps both running in InitScene4",
+        "Kept SpectralProps as primary system, removed SpectralXBWPStaticObjects spawn call",
+        "Fixed NullReferenceException in InitScene4 — StaticObjects.Spawned.Count called after StaticObjects commented out",
+        "Fixed tilemap painting condition — HandleTileMapMouseMove was using incorrect negation operator",
+        "── CAMERA AND UI ──",
+        "Fixed camera defaulting to FreeCam on BWP page load — NullReferenceException in InitScene4 was crashing SwitchToScene before SetCameraMode(Orthographic) could fire",
+        "Fixed BWP main menu not showing on load — same root cause as camera bug",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.301 SpectralX WebGL2 Camera OverHaul❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "Camera architecture rebuilt into a single unified matrix.",
+        "Camera modes updated: FreeCam, OrthoCam, OrbitCam, WebpageCam, Locked OrthoCharacter Follow.",
+
+        "=== Camera & Viewport Keybinds (VX5.301) ===",
+
+        "Ctrl + / — Look through the active camera",
+        "Ctrl + 0 — Set selected object as the active camera",
+
+        "Ctrl + 1 — Front view",
+        "Ctrl + 3 — Right side view",
+        "Ctrl + 7 — Top view",
+        "Ctrl + 9 — Opposite view",
+
+        "Ctrl + 5 — Toggle Perspective / Orthographic",
+
+        "Ctrl + 2 — Orbit view (Down)",
+        "Ctrl + 4 — Orbit view (Left)",
+        "Ctrl + 6 — Orbit view (Right)",
+        "Ctrl + 8 — Orbit view (Up)",
+
+        "Ctrl + Alt + Numpad 0 — Align camera to current viewport",
+
+        "Shift + Numpad 1 — Opposite Front view",
+        "Shift + Numpad 3 — Opposite Right view",
+        "Shift + Numpad 7 — Opposite Top view",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.300 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+" Removed Blue color from two objects in test Scene. For some reason they now work correctly who even knows why",
+"FITE ME HUMANS MAKE YOUR OWN SOLO WEBL2 ENGINE "
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.299 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added static objects to town",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.298 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added Town Map",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.297 SpectralX WebGL2 Rogue's Gambit Protocol❄️⚔️🩸🗡️⚔️❄️ ",
+    Lines = new List<string>
+    {
+"• Rogue attack timing now scales with Alacrity — cooldown on both Punch and Dags shrinks as Alacrity rises.",
+"• Added delayed damage resolution for all melee-class characters (Rogue, Warrior, Mage, Monk) — damage now lands on the 2nd-to-last frame of the attack animation instead of instantly on button press.",
+"• Same delayed-damage timing ported to all enemy attacks: Cat, Cow, Goatman, Psycho, ScavBoss, Skeleton, SkeletonWar, Boss, TownSlut, Zombie.",
+"• Added a safety check so delayed damage is skipped if the target dies from another source before the hit lands.",
+"• Reverted an experimental frame-indexed hit-flash duration on Rogue — it was miscalculating off the victim's current animation (Idle/Walk) instead of the attacker's swing, causing the red hit-flash to get stuck on for several seconds. Hit-flash duration is back to a flat, fixed timer.",
+"• No changes to attack ranges, damage values, or energy/mana/rage/kai/fury costs — this pass was purely about timing.",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.295 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added JS helper similar to Blood Splatter to remove pink Squares on static Object culling redraw"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.294 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed trap enemy on hit effects with Concat"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.293 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added Active Scene is BWP scene to setup for 10 Scene Addition",
+"Updated All guards in engine to call BWP active Scene instead of BWPScene4",
+"Updated TickScene lighting Guard to add Scene 3 and Scene 4."
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.292 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Updated mage and monk to on array for death textures to display correctly",
+"Updated Mage texture Name"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.291 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Ported the old div-engine UndeadGF kickable head prop into the WebGL2 SpectralX engine as a brand new SpectralPhysics.cs system.",
+        "Added ISpectralPhysics as a lean data-only contract (position, velocity, mass, collision radius) so future physics props can reuse the same shared tick logic without duplicating math per type.",
+        "UndeadGF heads now spawn scattered within a 12-unit radius near the training dummies, using true 3D world-space positions instead of absolute-positioned 2D divs.",
+        "Restored the original friction and kick-impulse feel exactly — heads drift, decelerate on their own, and get bumped whenever the player or an enemy walks into them.",
+        "Wired collision so both the active player character and every active wave enemy (Skeletons, PsychoSkeletons, ZombiePsycho, SkeletonWar, Goatman, ScavBoss, SkeletonBoss) can kick the heads, not just the player.",
+        "Physics props are ticked once per frame from the main engine loop and fully cleared on every scene switch, matching the same lifecycle pattern used by the dynamic object and breakables systems.",
+        "Zero changes required to any character or enemy class — physics collision is handled entirely by the new registry, keeping every existing class untouched.",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.290 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "— Rebindable Controls —",
+        "Keybinds are now fully live: rebinding a key in the Controls menu immediately changes what fires in-game, no restart needed.",
+        "Added reverse key lookup (KeybindConfig.GetAction) so input translates physical key presses into actions instead of hardcoded keys.",
+        "Converted all default binds (Debug, UI Toggle, Menu, Inventory, Attack, Special Attack) from hardcoded keys to rebindable actions.",
+        "Converted movement (W/A/S/D) to action-based held-key tracking (MoveUp/MoveDown/MoveLeft/MoveRight) so camera and character movement respect rebinding.",
+        "Directional attack combos (Move + Attack / Move + Special Attack) now derive from your current Movement and Attack bindings automatically — rebind either one and the combo follows, no separate setup needed.",
+        "Legacy Konami-style debug sequences (Up Up, Up Up Down Down, Left Right) remain on fixed arrow keys — not user-rebindable.",
+        "",
+        "— Controls Menu —",
+        "Removed unused 'Performance' bind — merged into Debug Overlay (key 3) in the current engine.",
+        "Added scrollable keybind panel so the menu no longer expands past the screen as entries are added.",
+        "Added an explanation note under Combat clarifying that directional attacks are automatic (Move Left/Right + Attack/Special Attack) and not independently bindable.",
+        "",
+        "— Known Follow-Up (not yet built) —",
+        "Objective 8 (duplicate key guard) was intentionally deferred: nothing currently stops two actions from being rebound to the same physical key in the Controls menu. If two actions share a key, only one will respond — the other goes silently dead until re-bound. This only happens if a duplicate is manually set via the menu; normal gameplay is unaffected. Flag for follow-up if this comes up in testing.",
+"",
+"— Bug Fixes —",
+"Fixed a case-sensitivity mismatch between KeybindConfig.GetAction and the internal binds dictionary that caused every rebindable action except movement to silently fail to fire (Attack, Special Attack, Menu, Inventory, UI/HUD Toggle, Debug Overlay). Movement was unaffected since it runs through a separate held-key path rather than the binds lookup."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.289 SpectralX WebGL2 Splatter Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Ported the old div-engine SplatterPuddle/BloodSplatterRegistry system into the WebGL2 SpectralX engine as a brand new SpectralSplatter.cs system.",
+        "Blood puddles now spawn as flat, ground-lying decals in true 3D world space instead of absolutely-positioned 2D img tags.",
+        "Puddles fade out linearly over 20 seconds and are capped at 200 active at once, with oldest puddles auto-evicted to protect performance.",
+        "Fixed a pink/placeholder texture flash on the very first puddle of a session by reusing the preloaded shared splatter texture instead of re-decoding it per-instance.",
+        "Wired splatter spawning into all four playable classes: Rogue, Warrior, Monk, and Mage — each now leaves blood behind on TakeDamage.",
+        "Wired splatter spawning into six standard enemies: Goatman, ZombiePsycho, ScavBoss, Cow, Cat, and TownSlut.",
+        "Added a brand new BoneSplatter001.png texture and tied it into all four undead enemy types — Skeleton, PsychoSkeleton, SkeletonWar, and SkeletonBoss — so they now shatter into bone splatter instead of blood on hit.",
+        "Splatter texture system now preloads both blood and bone textures once per BWP scene load, shared across every puddle instance to avoid redundant GPU texture uploads.",
+        "Splatter registry is fully cleared and reset on every scene switch to prevent orphaned decals or stale GPU references from a previous session.",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.288 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+    "Added Blood splatter on hit effects, To be added to cat cow and townslut"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.287 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "🩸 Fixed HUD (HP/Energy bars) only updating on move/attack instead of in real time",
+        "🩸 Root cause: WebGL render loop runs entirely in JS via requestAnimationFrame, driving Engine.Tick() through pure JS interop — Blazor had no visibility into it, so SpectralCharHUD never repainted on its own",
+        "🩸 Added a decoupled UI refresh timer to SpectralXCanvas.cs (10x/sec) that calls StateHasChanged() independently of the 60fps render loop and independently of player input",
+        "🩸 HUD now reflects live energy regen, life regen, and hunger degen ticking in the background — no longer requires a keypress or attack to visually catch up",
+        "🩸 Fix is centralized in SpectralXCanvas, so it applies to all characters (Rogue confirmed working, Warrior/Mage/Monk share the same HUD pathway)",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.285 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Restored Cats Animation states."
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.284 SpectralX WebGL2 Ambient Trap Extraction Protocol🐄🐱🌙⚔️🐄🐱",
+    Lines = new List<string>
+    {
+        "Ripped Cow, Cat, and TownSlut out of SpectralWaveSys entirely — they were never true wave enemies and their presence in the wave registry was silently corrupting core wave logic.",
+        "Fixed IsWaveCooked() — Cow/Cat/TownSlut were being checked as wave-completion blockers, meaning a single surviving ambient NPC could permanently halt wave progression.",
+        "Removed WaveCowCounts, WaveCatCounts, WaveTownSlutCounts and all associated spawn/despawn callback fields from SpectralWaveSys.",
+        "Trimmed the 16-argument SetSpawnCallback overload down to 10 args now that Cow/Cat/TownSlut callbacks are gone.",
+        "Stripped Cow/Cat/TownSlut spawn blocks out of LoadWave(), tick loops out of TickAll(), and cleanup out of ClearExpiredCorpses() / ClearAll() / GetAllEnemies().",
+        "Engine now spawns Cow/Cat/TownSlut directly in InitScene4() into their own Cows/Cats/TownSluts lists — no longer routed through the wave spawn origin/callback system.",
+        "Added new TickAmbientTraps(target, delta) on Engine — handles EnemyMove + Tick for all three ambient types independently of WaveSystem.TickAll, called directly from TickAndGetFrame.",
+        "Fixed ClearExpiredAmbientCorpses() — previous version had a copy-paste bug where the Cat block ignored corpse-expiry entirely and just force-spawned 3 new cats into WaveSystem.Cat every call. Now correctly checks IsCorpseExpired and despawns per-type like Cow/TownSlut already did.",
+        "Fixed BuildCowTexSwaps / BuildCatTexSwaps / BuildTownSlutTexSwaps — were reading from WaveSystem.Cow/Cat/TownSlut (now-deleted lists), repointed to Engine's own Cows/Cats/TownSluts.",
+        "SwitchToScene(BWPScene1) now explicitly despawns all ambient trap meshes before Scene4.Clear() and list resets, preventing orphaned mesh buildup across repeated scene transitions.",
+        "Result: Cat, Cow, and TownSlut now patrol, chase, and attack correctly on their own tick, fully decoupled from wave spawn/advance/cleanup timing.",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.282 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed All animations, hit effects, death effects, attack effects for all chars and enemies."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.280 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Enemy UVoffset warrior mirroring characters structure in apply animation to mesh"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.280 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed JS warrior uploads, removed warrior guard in render frame uvoffset, added append to warrior in engine",
+"Added restructure for apply animation to mesh to match rogue structure."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.279 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"New JS texture system is broken and needs to be fixed for warrior and all enemies, works for rogue mage monk"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.279 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Removed NPC trap Enemies until fixed"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.279 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added NPC trap Enemies but they need size and UV adjsutment"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.278 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Added 8 new enemies to the wave system: ZombiePsycho, SkeletonWar, Goatman, ScavBoss, SkeletonBoss, Cow, Cat, TownSlut",
+        "SpectralWaveSys: new per-enemy registries, wave count arrays, and spawn/despawn callback wiring for all 8 enemies",
+        "SkeletonWar, ScavBoss, and SkeletonBoss are wave-driven alongside Skeleton/PsychoSkeleton/ZombiePsycho/Goatman",
+        "Cow, Cat, and TownSlut are zeroed out of wave progression for now — reserved for solo/manual spawn as environmental traps",
+        "WebGLDataCore: added TexUrls/TexSwaps property pairs for all 8 new enemies, matching the Skeleton/PsychoSkeleton pattern",
+        "SpectralXEngine.InitScene4: added Spawn/Despawn method pairs for all 8 new enemies (mesh copy, naming, InitMesh wiring)",
+        "SpectralXEngine: added preload flags, BuildXTexSwaps methods, and frame-data wiring for all 8 new enemies",
+        "SpectralXEngine: extended mesh-preservation allowlist (preserveMesh) to cover all 8 new enemy mesh name prefixes",
+        "SpectralXEngine: reset all 8 new preload flags on scene switch to BWPScene1",
+        "SpectralEngine.js: registered preload + texture swap calls for all 8 new enemies through the existing unified enemy texture system",
+        "All 8 new enemies now fully wired end-to-end — WaveSys → WebGLDataCore → SpectralEngine.cs → JS",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.276 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Unified enemy Tex Swaps into one function"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.275 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "Added full PsychoSkeleton enemy integration across C# and WebGL2 pipelines.",
+        "Implemented PsychoSkeleton registry in SpectralWaveSys with spawn/despawn callbacks.",
+        "Added WavePsychoSkeletonCounts and unified multi‑enemy wave progression.",
+        "Created BuildPsychoSkeletonTexSwaps() mirroring Skeleton swap logic.",
+        "Added psychoSkeletonTexUrls + psychoSkeletonTexSwaps JSON fields to frame data.",
+        "Implemented TextureDirty propagation for PsychoSkeleton hit/death/animation states.",
+        "Fixed mesh‑preservation logic by adding correct \"PsychoSkeletonSquare_\" prefix.",
+        "Corrected typo in mesh‑preservation block preventing UV sync on PsychoSkeleton.",
+        "Added PsychoSkeleton to GetAllEnemies() so Rogue/Warrior/Monk/Mage can damage them.",
+        "Updated attack dispatcher to sweep both Skeletons and PsychoSkeletons.",
+        "Added PsychoSkeleton preload cache + pending swap queues in WebGL init.",
+        "Implemented preloadPsychoSkeletonTextures() with full GL texture setup.",
+        "Implemented processPsychoSkeletonTexSwaps() and pending‑swap resolution.",
+        "Added PsychoSkeleton texture‑swap cache/queue block in frame processor.",
+        "Added PsychoSkeleton swap application in render loop for live texture updates.",
+        "Added PsychoSkeletonTexUrls preload flag (_psychoSkeletonTexPreloaded = true).",
+        "Verified PsychoSkeleton animation sheets, hit flash, and death sprite pipeline.",
+        "Resolved UV offset drift caused by incorrect mesh‑preservation prefix.",
+        "Finalized multi‑enemy texture pipeline: Skeleton + PsychoSkeleton fully stable.",
+        "Prepared engine for additional enemy classes (Zombie, Lich, Demon, etc.).",
+        "Added Death Animation textures for characters"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.273 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Made unified Preload for char textures."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.271 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Temp removed rogue on hit texture effect to keep red flash so it doesn't go invisible",
+"Char hit effects to be added warrior monk mage",
+    "Skeleton hit effect to be removed and add red flash temp"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.270 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Skeleton on Hit and Death Effects",
+"Added hit effect and death effects for characters but is flashing on hit needs small uv fix."
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.269 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+ "Added Character attacks to enemies",
+ "Added Wave Spawns of skeletons",
+ "On hit effects and death effects arnt working"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.269 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Fixed skeleton guard for UVoffset.",
+	"Skeleton is repeatedly attacking should only attack when triggering character collision"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.269 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Added Skeleton Tick but has UV offset error"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.269 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Added One Skeleton Spawn for test."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.268 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Fixed Char select Return to Main Menu bool to false on return"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.267 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "Activated Cheese and intelligence pots."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.265 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added XP gain on dummy hit for level system test for all chars",
+"Level Up System and stat point allocation now work"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.264 SpectralX WebGL2 Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Added Left and right animation attacks on keypress left and attack and idle.",
+    "Occasionaly characters moonwalk still....."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.263 SpectralX WebGL2 Particle System❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Particle System Clear buffer reset add null properties.",
+"Added clear in reset",
+"Particle systems now reset properly on page and scene redirect"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.262 SpectralX WebGL2❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Dummy On Death Effect and on hit effects.",
+    "Reduced all Char speeds"
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.261 SpectralX WebGL2❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed new chars turning black on movement updated UploadKey Call for new character guards",
+"Added Hashset for easy new character calls BrigandSquare etc."
+
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.260 SpectralX WebGL2❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+  "Added Existing Chars Mage Rogue and Monk with working animations and attacks",
+"Added Inventory and Level system",
+"Issues-->. Level Up system not wired in yet for attacks."
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.259 SpectralX WebGL2❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+  "Added remaining HUD and UI to Blood Wyrm Protocol"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.257 SpectralX WebGL2 PBR Landscape Materials Phase 2❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+   "Added Warrior combat animations on keypress f and g. hit collisions works on dummy but hit effects are not displaying correctly."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.257 SpectralX WebGL2 PBR Landscape Materials Phase 1❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+   "Added Normal, Specular snow tile map for testing, add 54 material max GPU slots"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.257 SpectralX WebGL2  Blood Wyrm Protocol Combat Phase 1❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+   "Added Dummies spawn"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.256 SpectralX WebGL2  Blood Wyrm Protocol❄️⚔️🩸🐺⚔️❄️ ",
+    Lines = new List<string>
+    {
+        "BWP UI Phase 1 — New RCL folder SpectralXGLX/BWP/BWPMenu/ created",
+        "BWP UI Phase 1 — SpectralBWPMainM.razor added to RCL — self-contained main menu with animated DiabloTitle005 fire sprite, 10-frame timer, 4 EventCallback buttons, no main project dependencies",
+        "BWP UI Phase 1 — SpectralXCanvas: _bwpMenuVisible field + BWPMenuVisible property + ToggleBWPMenu() method added",
+        "BWP UI Phase 1 — SpectralXInput key 5 bind wired to ToggleBWPMenu() replacing placeholder comment",
+        "BWP UI Phase 1 — SpectralXEngine.InitScene4: warrior auto-spawn removed, new public SpawnWarrior() method added for on-demand spawn",
+        "BWP UI Phase 1 — BloodWyrmProtocol: SpectralBWPMainM injected as ChildContent, menu auto-shows on scene load via OnMeshesReady callback",
+        "BWP UI Phase 1 — Menu toggles correctly on key 5 after warrior is spawned, warrior spawns on Single Player → Character Select → Start",
+        "BWP UI Phase 2 — Quit button wired to NavigationManager.NavigateTo('/') via HandleBWPQuit in BloodWyrmProtocol.razor.cs",
+        "BWP UI Phase 2 — @inject NavigationManager NavManager added to BloodWyrmProtocol.razor markup file",
+        "BWP UI Phase 3 — SpectralBWPOptions.razor added to RCL — lore text panel, lighting controls placeholder (greyed out, pointer-events disabled), Main Menu back button",
+        "BWP UI Phase 3 — _showOptions bool + HandleBWPOptions/HandleOptionsBack handlers added to BloodWyrmProtocol.razor.cs",
+        "BWP UI Phase 4 — SpectralBWPControls.razor added to RCL — live keybind table with click-to-rebind, section dividers for Movement/Combat/UI/Debug/Gamepad, blocked reserved keys Tab/F5/F12",
+        "BWP UI Phase 4 — KeybindConfig.cs updated for new SpectralX engine — Menu key updated to 5, Debug updated to 3, UIToggle 4 added, removed stale SkelAttack and Debug2 entries",
+        "BWP UI Phase 4 — _showControls bool + HandleBWPControls/HandleControlsBack handlers added to BloodWyrmProtocol.razor.cs",
+        "BWP UI Phase 5 — SpectralBWPCharMenu.razor added to RCL — portrait grid with Warrior/???/Rogue/Mage/Monk, red glow selection highlight, START disabled until char selected, locked placeholder slots greyed out",
+        "BWP UI Phase 5 — HandleSinglePlayer updated to open char select instead of directly spawning, HandleCharSelected/HandleCharStart handlers added",
+        "BWP UI Phase 5 — Full menu flow working: Main Menu → Single Player → Char Select → Start spawns Warrior → menu closes → key 5 toggles menu back",
+        "BWP UI Phase 5 — Placeholder hooks in place for Rogue/Mage/Monk spawn — wired to SpawnWarrior() until class-specific spawn system is built",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.253 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Tile Texture Update",
+"Removed cube city"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.253 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed GPU splat map Full upload , removed partial upload, Now paints correctly and loads correctly",
+    "Added pending full seed data removed old full and partial uploads",
+"Removed shadow casting form warrior point light temp until fixed."
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.252 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Added JS invoke async reset foliage systems to scene switch 2 and 3.",
+"Foliage systems now reset properly on redirect"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.252 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Updated Rocks."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.251 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Added Pine Trees to Scene 3."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.250 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Added Foliage to Scene 3",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.249 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Added Point/Area Light Shadow casting to JS Meshes on Landscape"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.249 SpectralX WebGL2 ❄️❄️🐴🐺❄️❄️ ",
+    Lines = new List<string>
+    {
+"Added Spot Light Shadow casting to JS Meshes on Landscape"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.248 SpectralX WebGL2 Blood Wyrm Protocol ❄️🐴🐺 ",
+    Lines = new List<string>
+    {
+ "Removed racing condition in input, But gpu splat maps are not blending and painting correctly again le sigh"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.247 SpectralX WebGL2 Blood Wyrm Protocol ❄️🐴🐺 ",
+    Lines = new List<string>
+    {
+ "Fixed Partial Upload for Scene switch call for Tile maps to paint correctly"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.246 SpectralX WebGL2 Blood Wyrm Protocol ❄️🐴🐺 ",
+    Lines = new List<string>
+    {
+   "Added Locked Isometric Follow Camera for Character"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.245 SpectralX WebGL2 Sky System Overhaul ✨🌙☁️ ",
+    Lines = new List<string>
+    {
+        "fixed starfield and shooting stars not rendering — were using skysphere's per-frame camera-recentering MVP instead of raw camera VP, swapped to frame.vp temp fix",
+        "confirmed star twinkle and shooting star spawn/decay working correctly in Release build",
+        "reordered sky shader composite layers — stars now draw first, then sun/moon, then clouds on top, so sun/moon and clouds properly occlude stars instead of stars rendering over everything",
+        "fixed sun and moon drawing in front of clouds — moved sun/moon shading block earlier in shader before cloud cubemap sampling",
+        "reduced moon halo glow ring radius and intensity for a tighter, less overblown look",
+        "added overdriven moon core brightness plus additive center hotspot for a stronger glow without growing the visible disk size",
+        "widened moon hotspot falloff to remove a sharp 'iris' artifact in the center of the moon",
+        "fixed stray syntax error (dangling asterisk) in sky fragment shader rainbow block",
+        "Made rainbow a smiley face in the sky until i fix it correctly :)"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.244 SpectralX WebGL2 Blood Wyrm Protocol❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"enabled stars and shooting stars with frame.vp temp",
+"change sun moon order behind clouds in shader and moon glow smaller"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.243 SpectralX WebGL2 Blood Wyrm Protocol❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"Changed Perspective of All World Objects to Match Isocamera."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.242 SpectralX WebGL2 GPU Per Pixel Splat Maps With Infinite Layer Array Texturing❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"right so 23 attempts later and gpu splat MAPS work YAY!"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.241 SpectralX WebGL2 GPU Per Pixel Splat Maps With Infinite Layer Array Texturing❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"i made splat maps FINALLY and it works YAY"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.240 SpectralX WebGL2❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"Implemented 9/12 objectives initial setup for gpu per pixel splat maps with layer arrays",
+"Investigated errors in shadow pass for foliage and scene 3 shadow casting is causing errors similar to isometric camera"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.239 SpectralX WebGL2❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"UI is now hidden by default",
+"Added Campfires and all dynamic Pots to Blood Wyrm Protocol Forest Map 1",
+"Landscape Paint toggle isActive set to false on start"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.238 SpectralX WebGL2❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"Adjusted Shadow Casting and Directional Light to Match Sun rising in the East on landscape",
+    "To be updated i have to change the shadow settings if i change 1024 to uShadowMapSize of 4096, otherwise its casting to dim"
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.237 SpectralX WebGL2❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"Commented out refiring debugs"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.236 SpectralX WebGL2❄️❄️❄️ ",
+    Lines = new List<string>
+    {
+"Fixed Typo in cloudOpacity,and order of gluniform to before texture bind and draw",
+"Updated Stars Texture",
+"Added Rainbow to appear at certain Cloud Opacity ranges"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.235 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Added Opacity Fade over time to Clouds",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.234 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Removed Pole Blobs, Adjust Sun and moon positions, Adjusted horizon band",
+"For some reason when i moved the positioning on this i got decrease in sun and moon brightness"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.234 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Updated CubeMap Textures. Poly Haven has Really nice textures for this setup!"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.233 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Updated all Sky Textures to Cubemaps 4:3, Needs to be updated to 16:9",
+"Fixed Textures disappearing on scene redirect"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.232 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Rebuilt Sky System to CubeMap But needs to be texture updated and polished."
+
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.231 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Fixed Landscape Tile tear at edges of tiles.",
+
+    },
+},
+
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.230 SpectralX WebGL2 ",
+    Lines = new List<string>
+    {
+"Attempted to Migrate Landscape Tile Map to its on Js file but had to many errors to mess with for today",
+"Moved Text System To independant Js mod file"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.229 SpectralX WebGL2 Engine Mod Phase 2,3,4,5 of 8 complete",
+    Lines = new List<string>
+    {
+"Scrollbar, Foliage, Cube City, Particles",
+"AA, shadow and Landscape tile system on hold"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.228 SpectralX WebGL2 Engine Mod Phase 1 of 7 complete",
+    Lines = new List<string>
+    {
+"Particle System Migrate to SpectralParticleSystem.js"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.227 SpectralX WebGL2 Full Modification Engine",
+    Lines = new List<string>
+    {
+"Created window.SpectralEngine and 8 new mod files to be filed in.",
+"Engine is now fully easily moddable to add new JS system",
+"Sky System Mod 1/8 Complete and working as first transfer"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.226 SpectralX WebGL2 Landscape Tile Map",
+    Lines = new List<string>
+    {
+"Updated Local save/load storage to guard per scene."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.225",
+    Lines = new List<string>
+    {
+ "IS IT CONCEIVABLE HUMANS THAT I HAVE ZERO ERRORS IN MY PROJECT RIGHT NOW THIS IS A MILESTONE"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.224 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+      "Let THE TORCHES BE LIT FOR THE CAMPFIRE IN THE ZE GAME"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.223 SpectralX WebGL2 Landscape Tile Map Systems",
+    Lines = new List<string>
+    {
+      "Functions test import/export does work for .png and .r16!"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.223 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+        "SpectralXSun: Added SunDirectionTile property for isometric Z-up tilemap lighting arc",
+        "SpectralXSun: ComputeSunDirection re-enabled — now computes SunDirection, SunDirectionSky and SunDirectionTile separately",
+        "SpectralXSun: SunDirectionTile arcs in YZ plane with fixed X offset for isometric shadow direction",
+        "SpectralXSun: ComputeMoon updated — directions set by ComputeSunDirection, moon elevation derived from angle offset",
+        "SpectralXEngine: BuildWebGLFrame — SunDirX/Y/Z now sends SunDirectionTile for BWPScene1 instead of SunDirection",
+        "SpectralXEngine: ApplyTile removed — not needed, Apply() handles all scenes correctly via separate tile uniform path",
+        "SpectralGL JS: drawTileMap shadow map bind now skipped for activeScene 4 — fixes tilemap black on ACTIVE toggle",
+        "Fix: Shadow pass LookAt matrix was corrupting tilemap depth buffer when ComputeSunDirection changed light position",
+        "Fix: Tilemap going completely black when landscape toggled ACTIVE with ComputeSunDirection enabled",
+        "Fix: All scenes lighting, shadows and toggles now working correctly across Scene 2, 3 and 4",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.222 SpectralX WebGL2 Landscape Tile Map",
+    Lines = new List<string>
+    {
+"Disabled compute sun direction temporarily until i can fix the issue with isocamera glitching the directional light out on toggle switch",
+"this disables shadow and light casting correctly on objects temporarily."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.221 SpectralX WebGL2 Landscape Tile Map",
+    Lines = new List<string>
+    {
+"Added Support for Import export .r16 and .png for tilemap as well as load defaultscene and loaddefault",
+"Added Json Class serialization properties to engine for import/ export paint/height maps",
+"Updated window.SpectralLandscape to accomadte for JS side properties",
+"Updated all landscape UI as well.",
+"to be tested to see if it works"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.220 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+        "Updated if directional light in webgl frame for isocamera allows scene to start at noon for z+ perspective",
+"Fixed Start Time to start at noon in Scene 4, but the isocamera is creating an issue still somewhere when toggling the change time of day",
+"i think i have ambiguity in if else enable directional light for sundir skycolor and sunintenstity to work for isocamera view",
+        "the last remaining piece is correcitng the JS side to update for Scen for for isocamera only z+ to fix the toggle slider glitch"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.219 SpectralX WebGL2 Cube City Builder Phase Fixes",
+    Lines = new List<string>
+    {
+
+"updated cube maze City",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.218 SpectralX WebGL2 Cube City Builder Phase Fixes",
+    Lines = new List<string>
+    {
+        "Fixed phases 3-7 not displaying — root cause was TickLayFoundations using local loop variable n for grid indexing instead of persistent _citySpawnIndex, causing spiral traversal to reset every frame and never progress",
+        "TickLayFoundations rewritten — restored SpiralIndex traversal with persistent _citySpawnIndex increment, spawn height corrected to 12 units above ground, DropLayerIntoPlace wired correctly for layer 3",
+        "TickBuild rewritten — removed erroneous cubesPerSec * 2f multiplier, replaced broken grid check with 40-attempt random occupied cell search, drop height normalized to 10 units above home position",
+        "InitCubeCityBuilder now pre-seeds entire _cityGrid with road gaps cut at every 5th cell — guarantees TickBuild has a full city footprint to stack on even if LayFoundations phase expires before completing",
+        "InitCubeCityBuilder now clears _fullGrid, _fullHeight, _occlusionTopZ, _buildingCount and _holoSignCount on init — previously these were not reset on scene reload causing stale state from previous cycles",
+        "SetupRebuild now clears all four grids — _cityGrid, _cityHeight, _fullGrid, _fullHeight — plus _occlusionTopZ, _buildingCount, _holoSignCount — previously only _cityGrid and _cityHeight were cleared causing second cycle foundations to skip all cells already marked occupied",
+        "Confirmed all phases 1 through 12 now displaying correctly — Dormant, FirstCube, SpawnVehicles, LayFoundations, BuildVillage, BuildTown, BuildCity, BuildMetropolis, BuildFuture, PeacefulLife, CelebrationFireworks, GrandExplosion, Rebuild all functional",
+        "FinalFireworks to CityAtPeace2 hold behavior confirmed working — city persists in peaceful state after finale instead of resetting to Dormant",
+        "Phase advance guard updated to block FinalFireworks from auto-advancing — prevents premature reset after grand finale",
+        "Cube city Z offset raised to 2f globally via SpawnCube — both Pos and HomePos lifted so all city cubes sit above tile map ground plane and no longer clip through terrain",
+        "MAX_BUILDINGS corrected to 512 — was incorrectly set to 24 during merge, limiting district building phases to 24 structures maximum",
+        "FULL_GRID confirmed at 64 for current performance budget — note for future: raise to 128 to match full tile map world space once phase visuals are finalized",
+        "Console.WriteLine debug spam removed from TickLayFoundations and TickBuild — was logging every frame causing significant string allocation overhead at 60fps",
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.217 SpectralX WebGL Cube City Builder - Version 1",
+    Lines = new List<string>
+    {
+        "• Fully replaced old CubeMaze with new Cube City Builder system",
+        "• All buildings now correctly sit 1.5f above the tile map (visual alignment fix)",
+        "• Fixed neon night hue cycling (safe positive modulo)",
+        "• Fixed Lerp issues (custom Vector3/Float Lerp helpers added)",
+        "• Mega Structure now properly tapers and spawns with correct height offset",
+        "• Foundation, District, and Hologram cubes now spawn at correct elevated height",
+        "• Multiple hardcoded Z positions updated for consistent 1.5f ground clearance",
+        "• SpawnCube now universally adds +1.5f to both Pos and HomePos",
+        "• Visual polish applied across all phases (Ruins, Foundation, Districts, Neon Night, Mega Tower, etc.)",
+        "• City now renders correctly above the ground plane with proper layering"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.216 SpectralX WebGL Cube City Culling and Debug",
+    Lines = new List<string>
+    {
+        "New SpectralXEngine.CubeCityBuilder_Culling.cs partial — three-stage culling pipeline added to PackBuffers(), zero JS changes required",
+        "Stage 1 distance cull — cubes beyond _cullRadius world units from camera position skipped before any other check, default 80f covers full 128 grid with margin, set to 0 to disable",
+        "Stage 2 frustum cull — uses existing _frustumPlanes float[24] already maintained by SpectralXEngine.ExtractFrustumPlanes() each frame, sphere radius per cube = scale x 0.87 (half-diagonal of unit cube), outside any of 6 planes = skip",
+        "Stage 3 column occlusion cull — CPU-side conservative height-stack occlusion, RebuildOcclusionMap() builds Dictionary of max occupied Z per XY column at 0.5 unit resolution, any cube whose top face is more than _occlusionBias units below column top is skipped",
+        "Occlusion map uses packed int key (gx+512 << 16 | gz+512) for zero-allocation column lookup per frame",
+        "Occlusion culling scoped to structure layers 3-22 only — vehicles, fireworks, and transition cubes excluded as they move and the static map does not track them",
+        "_occlusionBias default 1.5f — tunable via SetOcclusionBias(), lower toward 0.5 for more aggression, raise toward 3.0 if visual holes appear in buildings",
+        "_cullRadius default 80f — tunable via SetCullRadius(), 60 for close camera, 120 for wide overhead",
+        "RebuildOcclusionMap() called at top of AdvanceCityPhaseExpanded() before switch — occlusion data stays current each phase transition",
+        "Four per-frame cull stat counters added — _lastFrameDrawn, _lastFrameCulledFrustum, _lastFrameCulledOcclusion, _lastFrameCulledDistance",
+        "Public debug properties exposed — CityPhaseDebug shows phase name plus timer and duration, CityActiveCount, CityPackedCount, CityDrawn, CityCulledFrustum, CityCulledOcclusion, CityCulledDistance",
+        "SpectralXDebugRender wired with new CUBE CITY panel — shows phase timer, active vs packed counts, and all three cull buckets live in the left debug overlay",
+        "Console log in PackBuffers available but commented — uncomment to see cull breakdown every 2 seconds during tuning",
+        "ForceOcclusionRebuild() public method added — call from debug console or UI to force map rebuild mid-phase when tuning bias values",
+        "CullStats string property added — single-line summary of all four counters for quick paste into external monitoring",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.215 SpectralX WebGL Cube City Phase Expansion",
+    Lines = new List<string>
+    {
+        "Extended CityPhase enum from 12 to 25 phases — added RuinsSettle, FoundationCrawl, DowntownCore, ResidentialSprawl, IndustrialZone, CommercialStrip, HologramSigns, NeonNight, ChaosDistrict, MegaStructure, CityAtPeace2, FinalFireworks",
+        "Replaced fixed PhaseDurations array — front phases shortened (Dormant 1.5s, FirstCube 2.5s), city building phases extended (BuildCity 28s, BuildMetropolis 32s, BuildFuture 36s), three phases randomized at runtime: PeacefulLife 25-55s, NeonNight 20-45s, CityAtPeace2 30-60s",
+        "New AdvanceCityPhaseExpanded() replaces AdvanceCityPhase() — single method handles all 25 phase transitions including random duration resolution",
+        "New district building system — SetupDistrict() places varied footprint rectangular buildings across full grid with per-district zone logic: core center 30x30, residential outer ring, industrial west quadrant, commercial main avenues, chaos anywhere",
+        "Building footprints vary from 1x1 to 10x10 cells — each floor spawned as individual cube instance dropping from above, capped at 80 cubes per building to prevent overflow",
+        "Per-district color palettes — downtown glass blue to cyan spires, residential warm earthy to orange, industrial dark metal to rust, commercial bright neon hues, chaos pure random hue per building",
+        "FULL_GRID extended to 128 to match tile map world space — FullGridToWorld maps grid cells to world coordinates centered at origin",
+        "MAX_BUILDINGS set to 512 to support full district population across all phases",
+        "Hologram sign system — SetupHologramSigns() places 40-80 cyberpunk ad billboards at building-top height across city, 10 ad brands: Jibba Cola, Cat Show, Noodle Palace, Void Bank, Mega Cubes, Dr Tentacle, Pixel Brew, Cube Air, Shadow Net, Roboute Inc",
+        "Each ad brand assigned unique neon color — signs spawn as flat rectangle of glowing cubes, pulse and float with per-cube phase offset and rare random flicker effect",
+        "NeonNight phase — all active building cubes shift to cycling hue colors with per-instance phase offset, upper floors sway gently, color lerps at 0.8 speed",
+        "MegaStructure phase — single central tower assembles 0.8 floors per second from height 0 to 50, footprint tapers from 4x4 base to 2x2 at top, color shifts from grey base to full spectrum plasma apex, top 30 percent of tower slowly rotates via Phase field",
+        "RuinsSettle phase — post-explosion debris receives sudden 0.3x velocity drag, gravity pulls all cubes to Z=0, colors fade to rubble grey, grids cleared for new city cycle",
+        "FoundationCrawl phase — deactivates all debris except 3 origin cubes, new foundation cubes crawl outward from center at 2 per second with expanding radius, road gaps preserved every 6 cells",
+        "CityAtPeace2 phase — long random 30-60s peaceful phase, upper floors bob gently, warm color pulse applied to all active instances",
+        "FinalFireworks phase — reuses TickFireworks for grand finale before full reset",
+        "Cube city Z offset raised to 2f globally in SpawnCube() — both Pos and HomePos lifted to better match tile map ground plane",
+        "DropLayerIntoPlace() helper added — shared drop-from-above logic for all district build phases, 20 units per second fall speed",
+        "Lerp() scalar and Vector3 overloads added as private statics to resolve MathF.Fmod and Vector3.Lerp conflicts in partial class",
+        "Phase advance guard updated — CityAtPeace2 excluded from auto-advance alongside Rebuild so random duration is respected",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.214 SpectralX WebGL Cube City Builder",
+    Lines = new List<string>
+    {
+        "Retired SpectralXEngine.CubeMaze.cs — 100 individual SpectralXMesh cube objects replaced with pure struct array instancing system",
+        "New SpectralXEngine.CubeCityBuilder.cs — 10,000 cube capacity, zero per-cube mesh allocations, all transforms packed into float[] buffers every tick",
+        "12-phase civilization lifecycle: Dormant → FirstCube → SpawnVehicles → LayFoundations → BuildVillage → BuildTown → BuildCity → BuildMetropolis → BuildFuture → PeacefulLife → CelebrationFireworks → GrandExplosion → Rebuild",
+        "Phase 1 FirstCube: origin cube pulses alone then spawns 8 rainbow seed cubes in a ring",
+        "Phase 2 SpawnVehicles: 8 cube vehicles roll out from center carrying payload cubes to foundation sites, vehicles bob and spin in transit",
+        "Phase 3 LayFoundations: payload cubes slam down from above in a spiral outward pattern, roads preserved by skipping every 5th grid cell",
+        "Phase 4-8 Build Phases: incremental per-second cube spawning drives village earthy tones through town stone, city glass, metropolis neon, and future plasma color palettes",
+        "Phase 7 BuildMetropolis: adds flying cube transport vehicles orbiting above the city",
+        "Phase 8 BuildFuture: 32-cube orbital ring system rotates above the spires",
+        "Phase 9 PeacefulLife: upper floor cubes gently bob, all city lights pulse — the citizens are happy",
+        "Phase 10 CelebrationFireworks: cube rockets launch from random city positions, reach apex and burst into 8 colored fragment cubes, fragments fade and shrink as they fall",
+        "Phase 11 GrandExplosion: full nova detonation — every cube fires outward with speed proportional to its build height, gravity and drag applied per frame",
+        "Phase 12 Rebuild: all cubes lerp home in a spiral, city grid resets, cycle restarts from Dormant",
+        "New CubeCityInstanceGroup data class added to SpectralUI.cs — meshId, count, positions, scales, rotations, colors, phase",
+        "WebGLFrameData extended with cubeCityInstances property — only populated on SceneID.Home, null on all other scenes",
+        "New JS instancer renderCubeCity() added to SpectralEngine.js — mirrors foliage instancing pattern exactly, uses drawArraysInstanced with per-instance pos/scale/rot/color attributes",
+        "CubeCity shader supports full 32-light array, directional shadow map, Y-axis per-instance rotation encoded from Phase field",
+        "GPU buffers use bufferSubData when count fits existing allocation, bufferData only when growing — no unnecessary reallocation per frame",
+        "resetCubeCity() wired into SwitchToScene Home branch via JS interop to clear stale GPU buffers on scene switch",
+        "TickCubeMaze replaced with TickCubeCityBuilder in TickAndGetFrame",
+        "InitCubeCityBuilder replaces old maze init block in InitScene3",
+        "HueToRgb utility added for rainbow color generation across fireworks and seed cube ring",
+        "BuildColor utility maps phase and normalized height to era-appropriate color palette per build layer",
+        "SpiralIndex utility generates outward spiral grid traversal for organic foundation laying order",
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.213 SpectralX WebGL Tile Map Scene 3 Final Form",
+    Lines = new List<string>
+    {
+"Changed || to && in tile map scene call to enable tile and topography painting on home page"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.212 SpectralX WebGL Lighting System Reinvigorate Mutation Phase 1",
+    Lines = new List<string>
+    {
+"Added Json Serialization Property Enabled Directional Light",
+"Updated DrawTileMap gl uniforms to call if frame.directionalightenabled.",
+"This removes the constant render on the JS side and C# now controls whether or not the Directional Lights appear per scene."
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.211 SpectralX WebGL 2",
+    Lines = new List<string>
+    {
+"Snow Tile Map Added to Home Page",
+    "change @input to @onchange for Time of day slider call to reduce slide jitter",
+    "Added tile Map controls to home page but doesnt paint yet"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.210 SpectralX WebGL2 Sky Sphere and Landscape Shaders",
+    Lines = new List<string>
+    {
+        "SHADOW DIRECTION FIX",
+        "Identified uSunDir was driving both shadow/lighting and sky shader sun disc position causing conflicts when adjusting either system",
+        "Corrected sun arc plane from Y/Z to X/Z in ComputeSunDirection so directional shadows cast correctly on east/west X axis",
+        "Negated X component in ComputeSunDirection and ComputeMoon to invert shadow casting direction to correct east/west orientation",
+        "Shadow map projection matrix uLightVP0 confirmed to derive from SunDirection via Apply() automatically following direction corrections",
+
+        "SKY SPHERE ARC SEPARATION",
+        "Root cause identified — uSunDir and uMoonDir were shared between lighting system and sky shader causing every sky shader tweak to break shadow direction and vice versa",
+        "Added SunDirectionSky and MoonDirectionSky properties to SpectralXSun preserving original Y/Z arc plane for sky shader independently of lighting",
+        "SunDirection and MoonDirection retain corrected X/Z arc plane exclusively for directional light shadow casting and Apply()",
+        "Added SunDirSkyX/Y/Z and MoonDirSkyX/Y/Z JSON serialization properties to WebGLFrameData",
+        "Wired Sun.SunDirectionSky and Sun.MoonDirectionSky into BuildWebGLFrame alongside existing SunDirection light properties",
+        "Updated JS sky draw call to send frame.sunDirSkyX/Y/Z to uSunDir and frame.moonDirSkyX/Y/Z to uMoonDir instead of light direction values",
+        "Reverted sky fragment shader sun and moon position code to original -uSunDir and -uMoonDir pattern removing all experimental remaps",
+
+        "TILEMAP SHADER",
+        "Confirmed tilemap fragment shader shadow factor derives from uLightVP0 and uSunDir automatically correct after lighting direction fix",
+        "Shadow casting on terrain confirmed working on east/west X axis matching sky sphere sun disc position",
+
+        "RESULT",
+        "Sun rises in east sets in west with shadows casting correctly across landscape matching sky sphere visual sun disc position",
+        "Sky shader sun disc moon disc and lighting shadows now fully independent and separately tunable without cross interference",
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.209 SpectralX WebGL2 CubeMaze & Scene3 Optimizations",
+    Lines = new List<string>
+    {
+        "CubeMaze: Switched from PrimCube to FBXCube (JSSourceMesh) — reuses existing GPU buffer, eliminates per-cube geometry upload",
+        "CubeMaze: Replaced new Random(seed) every tick with cached _mazeRand instance — eliminates AOT entropy cost per frame",
+        "CubeMaze: Cached _cubeMazeCells.Count in all for loops — AOT/WASM does not hoist List.Count like JIT does",
+        "CubeMaze: Preallocated _mazeRemoveBuffer to eliminate GC allocation spike on every effect cleanup",
+        "CubeMaze: TransformDirty gating in idle bump loop — settled cubes no longer send model matrix to JS every frame",
+        "CubeMaze: Void Invasion O(n²) inner loop optimized — DistanceSquared replaces Distance (eliminates sqrt), slow void cubes skip collision entirely",
+        "CubeMaze: TransformDirty gating in all 8 active effect blocks — cubes only cross WASM boundary when actually moving",
+        "Scene3: GlowPulse TextDirty = true removed from TickAnimations — was forcing full text mesh rebuild and re-serialization every frame for all pulsing text, significant smoothness improvement",
+        "NOTE: TickCubeMaze still accounts for roughly half of Scene3 frame time vs publish AOT — root cause is WASM interop serialization cost of 70+ mesh objects per frame in BuildWebGLFrame, not the tick logic itself",
+        "NOTE: Scene3 has additional per-frame cost from weather system, 30+ text meshes with glow calculations, and light gizmo sync — these are candidates for future optimization passes",
+        "NOTE: Publish AOT runs 3000+ FPS vs debug 450-666 FPS — gap is expected WASM JIT vs AOT difference, remaining work is reducing WASM boundary crossings in BuildWebGLFrame dirty list architecture",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.208 SpectralX WebGL2",
+    Lines = new List<string>
+    {
+"Changed Source of Cube Maze to uploaded JS FBXCube import but didnt make any performance difference over c# primcube which i thought i had uploaded to JS side as well"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.206 SpectralX WebGL 2 Custom Landscape Tile Maps Phase 4",
+    Lines = new List<string>
+    {
+"Updated Landscape Paint Toggle UI for Scene 4 to Display custom Textures"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.205 SpectralX WebGL 2 Custom Landscape Tile Maps Phase 3 — C# Data Contract and Scene4",
+    Lines = new List<string>
+    {
+        "SpectralXLandTileMap.cs — TileMapFrameData now includes TileGridSize property sent every frame",
+        "SpectralXLandTileMap.cs — Both full and partial upload return blocks now populate TileGridSize",
+        "SpectralXLandTileMap.cs — Dirty region sentinel values changed to int.MaxValue and int.MinValue",
+        "SpectralXLandTileMap.cs — Dirty region reset after full and partial uploads now uses MaxValue MinValue sentinels",
+        "SpectralXLandTileMap.cs — BuildFrameData partial path — added invalid dirty rect guard forces full upload on bad state",
+        "SpectralXEngine.cs — TileMapTextures now sends TileMap.EffectiveTexturePaths instead of static TexturePaths",
+        "SpectralXEngine.cs — Added OnTileGridRebuilding JSInvokable — resets texture uploaded flag and marks tilemap dirty",
+        "SpectralXEngine.cs — SwitchToScene BWPScene1 — calls TileMap.MarkDirty after init forces C# resend",
+        "SpectralXEngine_Init.cs — Scene4 InitScene4 — TileMap.SetGridSize(128) called before Init()",
+        "SpectralXEngine_Init.cs — Scene4 InitScene4 — CustomTexturePaths set to DirtTile010 and scene specific textures",
+        "WebGLFrameData.cs — TileMapFrameData class — added TileGridSize int property with JsonPropertyName tileGridSize",
+        "Bug Fix — _dirtyMaxX _dirtyMaxY initialized to zero caused zero or negative dirty rect dimensions on first partial upload",
+        "Bug Fix — Stale WebGL context objects caused INVALID_OPERATION errors on scene switch — resolved by nulling all tilemap state in init()",
+        "Bug Fix — JS grid rebuild returned early before height data arrived — resolved via OnTileGridRebuilding callback loop",
+        "Result — Scene4 now renders 128x128 custom tilemap with per-scene texture override fully independent of Scene2 512 grid",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.204 SpectralX WebGL 2 Custom Landscape Tile Maps Phase 2 — JS Dynamic Grid",
+    Lines = new List<string>
+    {
+        "SpectralEngine.js — GRID_SIZE converted from const to let — dynamically updated at runtime",
+        "SpectralEngine.js — GRID_VERTS, GRID_ORIGIN_X, GRID_ORIGIN_Y converted to let — recomputed on size change",
+        "SpectralEngine.js — CHUNKS_PER_SIDE converted to let — recalculated when GRID_SIZE changes",
+        "SpectralEngine.js — Added updateGridConstants() — updates all derived grid constants in one call",
+        "SpectralEngine.js — Added teardownTileMap() — cleanly deletes all GPU tilemap resources for rebuild",
+        "SpectralEngine.js — Added _tileMapTexturesUploaded JS flag — mirrors C# flag prevents double upload",
+        "SpectralEngine.js — updateTileHeights() — detects tileGridSize change and triggers teardown and rebuild",
+        "SpectralEngine.js — uploadTileTextures() — logs full path array on completion",
+        "SpectralEngine.js — initTileMap() — reuses existing shader program on rebuild saves compile time",
+        "SpectralEngine.js — initTileMap() — uses current GRID_SIZE local snapshot for all geometry",
+        "SpectralEngine.js — init() — tilemap state fully nulled on context reset prevents stale GPU object errors",
+        "SpectralEngine.js — renderFrame() — added grid ready texture missing detection requests resend from C#",
+        "SpectralEngine.js — updateTileHeights() partial path — added w h bounds guard prevents INVALID_VALUE errors",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.203 SpectralX WebGL 2 Custom Landscape Tile Maps Phase 2",
+    Lines = new List<string>
+    {
+"Update SpectralXEngine.cs for texturepaths and tilegrid",
+"Custom Textures now display on scene 4 but the Js side needs to be updated to Change the grid size or it breaks"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.202 SpectralX WebGL 2 Custom Landscape Tile Maps Preparation Phase 1",
+    Lines = new List<string>
+    {
+        "SpectralXLandTileMap.cs — GridSize converted from const to instance property (default 512)",
+        "SpectralXLandTileMap.cs — TileCount converted from const to computed property (GridSize * GridSize)",
+        "SpectralXLandTileMap.cs — GridOriginX/Y converted from static readonly to computed properties",
+        "SpectralXLandTileMap.cs — _tiles array converted from readonly fixed-size to dynamic allocation in Init()",
+        "SpectralXLandTileMap.cs — _vertexHeights and _vertexSnapshot converted to dynamic allocation in Init()",
+        "SpectralXLandTileMap.cs — _smoothSnapshot converted to dynamic allocation in Init()",
+        "SpectralXLandTileMap.cs — Added SetGridSize() method for safe pre-Init configuration with power-of-2 validation",
+        "SpectralXLandTileMap.cs — Added CustomTexturePaths instance property for per-scene texture override",
+        "SpectralXLandTileMap.cs — Added EffectiveTexturePaths helper — returns CustomTexturePaths or static fallback",
+        "SpectralXLandTileMap.cs — TileIndex, TileCoord, InBounds, VertexIndex converted from static to instance methods",
+        "SpectralXLandTileMap.cs — AdjustHeight, SmoothHeight, FlattenHeight — added vertex boundary guards",
+        "SpectralXLandTileMap.cs — SmoothHeight — added snapshot array size guard before copy",
+        "SpectralXLandTileMap.cs — BuildFrameData — cache arrays now reallocate if GridSize changes",
+        "SpectralXLandTileMap.cs — BuildFrameData — added GridSize to console log for diagnostics",
+        "SpectralXLandTileMap.cs — ExportSaveData — added Init() guard and safe Array.Copy with min length",
+        "SpectralXLandTileMap.cs — ImportSaveDataAsync — added grid size mismatch detection and warning log",
+        "SpectralXLandTileMap.cs — Init() — added full console log on completion with GridSize/TileCount/VertCount",
+        "SpectralXLandTileMap.cs — Static TexturePaths preserved as fallback — Scene2 512 grid fully intact",
+        "SpectralXLandTileMap.cs — _dirtyMaxX/Y field initializer fixed — no longer references GridSize at declaration level",
+        "Bug Fix — _tiles array was never reallocated in Init() causing Scene2 and Scene4 to render empty",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.201",
+    Lines = new List<string>
+    {
+"changed scene 4 to sky sphere add string name tag, Updated to UVSphere on scene 4",
+"Rotated sky sphere in scene 4 to accommodate for shader changes",
+"Removed battle java script readded starfield original"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.200",
+    Lines = new List<string>
+    {
+"Moved cube maze to partial"
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.199",
+    Lines = new List<string>
+    {
+"Hidden Updates"
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.198",
+    Lines = new List<string>
+    {
+"Increased overall Font Size on Home Page for Clarity"
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.197",
+    Lines = new List<string>
+    {
+"Updated Home Page"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.196 SpectralXWebGL2 Sky Sphere Updates",
+    Lines = new List<string>
+    {
+        "Readjusted sun and moon cycle patterns"
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.195 SpectralXWebGL2 Sky Sphere Updates",
+    Lines = new List<string>
+    {
+        "Removed legacy pole mask system (poleAngle, poleMask, poleColor, horizonFade) that was generating extra blobs on sky sphere",
+        "Replaced legacy pole system with clean topApex/botApex system using dir.y axis for correct Y+/Y- pole placement",
+        "Fixed pole blob size mismatch — both poles now use identical smoothstep(0.0, 1.2) range and 0.92 strength",
+        "Swapped star and cloud draw order — stars now render first, clouds paint on top for realistic occlusion",
+        "Restored horizonFade on dir.z axis to correctly fade texture alpha near seam without generating visual blob",
+        "Increased sun inner glow strength from 0.55 to 0.85 for stronger aura",
+        "Increased moon inner glow strength from 0.35 to 0.65 for stronger aura",
+        "Maxed sun core brightness to 1.0 and moon core brightness to 1.0",
+        "TODO: Add second horizon band tied to uZenithColor to better blend poles into sky",
+        "TODO: Repoint pole poleColor from gradientColor to uHorizonColor so poles match horizon band 1 and cycle correctly with time of day",
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.194 SpectralWebGL2 Sky Sphere Updates",
+    Lines = new List<string>
+    {
+     "Rotated Sky Sphere so poles blobs will match east and west",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.193 SpectralWebGL2 Sky Sphere Updates",
+    Lines = new List<string>
+    {
+        "Rotated UVSphere 90 degrees on X axis in C# scene setup to reorient poles to Y+/Y-",
+        "Updated C# SpectralXSun ComputeSunDirection() to arc sun on XY plane instead of XZ plane",
+        "Updated C# SpectralXSun ComputeMoon() to arc moon on XY plane instead of XZ plane",
+        "Fixed vertex shader vLocalPos to pre-rotate position vec3(x, -z, y) matching sphere rotation",
+        "Updated fragment shader topApex pole to use dir.y axis, flipped to -dir.y for correct Y- placement",
+        "Updated fragment shader botApex pole to use dir.y axis for correct Y+ placement",
+        "Seam from UV sphere wrap now falls on XY plane covered by horizon band",
+        "Sun disk, scatter, glow and moon rendering confirmed functional after axis changes",
+        "Day/night cycle texture blend confirmed functional at golden hour and dusk",
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX5.191 SpectralWebGL2 Landscape Tile Map Repairs",
+    Lines = new List<string>
+    {
+        "BUGFIX: Tile map no longer disappears entirely on left or right click while landscape tools are active",
+        "BUGFIX: Tile map chunks no longer randomly becoming invisible during paint operations",
+        "BUGFIX: Removed erroneous updateChunkZBounds() call from partial upload path in updateTileHeights()",
+        "ROOT CAUSE: Partial height upload (patch slice) was being passed to updateChunkZBounds() instead of full grid heights array",
+        "ROOT CAUSE: Chunk AABB Z bounds were being overwritten with garbage values from patch data corrupting all 256 chunks permanently",
+        "ROOT CAUSE: Corrupted Z bounds caused every chunk to fail frustum AABB test resulting in zero chunks drawn until page refresh",
+        "FIX: updateChunkZBounds() now only called from full upload path where complete grid height array is available",
+        "FIX: Partial paint uploads no longer touch chunk Z bounds preserving valid frustum culling state",
+        "RESULT: Frustum culling system remains intact with no performance regression",
+        "RESULT: Tile map rendering now stable across all paint modes left click right click and camera movement",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.190 SpectralWebGL2 Input & Rendering Polish",
+    Lines = new List<string>
+    {
+        "Part 1: Fixed inconsistent TileMap loading on page redirects and scene switches",
+        "Tilemap now reliably appears in Scene 2 (Town) and Scene 4 (BWP) after refresh/redirect",
+        "",
+        "Part 3: Improved Point Light click & drag synchronization",
+        "Reduced drifting on long drags, better sensitivity, Shift key vertical control",
+        "",
+        "Part 4: Fixed skysphere jitter on main page (Scene 3) scrolling",
+        "Skysphere now stays stable during rail scrolling while remaining visible in all scenes",
+        "",
+        "Part 2: Left as-is (Scene 4 paint brush scroll only in free mode - dev tool acceptable)",
+        "",
+        "Status: Core rendering + input stability greatly improved ✅",
+        "Pending: Part 5 - Tilemap disappearing on left/right click (investigating input event conflict)"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.19 SpectralWebGL2 Tile Map Loading Fix",
+    Lines = new List<string>
+    {
+        "Fixed inconsistent TileMap loading on page redirects and scene switches",
+        "Tilemap now reliably appears in Scene 2 (Town) and Scene 4 (BWP)",
+        "Updated SpectralGLLoader.reset() call → now correctly passes BWP scene",
+        "Reduced unnecessary cubemap resets during scene transitions",
+        "",
+        "Note: Right-click still causes tilemap to disappear in Scene 2 + 4 (deferred to Part 5)",
+        "Status: Tilemap loading stabilized ✅"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.18 SpectralWebGL2",
+    Lines = new List<string>
+    {
+"Grok Will be a new AI FOR THE HORDE!",
+"I challenged grok and claude with the same task the both somehow successfully passed the test nice job!"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.17 SpectralWebGL2 Normal Lighting on Translucent Primitive Quad Faces Claude Patch Notes",
+    Lines = new List<string>
+    {
+        "ISSUE: Green PrimSquare in Scene 1 displaying incorrect lighting on translucent face.",
+        "",
+        "ROOT CAUSE 1 — Duplicate Buffer Key Collision:",
+        "  MeshLibrary.GetMesh('PrimSquare') was called twice in Init().",
+        "  First call: square2 (portal mesh) — correctly renamed to 'PortalSquare'.",
+        "  Second call: green square — never renamed, remained as 'PrimSquare_Clone'.",
+        "  Both meshes shared the same WebGL buffer key causing geometry/texture bleed.",
+        "  Portal animation sprite sheet was bleeding onto the green square mesh.",
+        "",
+        "ROOT CAUSE 2 — Surface Normal Inversion After Rotation:",
+        "  PrimSquare vertices are defined in the XY plane with Z+ surface normal.",
+        "  Rotating X +90 degrees caused the normal to point Y- (away from scene light).",
+        "  Light at position (0, -2, 10) could not illuminate the face correctly.",
+        "  dot(normal, lightDir) returned negative — face appeared unlit or flickering.",
+        "",
+        "FIX APPLIED — SpectralXEngine.Init.cs (single line change):",
+        "  Added: square.Name = 'GreenSquare'; before Scene.AddMesh(square).",
+        "  This gives the mesh a unique WebGL buffer key, resolving the collision.",
+        "",
+        "OPTIONAL SECONDARY FIX (noted for future reference):",
+        "  Changing rotation from +MathF.PI / 2f to -MathF.PI / 2f on the X axis",
+        "  would flip the surface normal to face Y+ toward the light source.",
+        "  Not required due to transparent two-pass renderer handling both windings.",
+        "",
+        "ADDITIONAL RECOMMENDATIONS:",
+        "  All PrimSquare clones in Init() should receive unique names before AddMesh.",
+        "  ColaSquare (BlueSquare) and other repeated primitives should follow same pattern.",
+        "  Prevents future buffer key collisions when the same base mesh is reused.",
+        "",
+        "TESTED: Scene 1 green translucent PrimSquare now correctly lit by scene lights.",
+        "CHALLENGE RESULT: Identified and solved by Claude Sonnet 4.6 in one analysis pass.",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.17 SpectralWebGL2 Normal Lighting on Translucent Primitive Quad Faces Grok Patch Notes",
+    Lines = new List<string>
+    {
+        "Fixed critical mesh buffer name collision on PrimSquare instances in Scene 1",
+        "The green translucent square was sharing the same GPU buffer as the portal square and other PrimSquares",
+        "This caused lighting changes to bleed across unrelated objects",
+        "",
+        "✅ One-line fix applied:",
+        "   square.Name = \"GreenSquare\";",
+        "",
+        "Result:",
+        "• Green square now receives independent lighting",
+        "• Other PrimSquares (portal, etc.) remain unaffected",
+        "• Translucent primitive quads now behave correctly under multi-light + shadow pipeline",
+        "• No more matrix-induced lighting corruption",
+        "",
+        "Technical Details:",
+        "- Unique meshId prevents buffer sharing in _meshBuffers",
+        "- Proper isolation for per-mesh color, emissive, shadow receive/cast flags",
+        "- Maintains performance (still reuses geometry definition, only name changes)",
+        "",
+        "Status: VISUALLY ERROR-FREE ✅",
+        "You have officially freed yourself from the matrix."
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.16 SpectralWebGL2 Translucent Shadows",
+    Lines = new List<string>
+    {
+"Renabled Translucent shadow casting on all objects",
+        "Scene 1 is now functioning correctly in all aspects of lighting and shadow as intended.",
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.15 Spectral WebGL2 Engine Fusion Fixes - Phase 2",
+    Lines = new List<string>
+    {
+        "• Increased shadow resolution to 4096",
+        "• Added proper GL culling (CULL_FACE + BACK) + depthFunc(LESS) in shadow pass",
+        "• SmoothSphere no longer self-shadows/glitches when translucent",
+        "• Double shadowing completely eliminated",
+        "Status: Single clean shadows from point lights. Translucent objects still do not cast shadows onto receivers."
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.13 Spectral WebGL2 Engine Fusion Fixes - Phase 1",
+    Lines = new List<string>
+    {
+        "• Fixed double shadowing from point light in InitScene1 (deduplicated lights in BuildWebGLFrame using position HashSet)",
+        "• Translucent objects (SmoothSphere + auras) no longer cast shadows into depth maps",
+        "• Added proper mesh.castsShadow check in JS shadow pass",
+        "• Cleaned up shadow caster filtering (emissive, particles, text skipped)",
+        "Result: Single clean shadow from the main point light. Translucent self-shadowing reduced."
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.12 ",
+    Lines = new List<string>
+    {
+      "Added Stale Shadow Pass Clear to FBO Buffers."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.11",
+    Lines = new List<string>
+    {
+ "Updated Snowflake texture,",
+"Adjusted sky textures"
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.10 to be a patch not or to not be a patch note that is the quesiton",
+    Lines = new List<string>
+    {
+"ive done so many patches i feel numbers dont even make sense anymore!",
+        "WebGL scrollbar thumb and track now inherit theme color from localStorage",
+        "Added hexToRgb() helper to SpectralEngine.js for CSS hex to WebGL float conversion",
+        "Scrollbar track tinted as dark variant of theme color, highlight as lightened variant",
+        "Fixed 1px browser scrollbar bleed by suppressing native overflow on html/body",
+        "Native scrollbar hidden across Chrome, Firefox, and Edge — WebGL scrollbar is now sole scroll control",
+        "Home page officially promoted to full 3D page — browser scrollbar disabled via no-scroll body class",
+        "Home.razor.cs implements IAsyncDisposable — scrollbar restored automatically on page navigation",
+        "Scrollbar suppression scoped to Home only — 2D pages retain native browser scroll behavior",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.9",
+    Lines = new List<string>
+    {
+        "Fixed null reference error on theme color picker (rgbPicker)",
+        "Removed premature DOM access — picker no longer queried before menu is open",
+        "Consolidated applyColor() into single script block",
+        "Theme now correctly loads from localStorage on page start without requiring picker in DOM",
+        "Eliminated duplicate addEventListener registration on picker element"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.8",
+    Lines = new List<string>
+    {
+ "Added WebGPU Test page."
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.7 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+ "Reverted to Patch 5.5 and works odd."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.6 SpectralX WebGL2",
+    Lines = new List<string>
+    {
+        "Edge 148 introduced GPU backend changes via WebGPU Compatibility Mode, altering ANGLE behavior.",
+        "ANGLE now enforces stricter GLSL rules: undefined behavior no longer silently resolves.",
+        "Uniform/UBO packing rules changed; implicit layout assumptions may now produce incorrect results.",
+        "Precision handling updated; float rounding and NaN propagation differ from previous versions.",
+        "Loop unrolling and branch flattening behavior changed due to updated shader compiler paths.",
+        "WebGPU linear_indexing feature updated shared shader compiler stack; GLSL→HLSL translation altered.",
+        "Canvas TextMetrics enhancements modified GPU resource usage; FBO state leakage behavior changed.",
+        "WebNN GPU backend introduced new compute pipelines; memory allocation patterns shifted.",
+        "Shaders relying on ANGLE quirks, undefined behavior, or uninitialized values now fail silently.",
+        "Engine-side shader system requires rebuild to align with stricter backend validation rules.",
+        "If edge changed how the gpu backend functions then why does an old version work?",
+        "Not much of an update to edge if it breaks within one repulbish."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.5 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+     "Microsoft updates edge my project breaks, i reload old project it works cause that makes any sense at all.",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.4 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+     "Fixed the error i made somewhere in something ya. but now it works so.",
+     "Renamed the point lights so they dont conflict with scene 4"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.3 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+      "Added Animations to Cube Maze on Home Page"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.2 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+      "Reorganized Home Page"
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.1 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+      "Readded Light Gizmos"
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.0 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+       "Increased static Object spawn count by 300+."
+    },
+},
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.9 SpectralX WebGL2 Blood Wyrm Protocol FRUSTUM CULL + WARRIOR LIGHT",
+    Lines = new List<string>
+    {
+        "STATIC OBJECT FRUSTUM CULLING — C# pre-cull before serialization, 60-70% draw call reduction",
+        "Warrior point light now follows warrior position every tick — attached via TickAndGetFrame",
+        "Removed light gizmo meshes from Scene4 — LightGizmo LightCore LightAuraInner LightAuraOuter deleted",
+        "Removed index 0 entries from _gizmoMap — was fighting warrior light sync every frame",
+        "Light1 position and range tuned for warrior illumination radius",
+        "SphereInFrustum + ExtractFrustumPlanes helpers added to SpectralXEngine",
+        "Static_ mesh prefix culled against isometric camera frustum planes each frame",
+        "Debug FPS restored from degraded to 700+ avg with culling active",
+        "Isometric scene tile map chunk culling already active — statics now match",
+        "GAME OF THE YEAR CONFIRMED — warrior walks around with light radius on grass at night",
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX4.8 SpectralX WebGL2 Blood Wyrm Protocol LIGHT RADIUS",
+    Lines = new List<string>
+    {
+        "BIG UPDATE LIGHT RADIUS ADDED TO WARRIOR!",
+        "Adjusted particle system in Scene 4 for 128 x 128 map",
+        "Added Frustrum Culling to Tile Maps",
+        "Added Light Radius to Warrior BEST STAT EVER",
+    },
+},
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.7 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+       "Added Static Object Set Forest Main Map",
+"Prepared for Optimizations",
+"Added Particle System/ Directional Light/ SkySphere to Scene BWPScene 1 Scene 4"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.6 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+        "WARRIOR MOVEMENT FIXED: Corrected isometric direction mapping — D now moves right, A left, W up, S down relative to camera perspective",
+        "WARRIOR ANIMATION FIXED: GetStateFromDir now correctly maps movement vectors to animation states matching visual direction",
+        "WARRIOR MOVEMENT AXES FIXED: Move() world position update corrected from XY to YX swap with negation to match isometric camera orientation",
+        "WARRIOR UV SCALE BUG FIXED: ApplyAnimationToMesh now forces UVScaleX and UVScaleY on the same frame as texture swap — this was the root cause of the 6 hour animation flicker bug",
+        "WARRIOR UV OFFSET FIXED: UVOffsetX and UVOffsetY are now zeroed immediately on animation state change preventing stale frame coordinates bleeding into new sheet",
+        "WARRIOR ANIMATION GUARD FIXED: SetAnimation early return no longer checks isOneShotAnimation flag preventing unnecessary texture re-dirty on same state",
+        "WARRIOR TRANSFORM DIRTY REMOVED: Removed unconditional TransformDirty = true from ApplyAnimationToMesh reducing redundant JS upload calls",
+        "WARRIOR STOP TIMER: StopDelay grace period system implemented — warrior holds last walk animation for 80ms after key release before returning to idle preventing snap flicker on quick inputs",
+        "ENGINE TICK ORDER FIXED: Warrior.Tick now runs before TickAnimations in TickAndGetFrame ensuring stop timer and animation state are settled before UV offsets are calculated",
+        "SHADOW DEBUG CONFIRMED: WarriorSquare castsShadow correctly passing as false through frame data pipeline — shadow pass not contributing to flicker",
+    },
+},
+
+
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.5 SpectralX WebGL2 Blood Wyrm Protocol",
+    Lines = new List<string>
+    {
+        "FIXED — IsoCamera YawDeg set to 0f, removes diamond rotation aligns to straight XY cardinal axes",
+        "FIXED — IsoCamera PitchDeg set to 70f, steep top-down Diablo 1 style perspective",
+        "FIXED — IsoCamera edge scroll Y axis signs corrected for YawDeg 0 orientation",
+        "FIXED — SpectralXBloodWarrior instantiated and added to Scene4 via InitScene4()",
+        "FIXED — PrimSquare mesh cloned from MeshLibrary and passed to InitMesh()",
+        "FIXED — WorldZ now syncs from mesh Position.Z on InitMesh, no more height sink on movement",
+        "FIXED — Warrior billboard rotation corrected to face isometric camera Vector3(PI/2, 0, -PI/2)",
+        "FIXED — Animation ghost flicker resolved, SpectralXEngine.TickAnimations is now single tick source for all animations",
+        "FIXED — SpectralXMesh sheet dimensions defaulted to 0f, prevents stale UV calculation before animation state is set",
+        "FIXED — SpectralXBloodWarrior.TickAnimation removed, warrior no longer fights engine tick on UV offsets",
+        "FIXED — Scene4 branch added to TickAnimations so warrior sprite frames advance correctly",
+        "FIXED — WASD movement working in BWPScene1, cardinal direction vectors drive warrior Move and Stop",
+        "NOTE  — CRITICAL: init order in InitScene4 matters drastically, mesh.Position must be set BEFORE Warrior.InitMesh is called or WorldZ syncs to 0f, always check init order when position or state bugs appear",
+        "PENDING — Warrior movement animations not yet playing on WASD, JS texture upload for walk states under investigation",
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.2 SpectralX WebGL2 Engine Fusion",
+    Lines = new List<string>
+    {
+    "Updated RoadMap Engine Fusion 98% complete.",
+    "Remaining errors: Scene 4 tile map paint brush scroll needs tuning",
+"Main page scroll is jiterry",
+"SpectralX Webgl2 now fully supports infinite scenes with transitions with infinite canvases of any size per page"
+    },
+},
+new PatchNoteEntry
+{
+    Title = "RTB VX4.1",
+    Lines = new List<string>
+    {
+    "Site Update :0."
+      
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX4.0 - SpectralX WebGL2",
+    Lines = new List<string>
+    {
+    "Changed isoCamera to 0 yaw, and adjusted mouse pan as well to accommodate."
+      
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.9 - SpectralX WebGL2",
+    Lines = new List<string>
+    {
+    "Fixed Particle Textures not rendering on Scene 2."
+      
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.7 - SpectralX WebGL2 Resolution System",
+    Lines = new List<string>
+    {
+        "FIXED: AA modes (FXAA/SMAA/TAA/SpectralAA V1-V3) now correctly render at fullscreen resolution instead of defaulting to 1024x768",
+        "FIXED: All AA FBO textures (shared, edge, blend, history, line) now resize correctly on fullscreen enter via resizeAAfbos()",
+        "FIXED: Exiting fullscreen now correctly restores native viewport resolution on all three pages — SpectralX game (1024x768), Home (1888x888), Diablo/BWP (scene 4)",
+        "FIXED: getViewportSize() now accepts isExiting flag — on exit reads container getComputedStyle() instead of canvas getBoundingClientRect() which was returning stale fullscreen dimensions",
+        "FIXED: registerFullscreenListener now handles Escape key fullscreen exit correctly — single pathway, no double-fire",
+        "FIXED: Removed competing ESCAPE handler from SpectralXInput.Execute() that was fighting with registerFullscreenListener causing 4+ keypresses needed to restore resolution",
+        "FIXED: Removed OnFullscreenExit JSInvokable from SpectralXInput — was a third competing pathway toggling IsFullscreen state incorrectly",
+        "FIXED: Removed _lastToggle and _toggleDebounce fields from SpectralXInput — no longer needed after pathway cleanup",
+        "FIXED: ToggleViewport() now has _isTogglingFullscreen guard flag preventing double-fire from button click and fullscreenchange event racing",
+        "FIXED: watchCanvasSize ResizeObserver now has 300ms debounce and respects _spectralFullscreenTransition flag — no longer fires intermediate sizes during CSS transition",
+        "FIXED: resizeCanvas() in SpectralGLInterop now calls resizeAAfbos() after every resize — AA FBOs stay in sync with canvas dimensions at all times",
+        "FIXED: registerFullscreenListener simplified — ToggleViewport() owns button click path, listener owns Escape path, no overlap",
+        "NEW: window._spectralFullscreenTransition flag coordinates JS resize events during fullscreen transitions across ResizeObserver and fullscreenchange listener",
+        "NEW: resizeAAfbos() function resizes all 8 AA textures in-place via texImage2D — no FBO recreation needed",
+        "NEW: resizeAAfbos exported in SpectralGLInterop return object for external access",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.5",
+    Lines = new List<string>
+    {
+"Detoggle fullscreen partially fixed to require two escape triggers to return to vieports native resolution",
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.4",
+    Lines = new List<string>
+    {
+"Updated toggle viewport to call containerID, instead of css class so it will now show exit fullscreen button and change back to native resolution correctly.",
+"It has a glitch though requires 5 multiple escape keys in scene 1,2 and 4,  to return to native resolution"
+
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.3",
+    Lines = new List<string>
+    {
+"Why are AI incapable of  making fullscreen listeners and returns its not that complicated if an idiot like me can solo program it.",
+    "this blows my mind because all it is a css class call with the size of the viewport return to a hardcode dimension or should work with a containerID....",
+"Fixed fullscreen return on Scene 1 and 2. Scene 4 requires a multiple esc key to go back but does return eventually to native res."
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.2 - Cleanup",
+    Lines = new List<string>
+    {
+"All AA modes and shadow modes are now working correctly on all canvas pages",
+    "Home page canvas is returning to its native resolution, Scene 1,2, and 4 are not returnign to native resolutions"
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.1 - Cleanup",
+    Lines = new List<string>
+    {
+ "Fixed AA modes on fullscreen resizing to native resolution when selected for SpectralX Page",
+"AA Modes now respect current viewport resolution",
+"Fullscreen listener is still not returning to native resolutions on exit fullscreen"
+
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX3.0 - Cleanup",
+    Lines = new List<string>
+    {
+  "Removed duplicate calls of input.register in all scenes all main init calls are in main init now only.",
+"Fixed gamepad"
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX2.9 - Cleanup",
+    Lines = new List<string>
+    {
+      "Move all 5 shadow JS shaders to frags, installed frag extension",
+"This provides better file structure overall, files are allocated by type and usage per language.",
+"And it provides better interpretability of code"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX2.8 - JS Engine Cleanup",
+    Lines = new List<string>
+    {
+        "SpectralEngine.js reorganized into clearly labeled system sections",
+        "CORE ENGINE STATE section established with shared GPU resources and program state",
+        "SHADOW SYSTEM section — vars, config, and initShadowMaps grouped together",
+        "PARTICLE SYSTEM section — vars, initParticles, renderParticles, resetParticles grouped",
+        "AA SHARED STATE section — shared FBO, drawQuad, createColorTexture, createFboForTexture",
+        "FXAA / SMAA / TAA / SpectralAA V1 / V2 / V3 each in own labeled section",
+        "SKY SYSTEM section — vars, initSkyProgram, ensureSkyTextures, resetSkyTextures grouped",
+        "TEXT SYSTEM section — vars, initTextShader, renderText grouped",
+        "TILEMAP SYSTEM section — vars, grid config constants, and all tilemap functions grouped",
+        "FOLIAGE SYSTEM section — vars, initFoliage, renderFoliage, resetFoliage grouped",
+        "SCROLLBAR SYSTEM section — vars and functions grouped with TODO migration note",
+        "ISO CAMERA INPUT section separated from scrollbar into own labeled section",
+        "Dead variables removed — _shadowMapLoc, _lightVPLoc, _shadowMode, _shadowThumbDragging",
+        "Dead variables removed — _fxaaTexWidth, _fxaaTexHeight, _taaTexWidth, _taaTexHeight",
+        "Dead variable removed — SHADOW_SIZE_MSAA unused constant",
+        "Removed _fxaaQuadVbo alias — replaced with _fullscreenQuadVbo directly",
+        "Removed _smaaQuadVbo alias — replaced with _fullscreenQuadVbo directly",
+        "Removed _shadowMode write in renderFrame — frame.shadowMode used directly",
+        "Removed stale inline comments and leftover debug notes throughout",
+        "jsconfig.json added to project root — enables ts-check for JS duplicate detection",
+        "Added @ts-check to SpectralEngine.js — surfaces undeclared and duplicate variables",
+        "File prepared for future SpectralGLState migration when refactor is ready",
+        "Created New file SpectralSystemLoaders and MeshLoaders for clean seperation"
+    },
+},
+
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX2.7 - Project Cleanup",
+    Lines = new List<string>
+    {
+        "SpectralXEngine refactored into partial class files",
+        "Init() moved to SpectralXEngine.Init.cs",
+        "InitScene2() moved to SpectralXEngine.InitScene2.cs",
+        "InitScene3() moved to SpectralXEngine.InitScene3.cs",
+        "InitScene4() moved to SpectralXEngine.InitScene4.cs",
+        "WebGL data classes moved to SpectralXEngine.WebGLDataCore.cs",
+        "Main engine file reduced to core tick loop, frame builder, and scene switching",
+        "Reduced AI context noise for easier engine collaboration",
+    },
+},
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX2.6 - Project Cleanup",
+    Lines = new List<string>
+    {
+"Removed 2 ununused icons to free 2kb of space in my 1gb of free to MAXIMIZE. renamed custom blazor icon",
+        "Engine is now fully GPU-driven. All CPU software rasterizer code removed.",
+        "Deleted Backend/Cpu: CpuDepthBuffer, CpuFragmentProcessor, CpuFramebuffer, CpuMathHelpers, CpuRasterizer, CpuVertexProcessor, SpectralGLCpuBackend, FrameData.",
+        "Deleted Backend/WebGL: WebGLInterop legacy JS bridge stub — functions were never wired into the live SpectralGLInterop path.",
+        "Deleted SpectralGL: SpectralGLBuffer, SpectralGLCapabilities, SpectralGLContext, SpectralGLDevice, SpectralGLFramebuffer, SpectralGLProgram, SpectralGLShader, SpectralGLTexture, Color.",
+        "Deleted SpectralGL/Math: Vec2 — confirmed unused, engine uses System.Numerics.Vector2 for 2D data.",
+        "Deleted SpectralXRenderer.cs entirely — was a thin wrapper around the CPU backend with no consumers in the GPU path.",
+        "SpectralXEngine.Resize() collapsed directly into OnCanvasResized — Viewport.SetSize() is now the single source of truth for canvas dimensions.",
+        "Removed Scene.DefaultProgram and Scene.DefaultTexture assignments from Init() — neither was consumed by the WebGL frame data path.",
+        "Removed GetFrameDataAsync() and Tick() JSInvokable stubs from SpectralXEngine — dead code post renderer removal.",
+        "Retained: Vec3, Vec4, Mat4 — core engine math actively used throughout scene init, camera, shadow, and frame build paths.",
+        "All four scenes tested post-cleanup — rendering, lighting, shadows, portals, weather, tilemap confirmed working correctly.",
+    },
+},
+
+
+
+                new PatchNoteEntry
+{
+    Title = "RTB VX2.5 - Project cleanup",
+    Lines = new List<string>
+    {
+
+"Removed PageDYn Folder moved test razor Page LavalampDyn into LavalLampLibrary.",
+"Added NewNovaAdeptus Razor Class Library",
+"Wired in Nova Adeptus Razor Class Library removed old files form Roboutes."
+    },
+},
+
+
+                new PatchNoteEntry
+{
+    Title = "RTB VX2.4 - Project cleanup",
+    Lines = new List<string>
+    {
+
+"Removed old injections from program.cs removed service file duplicates in roboutes, all service files live in SpectralX library now.",
+"Removed stale old build pages SpectralXlab, SpectralXshaders markup files",
+       "removed privacy page put links in resources",
+       "Move StarField background into MainLayout and removed duplicates on other pages."
+    
+    },
+},
+
+
+
+                        new PatchNoteEntry
+{
+    Title = "RTB VX2.3 - Project cleanup ",
+    Lines = new List<string>
+    {
+
+"Project cleanup, removed bwp and elonx library and according files, removed old spectralGL folders",
+"Removed SpectralXAXA Library SVG engine, Removed Webgl Test Build SpectralXBXB Library",
+"Removed all unused starter files from all razor class libraries",
+"Added Patch Notes 3"
+
+
+    },
+},
+
+
+
+
+
+
+    };
+
+}

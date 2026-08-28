@@ -1,0 +1,75 @@
+@* ============================================================
+   MutationLog.razor
+   AntigenHunter — Generation-by-Generation Mutation Log
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+@if (Result != null && Result.Generations.Any())
+{
+    <div class="ah-mutation-log ah-mt-md">
+        <div class="ah-mutation-log__header">
+            <span>🔬 Mutation Log</span>
+            <span class="ah-text-xs">
+                @Result.TotalImprovingMutations improving /
+                @Result.TotalAcceptedMutations accepted /
+                @Result.GenerationsCompleted rounds
+            </span>
+        </div>
+
+        <div class="ah-mutation-log__body">
+            @* Show improving generations + stochastic accepts *@
+            @foreach (var gen in Result.Generations
+                .Where(g => g.HadAcceptedMutation)
+                .OrderBy(g => g.GenerationNumber))
+            {
+                bool isBest = gen.GenerationNumber == Result.BestAffinityGeneration;
+
+                <div class="ah-mutation-row @(isBest ? "ah-mutation-row--best" : "")">
+                    <span class="ah-mutation-gen ah-text-mono">
+                        @gen.GenerationLabel
+                    </span>
+                    <span class="ah-mutation-code ah-text-mono">
+                        @gen.AcceptedMutation?.Notation
+                    </span>
+                    <span class="ah-mutation-score ah-text-mono">
+                        @gen.AffinityDisplayOut
+                        <span class="@gen.DeltaCssClass" style="font-size:0.7rem">
+                            @(gen.IsImprovement ? "▲" : "~")
+                        </span>
+                    </span>
+                    <span class="ah-mutation-cdr ah-mutation-cdr--@GetCdrClass(gen.AcceptedMutation?.RegionName)">
+                        @gen.AcceptedMutation?.RegionName
+                    </span>
+                    <span class="ah-mutation-star">
+                        @if (isBest) { <span title="Best mutation!">⭐</span> }
+                        else if (gen.AcceptedMutation?.WasStochasticAccept == true)
+                        { <span title="Stochastic accept" style="opacity:0.5">~</span> }
+                        else if (gen.IsImprovement)
+                        { <span style="color:var(--ah-green)">▲</span> }
+                    </span>
+                </div>
+            }
+
+            @if (!Result.Generations.Any(g => g.HadAcceptedMutation))
+            {
+                <div class="ah-empty" style="padding:1rem">
+                    <div class="ah-empty__text">No mutations accepted this run.</div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public SimulationRunResult? Result { get; set; }
+
+    private static string GetCdrClass(string? region) => region switch
+    {
+        "CDR-H1"   => "h1",
+        "CDR-H2"   => "h2",
+        "CDR-H3"   => "h3",
+        _          => ""
+    };
+}

@@ -1,0 +1,133 @@
+@* ============================================================
+   TargetSelector.razor — FIXED
+   Dropdown was not rendering due to _selectedKey mismatch.
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+<div>
+    @* ── Dropdown ─────────────────────────────────────────── *@
+    <label class="ah-label" for="target-select">
+        Select Cancer Target
+    </label>
+    <select id="target-select"
+            class="ah-select"
+            @onchange="OnTargetChanged">
+
+        <optgroup label="── Available Targets ──">
+            @foreach (var t in TargetProteinDatabase.ActiveTargets)
+            {
+                <option value="@((int)t.TargetType)"
+                        selected="@(SelectedTarget == t.TargetType)">
+                    @t.Name — @string.Join(", ", t.CancerTypes.Take(1))
+                    [@t.DifficultyStars]
+                </option>
+            }
+        </optgroup>
+
+        <optgroup label="── Coming Soon: Phase 2 ──">
+            @foreach (var t in TargetProteinDatabase.Phase2Targets)
+            {
+                <option value="@((int)t.TargetType)" disabled>
+                    🔒 @t.Name — @string.Join(", ", t.CancerTypes.Take(1))
+                </option>
+            }
+        </optgroup>
+
+        <optgroup label="── Coming Soon: Phase 3 ──">
+            @foreach (var t in TargetProteinDatabase.Phase3Targets)
+            {
+                <option value="@((int)t.TargetType)" disabled>
+                    🔒 @t.Name — @string.Join(", ", t.CancerTypes.Take(1))
+                </option>
+            }
+        </optgroup>
+
+    </select>
+
+    @* ── Target Info Card ─────────────────────────────────── *@
+    @if (_selected != null)
+    {
+        <div class="ah-target-card ah-mt-md">
+            <div class="ah-flex-between">
+                <div class="ah-target-card__name">@_selected.Name</div>
+                <span class="ah-difficulty ah-difficulty--@_selected.DifficultyClass">
+                    @_selected.DifficultyStars @_selected.DifficultyLabel
+                </span>
+            </div>
+
+            <div class="ah-target-card__cancer">
+                @_selected.FullProteinName — @_selected.CancerTypeDisplay
+            </div>
+
+            <div class="ah-text-sm ah-mt-sm" style="color:var(--text-secondary)">
+                @_selected.EpitopeDescription
+            </div>
+
+            <div class="ah-target-card__meta ah-mt-sm">
+                <span class="ah-meta-item">
+                    🔬 Epitope: <span>@_selected.EpitopeRegion</span>
+                </span>
+                <span class="ah-meta-item">
+                    💊 Ref Ab: <span>@_selected.ReferenceAntibody (@_selected.ReferenceAntibodyBrand)</span>
+                </span>
+                @if (_selected.HasPdbReference)
+                {
+                    <span class="ah-meta-item">
+                        🗂 PDB: <span>@_selected.PdbId</span>
+                    </span>
+                }
+                <span class="ah-meta-item">
+                    📊 Ref Kd: <span>@_selected.ReferenceAffinityNm nM</span>
+                </span>
+            </div>
+
+            <div class="ah-mt-md">
+                <div class="ah-label">Key Epitope Contacts</div>
+                <div class="ah-flex-wrap">
+                    @foreach (var epi in _selected.TopEpitopeResidues)
+                    {
+                        <span class="ah-badge ah-badge--cyan" title="@epi.Note">
+                            @epi.Name
+                        </span>
+                    }
+                </div>
+            </div>
+
+            <div class="ah-mt-md" style="border-top:1px solid var(--ah-border);padding-top:0.75rem">
+                <div class="ah-label">🧠 Simulation Hint</div>
+                <div class="ah-text-sm" style="color:var(--text-secondary);font-style:italic">
+                    @_selected.SimulationHint
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter] public CancerTargetType SelectedTarget { get; set; } = CancerTargetType.HER2;
+    [Parameter] public EventCallback<CancerTargetType> SelectedTargetChanged { get; set; }
+
+    private TargetProtein? _selected;
+
+    protected override void OnInitialized()
+    {
+        _selected = TargetProteinDatabase.Get(SelectedTarget);
+    }
+
+    protected override void OnParametersSet()
+    {
+        _selected = TargetProteinDatabase.Get(SelectedTarget);
+    }
+
+    private async Task OnTargetChanged(ChangeEventArgs e)
+    {
+        if (int.TryParse(e.Value?.ToString(), out int intVal))
+        {
+            var parsed = (CancerTargetType)intVal;
+            _selected  = TargetProteinDatabase.Get(parsed);
+            await SelectedTargetChanged.InvokeAsync(parsed);
+        }
+    }
+}

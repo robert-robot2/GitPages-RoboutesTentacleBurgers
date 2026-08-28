@@ -1,0 +1,250 @@
+@* ============================================================
+   AffinityChart.razor
+   AntigenHunter — Pure SVG Affinity Line Chart
+   Renders binding affinity improvement over generations.
+   No external libraries — pure SVG + C#.
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+@using System.Globalization
+
+@if (ChartPoints != null && ChartPoints.Count > 1)
+{
+    <div class="ah-chart-container">
+        <div class="ah-chart-title">
+            <span>Binding Affinity Over Evolution</span>
+            <span class="ah-chart-title__unit">↓ Lower = Better</span>
+        </div>
+
+        <svg class="ah-chart-svg"
+             viewBox="0 0 @_width @_height"
+             preserveAspectRatio="none"
+             xmlns="http://www.w3.org/2000/svg">
+
+            <defs>
+                <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%"   stop-color="var(--ah-cyan)" stop-opacity="0.3"/>
+                    <stop offset="100%" stop-color="var(--ah-cyan)" stop-opacity="0.0"/>
+                </linearGradient>
+            </defs>
+
+            @* ── Grid Lines ──────────────────────────────── *@
+            @for (int i = 0; i <= 4; i++)
+            {
+                double y = _padTop + (_plotHeight * i / 4.0);
+                string sx1 = F(_padLeft);
+                string sx2 = F(_padLeft + _plotWidth);
+                string sy = F(y);
+                string slx = F(_padLeft - 4);
+                string sly = F(y + 3);
+
+                <line class="ah-chart-grid-line"
+                      x1="@sx1" y1="@sy"
+                      x2="@sx2" y2="@sy" />
+                <svg:text class="ah-chart-axis-label"
+                          x="@slx"
+                          y="@sly"
+                          text-anchor="end">
+                    @GetYLabel(i)
+                </svg:text>
+            }
+
+            @* ── Area Fill ───────────────────────────────── *@
+            <path class="ah-chart-area"
+                  d="@BuildAreaPath()" />
+
+            @* ── Line ────────────────────────────────────── *@
+            <path class="ah-chart-line"
+                  d="@BuildLinePath()" />
+
+            @* ── Data Points ─────────────────────────────── *@
+            @foreach (var pt in _computed)
+            {
+                string cx = F(pt.Px);
+                string cy = F(pt.Py);
+                string dotClass = pt.IsBestSoFar
+                ? "ah-chart-dot ah-chart-dot--best"
+                : "ah-chart-dot";
+                string radius = pt.IsBestSoFar ? "4" : "2.5";
+
+                <circle class="@dotClass"
+                        cx="@cx"
+                        cy="@cy"
+                        r="@radius">
+                    <title>@pt.Label</title>
+                </circle>
+            }
+
+
+            @* ── X-axis labels ────────────────────────────── *@
+            @if (_computed.Count > 1)
+            {
+                string sxStart = F(_padLeft);
+                string sxEnd = F(_padLeft + _plotWidth);
+                string syBottom = F(_height - 2);
+
+                int midGen = _computed.Last().Generation / 2;
+                string sxMid = F(GetX(midGen));
+
+                @* Start label *@
+                <svg:text class="ah-chart-axis-label"
+                          x="@sxStart"
+                          y="@syBottom"
+                          text-anchor="middle">0</svg:text>
+
+                @* End label *@
+                <svg:text class="ah-chart-axis-label"
+                          x="@sxEnd"
+                          y="@syBottom"
+                          text-anchor="middle">@(_computed.Last().Generation)</svg:text>
+
+                @* Mid label *@
+                <svg:text class="ah-chart-axis-label"
+                          x="@sxMid"
+                          y="@syBottom"
+                          text-anchor="middle">@midGen</svg:text>
+            }
+        </svg>
+
+        @* ── Summary Row ─────────────────────────────────── *@
+        <div class="ah-flex-between ah-mt-sm">
+            <span class="ah-badge ah-badge--muted">
+                Start: @GenerationResult.FormatAffinityNm(StartNm)
+            </span>
+            <span class="ah-badge ah-badge--gold">
+                Best: @GenerationResult.FormatAffinityNm(BestNm)
+                at Gen @BestGeneration
+            </span>
+            <span class="ah-badge ah-badge--green">
+                @FoldImprovement.ToString("F1")x improvement
+            </span>
+        </div>
+    </div>
+}
+else
+{
+    <div class="ah-chart-container">
+        <div class="ah-empty" style="padding:1rem">
+            <div class="ah-empty__icon">📊</div>
+            <div class="ah-empty__text">
+                Chart will appear after simulation runs
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public List<AffinityChartPoint>? ChartPoints { get; set; }
+    [Parameter] public double StartNm           { get; set; }
+    [Parameter] public double BestNm            { get; set; }
+    [Parameter] public int    BestGeneration    { get; set; }
+    [Parameter] public double FoldImprovement   { get; set; }
+
+    // ── SVG Dimensions ────────────────────────────────────────
+    private const double _width     = 500;
+    private const double _height    = 180;
+    private const double _padLeft   = 42;
+    private const double _padRight  = 10;
+    private const double _padTop    = 10;
+    private const double _padBottom = 18;
+    private double _plotWidth  => _width  - _padLeft - _padRight;
+    private double _plotHeight => _height - _padTop  - _padBottom;
+
+    // ── Computed Points ───────────────────────────────────────
+    private List<ComputedPoint> _computed = new();
+
+    private double _minNm, _maxNm;
+
+    protected override void OnParametersSet()
+    {
+        ComputePoints();
+    }
+
+    private void ComputePoints()
+    {
+        _computed.Clear();
+        if (ChartPoints == null || ChartPoints.Count == 0) return;
+
+        _maxNm = ChartPoints.Max(p => p.AffinityNm) * 1.05;
+        _minNm = Math.Max(0, ChartPoints.Min(p => p.AffinityNm) * 0.85);
+
+        int maxGen = ChartPoints.Max(p => p.Generation);
+
+        foreach (var pt in ChartPoints)
+        {
+            double px = GetX(pt.Generation, maxGen);
+            double py = GetY(pt.AffinityNm);
+            string label = $"Gen {pt.Generation}: {GenerationResult.FormatAffinityNm(pt.AffinityNm)}"
+                + (string.IsNullOrEmpty(pt.MutationLabel) ? "" : $" [{pt.MutationLabel}]");
+
+            _computed.Add(new ComputedPoint
+            {
+                Generation  = pt.Generation,
+                AffinityNm  = pt.AffinityNm,
+                Px          = px,
+                Py          = py,
+                IsBestSoFar = pt.IsBestSoFar,
+                Label       = label
+            });
+        }
+    }
+
+    private double GetX(int generation, int maxGen = -1)
+    {
+        if (maxGen < 0 && _computed.Count > 0)
+            maxGen = ChartPoints!.Max(p => p.Generation);
+        if (maxGen == 0) return _padLeft;
+        return _padLeft + (double)generation / maxGen * _plotWidth;
+    }
+
+    private double GetY(double nM)
+    {
+        if (_maxNm <= _minNm) return _padTop + _plotHeight / 2;
+        double fraction = (nM - _minNm) / (_maxNm - _minNm);
+        fraction = Math.Clamp(fraction, 0, 1);
+        return _padTop + fraction * _plotHeight;
+    }
+
+    private string GetYLabel(int i)
+    {
+        double nM = _maxNm - (_maxNm - _minNm) * i / 4.0;
+        return GenerationResult.FormatAffinityNm(nM);
+    }
+
+    private string BuildLinePath()
+    {
+        if (_computed.Count < 2) return string.Empty;
+        var sb = new System.Text.StringBuilder();
+        sb.Append($"M {F(_computed[0].Px)} {F(_computed[0].Py)}");
+        for (int i = 1; i < _computed.Count; i++)
+            sb.Append($" L {F(_computed[i].Px)} {F(_computed[i].Py)}");
+        return sb.ToString();
+    }
+
+    private string BuildAreaPath()
+    {
+        if (_computed.Count < 2) return string.Empty;
+        double baseline = _padTop + _plotHeight;
+        var sb = new System.Text.StringBuilder();
+        sb.Append($"M {F(_computed[0].Px)} {F(baseline)}");
+        sb.Append($" L {F(_computed[0].Px)} {F(_computed[0].Py)}");
+        for (int i = 1; i < _computed.Count; i++)
+            sb.Append($" L {F(_computed[i].Px)} {F(_computed[i].Py)}");
+        sb.Append($" L {F(_computed.Last().Px)} {F(baseline)} Z");
+        return sb.ToString();
+    }
+
+    private static string F(double v) =>
+        v.ToString("F1", CultureInfo.InvariantCulture);
+
+    private class ComputedPoint
+    {
+        public int    Generation  { get; set; }
+        public double AffinityNm  { get; set; }
+        public double Px          { get; set; }
+        public double Py          { get; set; }
+        public bool   IsBestSoFar { get; set; }
+        public string Label       { get; set; } = string.Empty;
+    }
+}

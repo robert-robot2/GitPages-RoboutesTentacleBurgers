@@ -1,0 +1,188 @@
+﻿@page "/PythonTests"
+@inject IJSRuntime JS
+
+<PageTitle>Python Practice</PageTitle>
+<div class="DiabloBlueGlow" style="font-size:150%">Python Tests</div>
+<div style="font-family:monospace; padding:20px; background:#1a1a2e;
+    color:#00ff88; min-height:100vh;">
+
+    <h2 style="color:#4A90D9;">🐍 Python Practice Console</h2>
+
+    <!-- Question Display -->
+    <div style="background:#0d0d1a; border:1px solid #4A90D9;
+        padding:15px; margin-bottom:15px; border-radius:4px;">
+        <strong style="color:#f4c542;">Question:</strong>
+        <pre style="color:#ffffff; margin:10px 0;">@currentQuestion</pre>
+    </div>
+
+    <!-- Code Input -->
+    <div style="margin-bottom:10px;">
+        <strong style="color:#f4c542;">Your Python function name to test:</strong><br />
+        <input @bind="functionName"
+               style="width:300px; background:#0d0d1a; color:#00ff88;
+        border:1px solid #4A90D9; padding:8px;
+        font-family:monospace; margin-top:5px;" />
+    </div>
+
+    <div style="margin-bottom:10px;">
+        <strong style="color:#f4c542;">Test input:</strong><br />
+        <input @bind="testInput"
+               style="width:300px; background:#0d0d1a; color:#00ff88;
+        border:1px solid #4A90D9; padding:8px;
+        font-family:monospace; margin-top:5px;" />
+    </div>
+
+    <button @onclick="RunTest"
+            style="background:#4A90D9; color:white; border:none;
+        padding:10px 20px; cursor:pointer; font-family:monospace;
+        margin-right:10px;">
+        ▶ RUN TEST
+    </button>
+
+    <button @onclick="NextQuestion"
+            style="background:#f4c542; color:#1a1a2e; border:none;
+        padding:10px 20px; cursor:pointer; font-family:monospace;">
+        → NEXT QUESTION
+    </button>
+
+    <!-- Output -->
+    @if (!string.IsNullOrEmpty(output))
+    {
+        <div style="background:#0d0d1a; border:1px solid #00ff88;
+            padding:15px; margin-top:15px; border-radius:4px;">
+            <strong style="color:#f4c542;">Output:</strong>
+            <pre style="color:#00ff88; margin:5px 0;">@output</pre>
+        </div>
+    }
+
+    <!-- Result History -->
+    @if (history.Count > 0)
+    {
+        <div style="margin-top:20px;">
+            <strong style="color:#f4c542;">Session History:</strong>
+            @foreach (var h in history)
+            {
+                <pre style="color:#aaaaaa; margin:3px 0; font-size:0.85em;">
+                    @h</pre>
+                }
+            </div>
+        }
+    </div>
+
+@code {
+    private string output = "";
+    private string functionName = "reverse_words";
+    private string testInput = "hello world";
+    private List<string> history = new();
+    private int questionIndex = 0;
+
+    private string currentQuestion => Questions[questionIndex % Questions.Count];
+
+    private List<string> Questions = new()
+{
+    "Q1: Write a function reverse_words(sentence)\n" +
+    "    Input:  'hello world'\n" +
+    "    Output: 'world hello'",
+
+    "Q2: Write a function is_palindrome(s)\n" +
+    "    Input:  'racecar'\n" +
+    "    Output: True\n" +
+    "    Input:  'hello'\n" +
+    "    Output: False",
+
+    "Q3: Write a function most_common_word(sentence)\n" +
+    "    Input:  'the cat sat on the mat the'\n" +
+    "    Output: 'the'\n" +
+    "    Hint:   from collections import Counter",
+
+    "Q4: Write a function count_vowels(s)\n" +
+    "    Input:  'hello world'\n" +
+    "    Output: 3\n" +
+    "    Vowels: a e i o u",
+
+    "Q5: Write a function fizzbuzz(n)\n" +
+    "    Return a LIST of fizzbuzz values from 1 to n\n" +
+    "    Input:  '5'\n" +
+    "    Output: ['1','2','Fizz','4','Buzz']",
+
+    "Q6: Write a function remove_duplicates(items)\n" +
+    "    Input:  '1,2,2,3,3,4'\n" +
+    "    Output: [1, 2, 3, 4]\n" +
+    "    Hint:   think about what a set does",
+
+    "Q7: Write a function is_anagram(word1, word2)\n" +
+    "    Input:  'listen silent'\n" +
+    "    Output: True\n" +
+    "    Input:  'hello world'\n" +
+    "    Output: False\n" +
+    "    Hint:   sorted() on a string sorts its letters",
+
+    "Q8: Write a function sum_of_digits(n)\n" +
+    "    Input:  '1234'\n" +
+    "    Output: 10\n" +
+    "    Hint:   str(n) turns a number into a string you can loop",
+
+    "Q9: Write a function flatten_list(items)\n" +
+    "    Input:  '1,2,3,4,5,6'\n" +
+    "    Output: [1, 2, 3, 4, 5, 6]\n" +
+    "    Note:   input comes as comma string, split and convert to int",
+
+    "Q10: Write a function second_largest(nums)\n" +
+    "    Input:  '1,5,3,9,2'\n" +
+    "    Output: 5\n" +
+    "    Hint:   sorted() and list indexing",
+};
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Check if Pyodide is ready, if not initialize it
+            var isReady = await JS.InvokeAsync<bool>(
+                "eval",
+                "PyodideHelper.pyodide !== null && PyodideHelper.pyodide !== undefined"
+            );
+        
+            if (!isReady)
+            {
+                output = "⏳ Loading Pyodide... wait 10 seconds then try Run Test";
+                StateHasChanged();
+            
+                // Trigger initialization with empty params
+                await JS.InvokeVoidAsync(
+                    "PyodideHelper.initialize",
+                    "{}", "[]", "[]", "{}", "{}"
+                );
+            
+                output = "✅ Pyodide ready — try Run Test now";
+                StateHasChanged();
+            }
+        }
+    }
+    private async Task RunTest()
+    {
+        try
+        {
+            // Use the same JS interop pattern as ChatBotAdeptus
+            // Calls run_test() in PythonTests.py through Pyodide
+            var result = await JS.InvokeAsync<string>(
+                "PyodideHelper.runPythonTest",
+                functionName,
+                testInput
+            );
+            output = $"✅ Result: {result}";
+            history.Add($"[{functionName}('{testInput}')] → {result}");
+        }
+        catch (Exception ex)
+        {
+            output = $"❌ Error: {ex.Message}";
+            history.Add($"[{functionName}] → ERROR");
+        }
+    }
+
+    private void NextQuestion()
+    {
+        questionIndex++;
+        output = "";
+        StateHasChanged();
+    }
+}

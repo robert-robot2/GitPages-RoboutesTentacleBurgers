@@ -1,0 +1,40 @@
+﻿@page "/SpectralX"
+
+<PageTitle>SpectralX</PageTitle>
+
+<div class="DiabloBlueGlow" style="font-size:150%">SpectralX — WebGL2 renderer pipeline</div>
+<div class="DiabloBlueGlow" style="font-size:150%">Controls: WASD / Right Click Hold / Gamepad</div>
+
+@using SpectralXGLX
+
+
+
+
+@if (showIntro)
+{
+    <div id="IntroOverlay">
+        <div>@((MarkupString)_starsOutput)</div>
+        <img src="/iAssets/ElonMenu.png" />
+        <button class="start-btn" @onclick="HideIntro">Start</button>
+    </div>
+}
+else
+{
+  
+    <SpectralXCanvas @ref="EngineComponent"
+                     CanvasClass="SpectralX-Viewport"
+                     ContainerId="SpectralX-Container">
+
+      
+
+
+        
+
+    </SpectralXCanvas>
+
+
+
+}
+
+
+

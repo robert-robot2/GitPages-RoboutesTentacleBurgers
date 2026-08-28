@@ -1,0 +1,439 @@
+﻿@page "/UltraMarineMineSweeper"
+<PageTitle>UltraMarineMineSweeper</PageTitle>
+
+<div class="DiabloBlueGlow" style="font-size:150%">UltraMarineMineSweeper</div>
+
+@page "/minesweeper"
+@using System.Timers
+@using Microsoft.AspNetCore.Components.Forms
+
+<div class="game-container">
+    <div class="header">
+        <div class="difficulty-selector">
+            <button class="difficulty-btn @(difficulty == Difficulty.Easy ? "active" : "")"
+                    @onclick="() => SetDifficulty(Difficulty.Easy)">
+                Easy (10x10, 15 mines)
+            </button>
+            <button class="difficulty-btn @(difficulty == Difficulty.Hard ? "active" : "")"
+                    @onclick="() => SetDifficulty(Difficulty.Hard)">
+                Hard (30x30, 85 mines)
+            </button>
+        </div>
+
+        <div class="image-upload">
+            <label>
+                Hidden Cell PNG:
+                <InputFile OnChange="e => LoadImageData(e, 0)" accept="image/png" />
+            </label>
+            <label>
+                Revealed Cell PNG:
+                <InputFile OnChange="e => LoadImageData(e, 1)" accept="image/png" />
+            </label>
+            <label>
+                Flag PNG:
+                <InputFile OnChange="e => LoadImageData(e, 2)" accept="image/png" />
+            </label>
+            <label>
+                Mine PNG:
+                <InputFile OnChange="e => LoadImageData(e, 3)" accept="image/png" />
+            </label>
+        </div>
+        <div class="info">
+            <span class="mines">💣 @mineCount</span>
+            <button class="reset-btn" @onclick="InitGame">🔄 Reset</button>
+            <span class="status">@(gameOver ? "💀 Game Over!" : won ? "🎉 You Won!" : "🎮 Playing")</span>
+        </div>
+    </div>
+
+    <div class="board-wrapper">
+        <svg width="@(COLS* CELL_SIZE)" height="@(ROWS* CELL_SIZE)" class="board" xmlns="http://www.w3.org/2000/svg">
+            @for (int r = 0; r < ROWS; r++)
+            {
+                for (int c = 0; c < COLS; c++)
+                {
+                    int row = r;
+                    int col = c;
+                    int x = col * CELL_SIZE;
+                    int y = row * CELL_SIZE;
+
+                    <g @onclick="() => RevealCell(row, col)"
+                       @oncontextmenu:preventDefault="true"
+                       @oncontextmenu="() => ToggleFlag(row, col)">
+
+                        @if (revealed[row, col])
+                        {
+                            @if (!string.IsNullOrEmpty(imageUrls[1]))
+                            {
+                                <image x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE" href="@imageUrls[1]" />
+                            }
+                            else
+                            {
+                                <rect x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE"
+                                      fill="#ddd" stroke="#999" stroke-width="1" />
+                            }
+
+                            @if (board[row, col] == -1)
+                            {
+                                @if (!string.IsNullOrEmpty(imageUrls[3]))
+                                {
+                                    <image x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE" href="@imageUrls[3]" />
+                                }
+                                else
+                                {
+                                    <foreignObject x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:@(CELL_SIZE * 0.5)px;">💣</div>
+                                    </foreignObject>
+                                }
+                            }
+                            else if (board[row, col] > 0)
+                            {
+                                string color = GetNumberColor(board[row, col]);
+                                <foreignObject x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE">
+                                    <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:@(CELL_SIZE * 0.45)px;font-weight:bold;color:@color;">@board[row, col]</div>
+                                </foreignObject>
+                            }
+                        }
+                        else
+                        {
+                            @if (!string.IsNullOrEmpty(imageUrls[0]))
+                            {
+                                <image x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE" href="@imageUrls[0]" />
+                            }
+                            else
+                            {
+                                <rect x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE"
+                                      fill="#aaa" stroke="#666" stroke-width="2" />
+                                <rect x="@(x + 2)" y="@(y + 2)" width="@(CELL_SIZE - 4)" height="@(CELL_SIZE - 4)"
+                                      fill="#ccc" stroke="#eee" stroke-width="1" />
+                            }
+
+                            @if (flagged[row, col])
+                            {
+                                @if (!string.IsNullOrEmpty(imageUrls[2]))
+                                {
+                                    <image x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE" href="@imageUrls[2]" />
+                                }
+                                else
+                                {
+                                    <foreignObject x="@x" y="@y" width="@CELL_SIZE" height="@CELL_SIZE">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:@(CELL_SIZE * 0.5)px;">🚩</div>
+                                    </foreignObject>
+                                }
+                            }
+                        }
+                    </g>
+                }
+            }
+        </svg>
+    </div>
+</div>
+
+<style>
+    .game-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+        background: #2c3e50;
+        min-height: 100vh;
+    }
+
+    .header {
+        margin-bottom: 20px;
+        background: #34495e;
+        padding: 15px;
+        border-radius: 10px;
+        width: 100%;
+        max-width: 800px;
+    }
+
+    .difficulty-selector {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        justify-content: center;
+    }
+
+    .difficulty-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        transition: all 0.3s;
+    }
+
+        .difficulty-btn:hover {
+            background: #2980b9;
+        }
+
+        .difficulty-btn.active {
+            background: #27ae60;
+            font-weight: bold;
+        }
+
+    .image-upload {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        margin-bottom: 15px;
+        color: white;
+        font-size: 14px;
+    }
+
+        .image-upload label {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .image-upload input[type="file"] {
+            font-size: 12px;
+        }
+
+    .info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        color: white;
+        font-size: 18px;
+    }
+
+    .mines, .status {
+        font-weight: bold;
+    }
+
+    .reset-btn {
+        background: #3498db;
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background 0.3s;
+    }
+
+        .reset-btn:hover {
+            background: #2980b9;
+        }
+
+    .board-wrapper {
+        max-width: 100%;
+        overflow: auto;
+        background: #1a252f;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .board {
+        background: white;
+        border: 3px solid #34495e;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    g {
+        cursor: pointer;
+    }
+
+        g:hover rect {
+            filter: brightness(1.1);
+        }
+</style>
+
+@code {
+    private enum Difficulty { Easy, Hard }
+
+    private Difficulty difficulty = Difficulty.Easy;
+    private int ROWS = 10;
+    private int COLS = 10;
+    private int MINES = 15;
+    private int CELL_SIZE = 40;
+
+    private int[,] board = new int[10, 10];
+    private bool[,] revealed = new bool[10, 10];
+    private bool[,] flagged = new bool[10, 10];
+    private bool gameOver = false;
+    private bool won = false;
+    private int mineCount = 15;
+    private string[] imageUrls = new string[4]
+    {
+        "/iAssets/TileUnclicked.png",
+        "/iAssets/TileClickedF.png",
+        "/iAssets/TileFlag.png",
+        "/iAssets/TileExplode.png"
+    };
+
+    protected override void OnInitialized()
+    {
+        InitGame();
+    }
+
+    private void SetDifficulty(Difficulty newDifficulty)
+    {
+        difficulty = newDifficulty;
+
+        if (difficulty == Difficulty.Easy)
+        {
+            ROWS = 10;
+            COLS = 10;
+            MINES = 15;
+            CELL_SIZE = 40;
+        }
+        else // Hard
+        {
+            ROWS = 30;
+            COLS = 30;
+            MINES = 185;
+            CELL_SIZE = 25;
+        }
+
+        InitGame();
+    }
+
+    private async Task LoadImageData(InputFileChangeEventArgs e, int index)
+    {
+        var file = e.File;
+        if (file != null && file.ContentType == "image/png")
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024).ReadAsync(buffer);
+            var base64 = Convert.ToBase64String(buffer);
+            imageUrls[index] = $"data:image/png;base64,{base64}";
+            StateHasChanged();
+        }
+    }
+
+    private void InitGame()
+    {
+        board = new int[ROWS, COLS];
+        revealed = new bool[ROWS, COLS];
+        flagged = new bool[ROWS, COLS];
+        gameOver = false;
+        won = false;
+        mineCount = MINES;
+
+        Random rand = new Random();
+        int minesPlaced = 0;
+
+        while (minesPlaced < MINES)
+        {
+            int r = rand.Next(ROWS);
+            int c = rand.Next(COLS);
+
+            if (board[r, c] != -1)
+            {
+                board[r, c] = -1;
+                minesPlaced++;
+
+                for (int dr = -1; dr <= 1; dr++)
+                {
+                    for (int dc = -1; dc <= 1; dc++)
+                    {
+                        int nr = r + dr;
+                        int nc = c + dc;
+
+                        if (nr >= 0 && nr < ROWS && nc >= 0 && nc < COLS && board[nr, nc] != -1)
+                        {
+                            board[nr, nc]++;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void RevealCell(int r, int c)
+    {
+        if (gameOver || won || revealed[r, c] || flagged[r, c]) return;
+
+        if (board[r, c] == -1)
+        {
+            revealed[r, c] = true;
+            gameOver = true;
+            RevealAllMines();
+            return;
+        }
+
+        FloodFill(r, c);
+        CheckWin();
+    }
+
+    private void FloodFill(int r, int c)
+    {
+        if (r < 0 || r >= ROWS || c < 0 || c >= COLS) return;
+        if (revealed[r, c] || flagged[r, c]) return;
+
+        revealed[r, c] = true;
+
+        if (board[r, c] == 0)
+        {
+            for (int dr = -1; dr <= 1; dr++)
+            {
+                for (int dc = -1; dc <= 1; dc++)
+                {
+                    FloodFill(r + dr, c + dc);
+                }
+            }
+        }
+    }
+
+    private void ToggleFlag(int r, int c)
+    {
+        if (gameOver || won || revealed[r, c]) return;
+
+        flagged[r, c] = !flagged[r, c];
+        mineCount += flagged[r, c] ? -1 : 1;
+    }
+
+    private void RevealAllMines()
+    {
+        for (int r = 0; r < ROWS; r++)
+        {
+            for (int c = 0; c < COLS; c++)
+            {
+                if (board[r, c] == -1)
+                {
+                    revealed[r, c] = true;
+                }
+            }
+        }
+    }
+
+    private void CheckWin()
+    {
+        int revealedCount = 0;
+        for (int r = 0; r < ROWS; r++)
+        {
+            for (int c = 0; c < COLS; c++)
+            {
+                if (revealed[r, c]) revealedCount++;
+            }
+        }
+
+        if (revealedCount == ROWS * COLS - MINES)
+        {
+            won = true;
+        }
+    }
+
+    private string GetNumberColor(int num)
+    {
+        return num switch
+        {
+            1 => "white",
+            2 => "green",
+            3 => "blue",
+            4 => "yellow",
+            5 => "purple",
+            6 => "orange",
+            7 => "red",
+            8 => "gray",
+            _ => "black"
+        };
+    }
+}

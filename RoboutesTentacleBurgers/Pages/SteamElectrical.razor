@@ -1,0 +1,3530 @@
+﻿@page "/SteamElectrical"
+@implements IDisposable
+
+<PageTitle>Steam-Electric Concept | Clean Energy Design</PageTitle>
+
+<div class="se-page">
+
+    <!-- NAV -->
+    <nav class="se-nav">
+        <span class="se-nav-brand">⚙ STEAM-ELECTRIC</span>
+
+        <ul class="se-nav-links">
+            <li><a href="#concept">Concept</a></li>
+            <li><a href="#schematic">Schematic</a></li>
+            <li><a href="#calculator">Calculator</a></li>
+            <li><a href="#truck">Truck</a></li>
+            <li><a href="#impact">Impact</a></li>
+            <li><a href="#safety">Safety</a></li>
+        </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section class="se-hero">
+        <div class="se-hero-grid"></div>
+
+        <span class="se-badge">CONCEPT DESIGN · OPEN SOURCE IDEA</span>
+
+        <h1>
+            The <span>Steam-Electric</span><br />
+            Vehicle System
+        </h1>
+
+        <p>
+            A closed-loop steam propulsion concept using battery-powered heating,
+            PWM control, and multi-axle electric motors.
+            Built around existing technology and thermodynamic principles.
+        </p>
+
+        <div class="se-hero-stats">
+            <div class="se-stat">
+                <div class="n">3×</div>
+                <div class="l">Concept torque advantage</div>
+            </div>
+
+            <div class="se-stat">
+                <div class="n">0</div>
+                <div class="l">Combustion events</div>
+            </div>
+
+            <div class="se-stat">
+                <div class="n">~40</div>
+                <div class="l">Illustrative moving parts</div>
+            </div>
+
+            <div class="se-stat">
+                <div class="n">H₂O</div>
+                <div class="l">Working fluid</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONCEPT -->
+    <div id="concept">
+        <section class="se-section">
+
+            <div class="se-section-sub">The Idea</div>
+
+            <h2 class="se-section-title">
+                Three component swaps. One electrical overhaul.
+            </h2>
+
+            <p class="se-section-lead">
+                This concept explores replacing the conventional combustion powertrain
+                with a steam-based mechanical system and electrical architecture.
+                The chassis, suspension, brakes, and body could remain conceptually
+                separate from the propulsion system.
+            </p>
+
+            <div class="se-card-grid">
+
+                <div class="se-card">
+                    <div class="se-card-icon">🔁</div>
+                    <h3>Engine → Steam Cylinders</h3>
+                    <p>
+                        A steam piston engine can provide mechanical torque through
+                        a crankshaft. A double-acting multi-cylinder configuration
+                        is shown here as a conceptual architecture.
+                    </p>
+                </div>
+
+                <div class="se-card">
+                    <div class="se-card-icon">💧</div>
+                    <h3>Fuel Tank → Water Tank</h3>
+                    <p>
+                        Water acts as the working fluid. A condenser can recover
+                        exhaust steam and return condensed water to the system.
+                    </p>
+                </div>
+
+                <div class="se-card">
+                    <div class="se-card-icon">⚡</div>
+                    <h3>Generator Loop</h3>
+                    <p>
+                        The steam engine can mechanically drive a generator while
+                        electric motors provide propulsion in an electric-drive
+                        architecture.
+                    </p>
+                </div>
+
+                <div class="se-card">
+                    <div class="se-card-icon">🎛</div>
+                    <h3>PWM Controller = Heat Control</h3>
+                    <p>
+                        A power controller can regulate electrical heating input.
+                        Actual thermal efficiency depends on the heater, boiler,
+                        insulation, operating pressure, and cycle design.
+                    </p>
+                </div>
+
+                <div class="se-card">
+                    <div class="se-card-icon">🔄</div>
+                    <h3>Closed Loop by Design</h3>
+                    <p>
+                        Water can be evaporated, expanded, condensed, and returned
+                        to the feed system. Some makeup water may still be required.
+                    </p>
+                </div>
+
+                <div class="se-card">
+                    <div class="se-card-icon">🏭</div>
+                    <h3>Manufacturing Concept</h3>
+                    <p>
+                        The design attempts to reduce some conventional combustion
+                        components, while recognizing that boilers, pumps, condensers,
+                        controls, and pressure hardware introduce their own complexity.
+                    </p>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- SCHEMATIC -->
+    <div class="se-section-full" id="schematic">
+        <section class="se-section">
+
+            <div class="se-section-sub">System Architecture</div>
+
+            <h2 class="se-section-title">
+                Closed-loop schematic
+            </h2>
+
+            <p class="se-section-lead">
+                Battery power supplies electrical heating. Steam expands through
+                the mechanical power unit, which can drive a generator. A condenser
+                recovers the working fluid.
+            </p>
+
+            <div class="se-schematic">
+
+                <svg width="100%"
+                     viewBox="0 0 680 520"
+                     role="img"
+                     aria-label="Steam-electric closed loop schematic">
+
+                    <title>Steam-electric closed loop schematic</title>
+
+                    <defs>
+                        <marker id="sarr"
+                                viewBox="0 0 10 10"
+                                refX="8"
+                                refY="5"
+                                markerWidth="6"
+                                markerHeight="6"
+                                orient="auto-start-reverse">
+
+                            <path d="M2 1L8 5L2 9"
+                                  fill="none"
+                                  stroke="context-stroke"
+                                  stroke-width="1.5"
+                                  stroke-linecap="round"
+                                  stroke-linejoin="round" />
+                        </marker>
+                    </defs>
+
+                    <!-- Battery -->
+                    <rect x="20"
+                          y="30"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#0a2040"
+                          stroke="#4ab4ff"
+                          stroke-width="1" />
+
+                    <text x="85"
+                          y="54"
+                          text-anchor="middle"
+                          fill="#4ab4ff"
+                          font-size="13"
+                          font-weight="600">
+                        Battery Pack
+                    </text>
+
+                    <text x="85"
+                          y="72"
+                          text-anchor="middle"
+                          fill="#5a8aaa"
+                          font-size="11">
+                        Battery / capacitor
+                    </text>
+
+                    <!-- Heating Element -->
+                    <rect x="20"
+                          y="140"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#1a0f00"
+                          stroke="#ff7a30"
+                          stroke-width="1" />
+
+                    <text x="85"
+                          y="164"
+                          text-anchor="middle"
+                          fill="#ff9a50"
+                          font-size="13"
+                          font-weight="600">
+                        Heating Element
+                    </text>
+
+                    <text x="85"
+                          y="182"
+                          text-anchor="middle"
+                          fill="#8a5a30"
+                          font-size="11">
+                        PWM controlled
+                    </text>
+
+                    <!-- Battery → Heater -->
+                    <line x1="85"
+                          y1="86"
+                          x2="85"
+                          y2="138"
+                          stroke="#4ab4ff"
+                          stroke-width="2"
+                          marker-end="url(#sarr)"
+                          fill="none"
+                          class="pulse-anim" />
+
+                    <text x="100"
+                          y="116"
+                          fill="#4ab4ff"
+                          font-size="11">
+                        DC power
+                    </text>
+
+                    <!-- Water Tank -->
+                    <rect x="20"
+                          y="250"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#001a30"
+                          stroke="#30a0ff"
+                          stroke-width="1" />
+
+                    <text x="85"
+                          y="274"
+                          text-anchor="middle"
+                          fill="#30a0ff"
+                          font-size="13"
+                          font-weight="600">
+                        Water Tank
+                    </text>
+
+                    <text x="85"
+                          y="292"
+                          text-anchor="middle"
+                          fill="#3a6a8a"
+                          font-size="11">
+                        Feedwater system
+                    </text>
+
+                    <!-- Heater → Water -->
+                    <line x1="85"
+                          y1="196"
+                          x2="85"
+                          y2="248"
+                          stroke="#ff7a30"
+                          stroke-width="1.5"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="100"
+                          y="226"
+                          fill="#ff7a30"
+                          font-size="11">
+                        heat
+                    </text>
+
+                    <!-- Steam -->
+                    <rect x="20"
+                          y="360"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#1a1200"
+                          stroke="#ffaa00"
+                          stroke-width="1" />
+
+                    <text x="85"
+                          y="384"
+                          text-anchor="middle"
+                          fill="#ffcc44"
+                          font-size="13"
+                          font-weight="600">
+                        Steam Output
+                    </text>
+
+                    <text x="85"
+                          y="402"
+                          text-anchor="middle"
+                          fill="#8a7a30"
+                          font-size="11">
+                        High pressure
+                    </text>
+
+                    <!-- Water → Steam -->
+                    <line x1="85"
+                          y1="306"
+                          x2="85"
+                          y2="358"
+                          stroke="#30a0ff"
+                          stroke-width="1.5"
+                          class="steam-anim"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="100"
+                          y="336"
+                          fill="#30a0ff"
+                          font-size="11">
+                        vaporize
+                    </text>
+
+                    <!-- Steam Cylinders -->
+                    <rect x="240"
+                          y="220"
+                          width="160"
+                          height="100"
+                          rx="10"
+                          fill="#001428"
+                          stroke="#4ab4ff"
+                          stroke-width="1.5" />
+
+                    <text x="320"
+                          y="252"
+                          text-anchor="middle"
+                          fill="#4ab4ff"
+                          font-size="13"
+                          font-weight="600">
+                        Steam Cylinders
+                    </text>
+
+                    <text x="320"
+                          y="272"
+                          text-anchor="middle"
+                          fill="#5a8aaa"
+                          font-size="11">
+                        Multi-cylinder
+                    </text>
+
+                    <text x="320"
+                          y="290"
+                          text-anchor="middle"
+                          fill="#5a8aaa"
+                          font-size="11">
+                        Piston → crankshaft
+                    </text>
+
+                    <text x="320"
+                          y="308"
+                          text-anchor="middle"
+                          fill="#ffaa00"
+                          font-size="11">
+                        High starting torque
+                    </text>
+
+                    <!-- Steam → Cylinders -->
+                    <path class="steam-anim"
+                          d="M150 388 Q195 388 195 270 Q195 270 238 270"
+                          stroke="#ffaa00"
+                          stroke-width="2"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="185"
+                          y="350"
+                          text-anchor="middle"
+                          fill="#ffaa00"
+                          font-size="11">
+                        steam
+                    </text>
+
+                    <!-- Condenser -->
+                    <rect x="240"
+                          y="390"
+                          width="160"
+                          height="50"
+                          rx="8"
+                          fill="#001a20"
+                          stroke="#00ddaa"
+                          stroke-width="1" />
+
+                    <text x="320"
+                          y="412"
+                          text-anchor="middle"
+                          fill="#00ddaa"
+                          font-size="13"
+                          font-weight="600">
+                        Condenser
+                    </text>
+
+                    <text x="320"
+                          y="430"
+                          text-anchor="middle"
+                          fill="#2a6a5a"
+                          font-size="11">
+                        Steam → water
+                    </text>
+
+                    <!-- Exhaust → Condenser -->
+                    <line x1="320"
+                          y1="320"
+                          x2="320"
+                          y2="388"
+                          stroke="#00ddaa"
+                          stroke-width="1.5"
+                          stroke-dasharray="4 3"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="336"
+                          y="358"
+                          fill="#00ddaa"
+                          font-size="11">
+                        exhaust
+                    </text>
+
+                    <!-- Condenser → Tank -->
+                    <path d="M240 415 Q200 415 200 278 Q200 278 150 278"
+                          stroke="#00ddaa"
+                          stroke-width="1.5"
+                          stroke-dasharray="3 4"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="195"
+                          y="370"
+                          text-anchor="middle"
+                          fill="#00ddaa"
+                          font-size="11">
+                        water
+                    </text>
+
+                    <!-- Generator -->
+                    <rect x="480"
+                          y="200"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#0a0a28"
+                          stroke="#aa88ff"
+                          stroke-width="1" />
+
+                    <text x="545"
+                          y="224"
+                          text-anchor="middle"
+                          fill="#aa88ff"
+                          font-size="13"
+                          font-weight="600">
+                        Generator
+                    </text>
+
+                    <text x="545"
+                          y="242"
+                          text-anchor="middle"
+                          fill="#5a4a8a"
+                          font-size="11">
+                        Shaft → electrical
+                    </text>
+
+                    <!-- Cylinders → Generator -->
+                    <line x1="400"
+                          y1="260"
+                          x2="478"
+                          y2="230"
+                          stroke="#aa88ff"
+                          stroke-width="2"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="442"
+                          y="238"
+                          text-anchor="middle"
+                          fill="#aa88ff"
+                          font-size="11">
+                        shaft
+                    </text>
+
+                    <!-- Electric Motor -->
+                    <rect x="480"
+                          y="320"
+                          width="130"
+                          height="56"
+                          rx="8"
+                          fill="#0a0a28"
+                          stroke="#aa88ff"
+                          stroke-width="1" />
+
+                    <text x="545"
+                          y="344"
+                          text-anchor="middle"
+                          fill="#aa88ff"
+                          font-size="13"
+                          font-weight="600">
+                        E-Motor
+                    </text>
+
+                    <text x="545"
+                          y="362"
+                          text-anchor="middle"
+                          fill="#5a4a8a"
+                          font-size="11">
+                        Electric drive
+                    </text>
+
+                    <!-- Generator → Motor -->
+                    <line x1="545"
+                          y1="256"
+                          x2="545"
+                          y2="318"
+                          stroke="#aa88ff"
+                          stroke-width="1.5"
+                          class="pulse-anim"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <!-- Generator → Battery -->
+                    <path class="pulse-anim"
+                          d="M545 200 Q545 80 300 50 Q200 36 152 50"
+                          stroke="#4aff90"
+                          stroke-width="2"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="350"
+                          y="34"
+                          text-anchor="middle"
+                          fill="#4aff90"
+                          font-size="12"
+                          font-weight="600">
+                        ↺ battery charging path
+                    </text>
+
+                    <!-- Regeneration -->
+                    <path d="M610 360 Q640 360 640 80 Q640 50 620 50 Q560 36 490 44"
+                          stroke="#4aff90"
+                          stroke-width="1"
+                          stroke-dasharray="3 3"
+                          fill="none"
+                          marker-end="url(#sarr)" />
+
+                    <text x="648"
+                          y="210"
+                          fill="#4aff90"
+                          font-size="11">
+                        regen
+                    </text>
+
+                </svg>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- CALCULATOR -->
+    <div id="calculator">
+        <section class="se-section">
+
+            <div class="se-section-sub">Live Calculator</div>
+
+            <h2 class="se-section-title">
+                Power budget &amp; torque estimator
+            </h2>
+
+            <p class="se-section-lead">
+                Adjust the parameters below to update the illustrative model in real time.
+                The calculated values are estimates and are not a substitute for detailed
+                thermodynamic or vehicle engineering analysis.
+            </p>
+
+            <div class="se-calc">
+
+                <!-- PSI -->
+                <div class="se-slider-row">
+                    <label for="psiSlider">Steam pressure (psi)</label>
+
+                    <input id="psiSlider"
+                           type="range"
+                           min="100"
+                           max="700"
+                           step="25"
+                           @bind="Psi"
+                           @bind:event="oninput"
+                           @bind:after="Recalc" />
+
+                    <span class="val">@Psi.ToString("F0") psi</span>
+                </div>
+
+                <!-- BORE -->
+                <div class="se-slider-row">
+                    <label for="boreSlider">Cylinder bore (inches)</label>
+
+                    <input id="boreSlider"
+                           type="range"
+                           min="3"
+                           max="10"
+                           step="0.5"
+                           @bind="Bore"
+                           @bind:event="oninput"
+                           @bind:after="Recalc" />
+
+                    <span class="val">@Bore.ToString("F1") in</span>
+                </div>
+
+                <!-- CYLINDERS -->
+                <div class="se-slider-row">
+                    <label for="cylinderSlider">Number of cylinders</label>
+
+                    <input id="cylinderSlider"
+                           type="range"
+                           min="2"
+                           max="12"
+                           step="2"
+                           @bind="Cylinders"
+                           @bind:event="oninput"
+                           @bind:after="Recalc" />
+
+                    <span class="val">@Cylinders cyl</span>
+                </div>
+
+                <!-- WEIGHT -->
+                <div class="se-slider-row">
+                    <label for="weightSlider">Vehicle weight (lb)</label>
+
+                    <input id="weightSlider"
+                           type="range"
+                           min="800"
+                           max="80000"
+                           step="100"
+                           @bind="WeightLb"
+                           @bind:event="oninput"
+                           @bind:after="Recalc" />
+
+                    <span class="val">
+                        @WeightLb.ToString("N0") lb
+                    </span>
+                </div>
+
+                <!-- PWM -->
+                <div class="se-slider-row">
+                    <label for="pwmSlider">PWM efficiency (%)</label>
+
+                    <input id="pwmSlider"
+                           type="range"
+                           min="70"
+                           max="98"
+                           step="1"
+                           @bind="PwmEff"
+                           @bind:event="oninput"
+                           @bind:after="Recalc" />
+
+                    <span class="val">@PwmEff%</span>
+                </div>
+
+                <!-- METRICS -->
+                <div class="se-metrics">
+
+                    <div class="se-metric">
+                        <div class="mn">
+                            @SteamTorque.ToString("N0")
+                        </div>
+
+                        <div class="ml">
+                            estimated ft-lb torque
+                        </div>
+                    </div>
+
+                    <div class="se-metric">
+                        <div class="mn">
+                            @TorqueRatio.ToString("F1")×
+                        </div>
+
+                        <div class="ml">
+                            relative comparison
+                        </div>
+                    </div>
+
+                    <div class="se-metric">
+                        <div class="mn">
+                            @RoadLoadW.ToString("N0") W
+                        </div>
+
+                        <div class="ml">
+                            road load at 55 mph
+                        </div>
+                    </div>
+
+                    <div class="se-metric">
+                        <div class="mn">
+                            @NetDrawW.ToString("N0") W
+                        </div>
+
+                        <div class="ml">
+                            estimated net battery draw
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- TORQUE COMPARISON -->
+                <h3 class="se-subheading">
+                    Torque comparison
+                </h3>
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Reference diesel</span>
+                        <span>2,050 ft-lb at 1,200 rpm</span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="width:35%;background:#cc4400;">
+                            2,050 ft-lb
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Your steam model</span>
+
+                        <span>
+                            @SteamTorque.ToString("N0") ft-lb
+                        </span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="@GetTorqueBarStyle()">
+
+                            @SteamTorque.ToString("N0") ft-lb
+
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </div>
+
+    <!-- TRUCK -->
+    <div class="se-section-full" id="truck">
+
+        <section class="se-section">
+
+            <div class="se-section-sub">
+                Heavy Haul Concept
+            </div>
+
+            <h2 class="se-section-title">
+                Steam-electric semi truck
+            </h2>
+
+            <p class="se-section-lead">
+                A conceptual heavy-haul architecture using a steam power block,
+                generator, battery system, and multiple electric drive motors.
+                Actual performance would require detailed vehicle simulation,
+                thermal modeling, component testing, and certification.
+            </p>
+
+            <div class="se-card-grid">
+
+                <div class="se-card">
+
+                    <div class="se-card-icon">🚛</div>
+
+                    <h3>
+                        Conventional Diesel Reference
+                    </h3>
+
+                    <p>
+                        Modern heavy-duty diesel engines provide substantial torque,
+                        but their peak torque occurs within a specific RPM range and
+                        is managed through a transmission.
+                    </p>
+
+                </div>
+
+                <div class="se-card"
+                     style="border-color:#4ab4ff;">
+
+                    <div class="se-card-icon">💨</div>
+
+                    <h3>
+                        Steam-Electric Concept Hauler
+                    </h3>
+
+                    <p>
+                        A multi-cylinder steam engine could provide mechanical power
+                        while electric motors provide wheel torque and electronic
+                        traction control.
+                    </p>
+
+                </div>
+
+                <div class="se-card">
+
+                    <div class="se-card-icon">📊</div>
+
+                    <h3>
+                        Grade Climbing
+                    </h3>
+
+                    <p>
+                        Electric traction motors can provide precise low-speed torque
+                        control. The actual grade capability depends on motor power,
+                        gearing, traction, thermal limits, and vehicle mass.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <div style="margin-top:2rem;">
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Diesel reference</span>
+                        <span>1,850 ft-lb</span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="width:32%;background:#cc4400;">
+                            1,850 ft-lb
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Higher-output diesel reference</span>
+                        <span>2,050 ft-lb</span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="width:36%;background:#993300;">
+                            2,050 ft-lb
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Illustrative steam V8</span>
+                        <span>~3,200 ft-lb</span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="width:56%;background:#1a6aaa;">
+                            ~3,200 ft-lb
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="se-bar-wrap">
+
+                    <div class="se-bar-label">
+                        <span>Illustrative steam + electric drive</span>
+                        <span>~5,800 ft-lb</span>
+                    </div>
+
+                    <div class="se-bar-track">
+
+                        <div class="se-bar-fill"
+                             style="width:100%;background:#4aff90;color:#001a10;">
+                            ~5,800 ft-lb
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+    </div>
+
+    <!-- IMPACT -->
+    <div id="impact">
+
+        <section class="se-section">
+
+            <div class="se-section-sub">
+                Ecosystem &amp; Resource Impact
+            </div>
+
+            <h2 class="se-section-title">
+                Oil vs water — system-level comparison
+            </h2>
+
+            <p class="se-section-lead">
+                Water can serve as the working fluid in a closed steam cycle.
+                However, replacing fossil fuels with electrically generated heat
+                does not automatically make the complete system zero-emission;
+                lifecycle emissions depend on the electricity source and equipment.
+            </p>
+
+            <div class="se-table-wrap">
+
+                <table class="se-table">
+
+                    <thead>
+                        <tr>
+                            <th>Factor</th>
+                            <th>Combustion system</th>
+                            <th>Steam-electric concept</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        <tr>
+                            <td>Working fluid</td>
+
+                            <td class="bad">
+                                Fuel combustion products
+                            </td>
+
+                            <td class="good">
+                                Water / steam
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Tailpipe combustion CO₂</td>
+
+                            <td class="bad">
+                                Produced during fuel combustion
+                            </td>
+
+                            <td class="good">
+                                No combustion at vehicle point of use
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Electricity requirement</td>
+
+                            <td>
+                                Usually not the primary energy source
+                            </td>
+
+                            <td class="good">
+                                Central to the proposed architecture
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Spill risk</td>
+
+                            <td class="bad">
+                                Fuel can be flammable and environmentally damaging
+                            </td>
+
+                            <td class="good">
+                                Water itself is non-flammable
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Pressure risk</td>
+
+                            <td>
+                                Engine and fuel systems have different hazards
+                            </td>
+
+                            <td class="bad">
+                                High-pressure steam requires rigorous engineering
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>Energy source</td>
+
+                            <td>
+                                Chemical fuel
+                            </td>
+
+                            <td>
+                                Electricity converted to thermal energy
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+    </div>
+
+    <!-- SAFETY -->
+    <div class="se-section-full" id="safety">
+
+        <section class="se-section">
+
+            <div class="se-section-sub">
+                Safety Design
+            </div>
+
+            <h2 class="se-section-title">
+                Pressure protection architecture
+            </h2>
+
+            <p class="se-section-lead">
+                High-pressure steam systems require multiple independent layers
+                of protection. The following is a conceptual architecture only;
+                real pressure vessels and steam systems require engineering,
+                testing, certified components, and applicable regulatory approval.
+            </p>
+
+            <div class="se-safety-grid">
+
+                <div class="se-safety-item">
+
+                    <h4>
+                        Layer 1 — Control
+                    </h4>
+
+                    <p>
+                        The controller regulates heat input and operating conditions.
+                        Independent monitoring should prevent operation outside
+                        defined limits.
+                    </p>
+
+                </div>
+
+                <div class="se-safety-item">
+
+                    <h4>
+                        Layer 2 — Pressure Relief
+                    </h4>
+
+                    <p>
+                        A properly rated pressure relief device provides an
+                        independent mechanical path for pressure protection.
+                    </p>
+
+                </div>
+
+                <div class="se-safety-item">
+
+                    <h4>
+                        Layer 3 — Independent Protection
+                    </h4>
+
+                    <p>
+                        Additional independent protection can be used where required
+                        by the applicable pressure-vessel engineering standard.
+                    </p>
+
+                </div>
+
+                <div class="se-safety-item">
+
+                    <h4>
+                        Emergency Shutdown
+                    </h4>
+
+                    <p>
+                        A real vehicle would require redundant shutdown controls,
+                        temperature monitoring, pressure monitoring, isolation,
+                        containment, and emergency procedures.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <!-- TIMELINE -->
+
+            <div style="margin-top:2.5rem;">
+
+                <div class="se-section-sub">
+                    Historical Precedent
+                </div>
+
+                <h3 class="se-section-title se-small-title">
+                    Steam technology has a long engineering history
+                </h3>
+
+                <div class="se-timeline"
+                     style="margin-top:1.5rem;">
+
+                    <div class="se-tl-item">
+
+                        <h4>
+                            18th Century — Steam Engines
+                        </h4>
+
+                        <p>
+                            Practical steam engines demonstrated that pressure,
+                            expansion, pistons, and crank mechanisms could convert
+                            thermal energy into mechanical work.
+                        </p>
+
+                    </div>
+
+                    <div class="se-tl-item">
+
+                        <h4>
+                            19th Century — Rankine Cycle
+                        </h4>
+
+                        <p>
+                            The Rankine cycle provided a formal thermodynamic
+                            framework for vapor power systems.
+                        </p>
+
+                    </div>
+
+                    <div class="se-tl-item">
+
+                        <h4>
+                            Early 20th Century — Steam Automobiles
+                        </h4>
+
+                        <p>
+                            Steam-powered automobiles demonstrated that compact
+                            steam propulsion was technically possible, although
+                            practical limitations affected their adoption.
+                        </p>
+
+                    </div>
+
+                    <div class="se-tl-item">
+
+                        <h4>
+                            Modern Era — Electric Control
+                        </h4>
+
+                        <p>
+                            Modern power electronics, sensors, generators,
+                            electric motors, and control systems provide capabilities
+                            that were unavailable to early steam vehicles.
+                        </p>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="se-footer">
+
+        <p>
+            Steam-Electric Vehicle Concept — experimental system architecture.
+        </p>
+
+        <p style="margin-top:.5rem;">
+            Concept calculations are illustrative and should not be treated as
+            certified vehicle, pressure-vessel, or safety specifications.
+        </p>
+
+    </footer>
+
+</div>
+
+@code
+{
+    // ============================================================
+    // Slider state
+    // ============================================================
+
+    private double Psi { get; set; } = 350;
+    private double Bore { get; set; } = 6;
+    private int Cylinders { get; set; } = 4;
+    private double WeightLb { get; set; } = 1500;
+    private int PwmEff { get; set; } = 92;
+
+    // ============================================================
+    // Computed outputs
+    // ============================================================
+
+    private double SteamTorque { get; set; }
+    private double TorqueRatio { get; set; }
+    private double TorqueBarPct { get; set; }
+    private double RoadLoadW { get; set; }
+    private double NetDrawW { get; set; }
+
+    // ============================================================
+    // Initialization
+    // ============================================================
+
+    protected override void OnInitialized()
+    {
+        Recalc();
+    }
+
+    // ============================================================
+    // Calculator
+    // ============================================================
+
+    private void Recalc()
+    {
+        // --------------------------------------------------------
+        // Illustrative steam torque model
+        // --------------------------------------------------------
+
+        double stroke = Bore * 1.2;
+
+        double pistonArea =
+            Math.PI * Math.Pow(Bore / 2.0, 2);
+
+        double forcePerCylinder =
+            Psi * pistonArea;
+
+        double torquePerCylinder =
+            (forcePerCylinder * (stroke / 24.0)) / 12.0;
+
+        SteamTorque =
+            Math.Round(
+                torquePerCylinder *
+                Cylinders *
+                0.72
+            );
+
+        // --------------------------------------------------------
+        // Reference comparison
+        // --------------------------------------------------------
+
+        const double dieselBest = 2050.0;
+
+        TorqueRatio =
+            dieselBest > 0
+                ? Math.Round(SteamTorque / dieselBest, 1)
+                : 0;
+
+        TorqueBarPct =
+            Math.Min(
+                95,
+                Math.Max(
+                    0,
+                    Math.Round(
+                        (SteamTorque / 6000.0) * 95
+                    )
+                )
+            );
+
+        // --------------------------------------------------------
+        // Road-load estimate at 55 mph
+        // --------------------------------------------------------
+
+        double weightKg =
+            WeightLb * 0.453592;
+
+        double speedMs =
+            55 * 0.44704;
+
+        // Illustrative aerodynamic parameters.
+        double airDensity = 1.225;
+        double dragCoefficient = 0.28;
+        double frontalArea = 2.0;
+
+        double aeroDrag =
+            0.5 *
+            airDensity *
+            dragCoefficient *
+            frontalArea *
+            speedMs *
+            speedMs;
+
+        double rollingCoefficient = 0.015;
+
+        double rollDrag =
+            rollingCoefficient *
+            weightKg *
+            9.81;
+
+        RoadLoadW =
+            Math.Round(
+                (aeroDrag + rollDrag) *
+                speedMs
+            );
+
+        // --------------------------------------------------------
+        // Illustrative power loop
+        // --------------------------------------------------------
+
+        double rankineEff = 0.35;
+
+        double steamPowerW =
+            RoadLoadW / rankineEff;
+
+        double pwmEfficiency =
+            Math.Max(0.01, PwmEff / 100.0);
+
+        double heatInputW =
+            steamPowerW / pwmEfficiency;
+
+        double generatorEfficiency = 0.82;
+        double generatorConversion = 0.40;
+
+        double genOutputW =
+            steamPowerW *
+            generatorEfficiency *
+            generatorConversion;
+
+        double regenW =
+            RoadLoadW * 0.18;
+
+        NetDrawW =
+            Math.Max(
+                0,
+                Math.Round(
+                    heatInputW -
+                    genOutputW -
+                    regenW
+                )
+            );
+    }
+
+    // ============================================================
+    // Dynamic torque bar style
+    // ============================================================
+
+    private string GetTorqueBarStyle()
+    {
+        return
+            $"width:{TorqueBarPct:F0}%;background:#4ab4ff;";
+    }
+
+    // ============================================================
+    // IDisposable
+    // ============================================================
+
+    public void Dispose()
+    {
+    }
+}
+
+<style>
+    /* ============================================================
+           GLOBAL
+           ============================================================ */
+
+    .se-page {
+        font-family: 'Segoe UI', sans-serif;
+        color: #e8e8e8;
+        background: #0d0f14;
+        min-height: 100vh;
+    }
+
+        .se-page *,
+        .se-page *::before,
+        .se-page *::after {
+            box-sizing: border-box;
+        }
+
+    /* ============================================================
+           NAV
+           ============================================================ */
+
+    .se-nav {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(13, 15, 20, 0.95);
+        backdrop-filter: blur(8px);
+        border-bottom: 1px solid #1e3a5f;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 2rem;
+        height: 52px;
+    }
+
+    .se-nav-brand {
+        font-size: 15px;
+        font-weight: 600;
+        color: #4ab4ff;
+        letter-spacing: 1px;
+        white-space: nowrap;
+    }
+
+    .se-nav-links {
+        display: flex;
+        gap: 1.5rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+        .se-nav-links a {
+            color: #9ab;
+            text-decoration: none;
+            font-size: 13px;
+            transition: color 0.2s;
+        }
+
+            .se-nav-links a:hover {
+                color: #4ab4ff;
+            }
+
+    /* ============================================================
+           HERO
+           ============================================================ */
+
+    .se-hero {
+        min-height: 88vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 4rem 2rem;
+        position: relative;
+        overflow: hidden;
+        background: linear-gradient( 160deg, #0d0f14 60%, #0a1a2e 100% );
+        border-bottom: 1px solid #1e3a5f;
+    }
+
+    .se-hero-grid {
+        position: absolute;
+        inset: 0;
+        opacity: 0.07;
+        background-image: linear-gradient( #4ab4ff 1px, transparent 1px ), linear-gradient( 90deg, #4ab4ff 1px, transparent 1px );
+        background-size: 40px 40px;
+    }
+
+    .se-hero h1 {
+        font-size: clamp(2rem, 5vw, 3.8rem);
+        font-weight: 700;
+        color: #fff;
+        margin: 0 0 1rem;
+        line-height: 1.15;
+        position: relative;
+    }
+
+        .se-hero h1 span {
+            color: #4ab4ff;
+        }
+
+    .se-hero p {
+        font-size: clamp(1rem, 2vw, 1.25rem);
+        color: #9ab;
+        max-width: 680px;
+        line-height: 1.7;
+        position: relative;
+        margin: 0;
+    }
+
+    .se-badge {
+        display: inline-block;
+        background: #0a1a2e;
+        border: 1px solid #1e3a5f;
+        border-radius: 20px;
+        padding: 6px 16px;
+        font-size: 12px;
+        color: #4ab4ff;
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+    }
+
+    .se-hero-stats {
+        display: flex;
+        gap: 2rem;
+        margin-top: 2.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+        position: relative;
+    }
+
+    .se-stat {
+        text-align: center;
+        min-width: 110px;
+    }
+
+        .se-stat .n {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #4ab4ff;
+        }
+
+        .se-stat .l {
+            font-size: 12px;
+            color: #6a8a9a;
+            margin-top: 2px;
+        }
+
+    /* ============================================================
+           SECTIONS
+           ============================================================ */
+
+    .se-section {
+        padding: 5rem 2rem;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .se-section-full {
+        padding: 5rem 2rem;
+        background: #0a1018;
+        border-top: 1px solid #1a2a3a;
+        border-bottom: 1px solid #1a2a3a;
+    }
+
+        .se-section-full .se-section {
+            padding: 0;
+        }
+
+    .se-section-title {
+        font-size: 1.6rem;
+        font-weight: 600;
+        color: #fff;
+        margin: 0 0 0.5rem;
+    }
+
+    .se-section-sub {
+        font-size: 14px;
+        color: #4ab4ff;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        margin-bottom: 0.5rem;
+    }
+
+    .se-section-lead {
+        color: #9ab;
+        line-height: 1.8;
+        max-width: 720px;
+        margin: 0 0 2.5rem;
+    }
+
+    /* ============================================================
+           CARDS
+           ============================================================ */
+
+    .se-card-grid {
+        display: grid;
+        grid-template-columns: repeat( auto-fit, minmax(260px, 1fr) );
+        gap: 1rem;
+    }
+
+    .se-card {
+        background: #111620;
+        border: 1px solid #1e3a5f;
+        border-radius: 10px;
+        padding: 1.5rem;
+        transition: border-color 0.2s, transform 0.2s;
+    }
+
+        .se-card:hover {
+            border-color: #4ab4ff;
+            transform: translateY(-2px);
+        }
+
+    .se-card-icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .se-card h3 {
+        font-size: 15px;
+        font-weight: 600;
+        color: #fff;
+        margin: 0 0 0.5rem;
+    }
+
+    .se-card p {
+        font-size: 13px;
+        color: #7a9aaa;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    /* ============================================================
+           SCHEMATIC
+           ============================================================ */
+
+    .se-schematic {
+        background: #080c10;
+        border: 1px solid #1e3a5f;
+        border-radius: 12px;
+        padding: 1.5rem;
+        overflow-x: auto;
+    }
+
+        .se-schematic svg text {
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+    /* ============================================================
+           CALCULATOR
+           ============================================================ */
+
+    .se-calc {
+        background: #111620;
+        border: 1px solid #1e3a5f;
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .se-slider-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin: 10px 0;
+        font-size: 13px;
+        color: #7a9aaa;
+    }
+
+        .se-slider-row label {
+            min-width: 200px;
+        }
+
+        .se-slider-row input[type="range"] {
+            flex: 1;
+            accent-color: #4ab4ff;
+            min-width: 100px;
+        }
+
+        .se-slider-row .val {
+            min-width: 100px;
+            text-align: right;
+            color: #4ab4ff;
+            font-weight: 600;
+        }
+
+    .se-metrics {
+        display: grid;
+        grid-template-columns: repeat( auto-fit, minmax(160px, 1fr) );
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .se-metric {
+        background: #0d1520;
+        border: 1px solid #1a2a3a;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+        .se-metric .mn {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #4ab4ff;
+        }
+
+        .se-metric .ml {
+            font-size: 11px;
+            color: #5a7a8a;
+            margin-top: 3px;
+        }
+
+    .se-subheading {
+        color: #fff;
+        font-size: 14px;
+        margin: 1rem 0 0.5rem;
+    }
+
+    /* ============================================================
+           BARS
+           ============================================================ */
+
+    .se-bar-wrap {
+        margin: 12px 0;
+    }
+
+    .se-bar-label {
+        display: flex;
+        justify-content: space-between;
+        gap: 1rem;
+        font-size: 12px;
+        color: #7a9aaa;
+        margin-bottom: 4px;
+    }
+
+    .se-bar-track {
+        height: 24px;
+        background: #0d1520;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .se-bar-fill {
+        height: 100%;
+        min-width: 0;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        padding-left: 10px;
+        padding-right: 10px;
+        font-size: 12px;
+        color: #fff;
+        font-weight: 500;
+        transition: width 0.5s ease;
+        white-space: nowrap;
+    }
+
+    /* ============================================================
+           TIMELINE
+           ============================================================ */
+
+    .se-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+        .se-timeline::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient( #4ab4ff, #1e3a5f );
+        }
+
+    .se-tl-item {
+        position: relative;
+        margin-bottom: 2rem;
+    }
+
+        .se-tl-item::before {
+            content: '';
+            position: absolute;
+            left: -2.35rem;
+            top: 4px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #4ab4ff;
+            border: 2px solid #0d0f14;
+        }
+
+        .se-tl-item h4 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #4ab4ff;
+            margin: 0 0 4px;
+        }
+
+        .se-tl-item p {
+            font-size: 13px;
+            color: #7a9aaa;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+    .se-small-title {
+        font-size: 1.2rem;
+    }
+
+    /* ============================================================
+           SAFETY
+           ============================================================ */
+
+    .se-safety-grid {
+        display: grid;
+        grid-template-columns: repeat( auto-fit, minmax(220px, 1fr) );
+        gap: 1rem;
+    }
+
+    .se-safety-item {
+        background: #0a1520;
+        border-left: 3px solid #4ab4ff;
+        border-radius: 0 8px 8px 0;
+        padding: 1rem 1.25rem;
+    }
+
+        .se-safety-item h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            margin: 0 0 4px;
+        }
+
+        .se-safety-item p {
+            font-size: 12px;
+            color: #5a7a8a;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+    /* ============================================================
+           TABLE
+           ============================================================ */
+
+    .se-table-wrap {
+        width: 100%;
+        overflow-x: auto;
+        border: 1px solid #1e3a5f;
+        border-radius: 10px;
+    }
+
+    .se-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+        min-width: 650px;
+    }
+
+        .se-table th {
+            background: #0a1520;
+            color: #4ab4ff;
+            padding: 10px 14px;
+            text-align: left;
+            border-bottom: 1px solid #1e3a5f;
+            font-weight: 600;
+        }
+
+        .se-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #141e2a;
+            color: #9ab;
+        }
+
+        .se-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .se-table tr:hover td {
+            background: #0d1520;
+        }
+
+        .se-table .good {
+            color: #4aff90;
+        }
+
+        .se-table .bad {
+            color: #ff6b6b;
+        }
+
+    /* ============================================================
+           FOOTER
+           ============================================================ */
+
+    .se-footer {
+        background: #080c10;
+        border-top: 1px solid #1e3a5f;
+        padding: 2rem;
+        text-align: center;
+        font-size: 12px;
+        color: #3a5a6a;
+    }
+
+        .se-footer p {
+            margin: 0;
+        }
+
+    /* ============================================================
+           ANIMATIONS
+
+           NOTE:
+        
+    ============================================================ */
+
+    @@keyframes steamFlow {
+        to {
+            stroke-dashoffset: -24;
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            opacity: 0.7;
+        }
+
+        50% {
+            opacity: 1;
+        }
+    }
+
+    .steam-anim {
+        stroke-dasharray: 6 4;
+        animation: steamFlow 1.4s linear infinite;
+    }
+
+    .pulse-anim {
+        animation: pulse 2s ease-in-out infinite;
+    }
+
+    /* ============================================================
+           MOBILE
+           ============================================================ */
+
+    @@media (max-width: 700px) {
+
+        .se-nav {
+            padding: 0 1rem;
+        }
+
+        .se-nav-links {
+            display: none;
+        }
+
+        .se-hero {
+            min-height: 80vh;
+            padding: 3rem 1.25rem;
+        }
+
+        .se-section {
+            padding: 3.5rem 1.25rem;
+        }
+
+        .se-section-full {
+            padding: 3.5rem 1.25rem;
+        }
+
+        .se-slider-row {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+            .se-slider-row label {
+                min-width: 0;
+            }
+
+            .se-slider-row input[type="range"] {
+                width: 100%;
+            }
+
+            .se-slider-row .val {
+                min-width: 0;
+                text-align: left;
+            }
+
+        .se-bar-label {
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .se-schematic {
+            padding: 0.75rem;
+        }
+    }
+</style>
+
+    <title>Global Resource Stress Model</title>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+
+    <style>
+            :root {
+                --bg: #080b12;
+                --panel: rgba(18, 23, 34, 0.82);
+                --panel2: rgba(25, 31, 45, 0.72);
+                --border: rgba(255,255,255,.09);
+                --text: #f3f6ff;
+                --muted: #8d96aa;
+                --orange: #ff7043;
+                --orange2: #ff9b71;
+                --blue: #4da3ff;
+                --cyan: #55e6d1;
+                --green: #5ee58a;
+                --yellow: #ffc857;
+                --red: #ff5263;
+                --shadow: 0 20px 60px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.04);
+                font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                margin: 0;
+                min-height: 100vh;
+                color: var(--text);
+                background: radial-gradient( circle at 15% 0%, rgba(255,112,67,.13), transparent 32% ), radial-gradient( circle at 90% 10%, rgba(77,163,255,.12), transparent 30% ), linear-gradient(135deg, #080b12, #0c111c 55%, #080b12);
+                padding: 32px 18px 60px;
+            }
+
+            .app {
+                width: min(1180px, 100%);
+                margin: auto;
+            }
+
+            /* ---------------- HEADER ---------------- */
+
+            .hero {
+                position: relative;
+                overflow: hidden;
+                padding: 34px;
+                border-radius: 26px;
+                background: linear-gradient( 135deg, rgba(255,112,67,.11), rgba(77,163,255,.06) 55%, rgba(94,229,138,.04) ), var(--panel);
+                border: 1px solid var(--border);
+                box-shadow: var(--shadow);
+                margin-bottom: 18px;
+            }
+
+                .hero::after {
+                    content: "";
+                    position: absolute;
+                    width: 300px;
+                    height: 300px;
+                    right: -120px;
+                    top: -160px;
+                    background: radial-gradient( circle, rgba(255,112,67,.25), transparent 65% );
+                    pointer-events: none;
+                }
+
+            .eyebrow {
+                color: var(--orange2);
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: .16em;
+                text-transform: uppercase;
+                margin-bottom: 10px;
+            }
+
+            .hero h1 {
+                margin: 0;
+                font-size: clamp(30px, 5vw, 52px);
+                line-height: 1;
+                letter-spacing: -.045em;
+            }
+
+            .hero p {
+                max-width: 760px;
+                color: var(--muted);
+                line-height: 1.65;
+                margin: 16px 0 0;
+                font-size: 14px;
+            }
+
+            .warning {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 20px;
+                padding: 8px 12px;
+                border-radius: 999px;
+                background: rgba(255,200,87,.08);
+                border: 1px solid rgba(255,200,87,.18);
+                color: #ffd978;
+                font-size: 12px;
+            }
+
+            /* ---------------- GRID ---------------- */
+
+            .grid {
+                display: grid;
+                gap: 14px;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(4, 1fr);
+                margin-bottom: 14px;
+            }
+
+            .two {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            @@media(max - width: 850px)
+
+            {
+                .metrics {
+                    grid-template-columns: repeat(2, 1fr);
+                }
+
+                .two {
+                    grid-template-columns: 1fr;
+                }
+            }
+
+            @@media(max - width: 520px)
+
+            {
+                .metrics {
+                    grid-template-columns: 1fr;
+                }
+
+                body {
+                    padding: 15px 10px 40px;
+                }
+
+                .hero {
+                    padding: 24px;
+                }
+            }
+
+            /* ---------------- CARDS ---------------- */
+
+            .card {
+                position: relative;
+                background: var(--panel);
+                border: 1px solid var(--border);
+                border-radius: 20px;
+                padding: 22px;
+                box-shadow: var(--shadow);
+                backdrop-filter: blur(16px);
+            }
+
+            .metric {
+                min-height: 140px;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                overflow: hidden;
+            }
+
+                .metric::before {
+                    content: "";
+                    position: absolute;
+                    width: 100px;
+                    height: 100px;
+                    right: -35px;
+                    bottom: -45px;
+                    border-radius: 50%;
+                    background: var(--accent);
+                    opacity: .08;
+                }
+
+            .metric-label {
+                color: var(--muted);
+                font-size: 12px;
+            }
+
+            .metric-number {
+                font-size: clamp(25px, 4vw, 36px);
+                font-weight: 750;
+                letter-spacing: -.04em;
+                margin-top: 12px;
+            }
+
+            .metric-unit {
+                color: #6f788b;
+                font-size: 11px;
+            }
+
+            .orange {
+                --accent: var(--orange);
+            }
+
+            .blue {
+                --accent: var(--blue);
+            }
+
+            .green {
+                --accent: var(--green);
+            }
+
+            .yellow {
+                --accent: var(--yellow);
+            }
+
+            .orange .metric-number {
+                color: var(--orange2);
+            }
+
+            .blue .metric-number {
+                color: var(--blue);
+            }
+
+            .green .metric-number {
+                color: var(--green);
+            }
+
+            .yellow .metric-number {
+                color: var(--yellow);
+            }
+
+            /* ---------------- SECTION HEADERS ---------------- */
+
+            .section {
+                margin-top: 18px;
+            }
+
+            .section-title {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 12px;
+            }
+
+                .section-title h2 {
+                    margin: 0;
+                    font-size: 16px;
+                    letter-spacing: -.01em;
+                }
+
+                .section-title span {
+                    color: var(--muted);
+                    font-size: 11px;
+                }
+
+            /* ---------------- CONTROLS ---------------- */
+
+            .controls {
+                display: grid;
+                gap: 17px;
+            }
+
+            .control {
+                display: grid;
+                grid-template-columns: minmax(190px, 1fr) 2fr 65px;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .control-name {
+                color: #cbd2df;
+                font-size: 13px;
+            }
+
+            .control-value {
+                text-align: right;
+                font-weight: 700;
+                color: var(--text);
+                font-variant-numeric: tabular-nums;
+            }
+
+            input[type="range"] {
+                appearance: none;
+                width: 100%;
+                height: 5px;
+                border-radius: 999px;
+                background: linear-gradient( 90deg, var(--orange), var(--blue) );
+                outline: none;
+            }
+
+                input[type="range"]::-webkit-slider-thumb {
+                    appearance: none;
+                    width: 18px;
+                    height: 18px;
+                    border-radius: 50%;
+                    border: 3px solid #0b0e15;
+                    background: white;
+                    box-shadow: 0 0 0 2px rgba(255,112,67,.65), 0 0 18px rgba(255,112,67,.45);
+                    cursor: pointer;
+                }
+
+                input[type="range"]::-moz-range-thumb {
+                    width: 16px;
+                    height: 16px;
+                    border-radius: 50%;
+                    border: 3px solid #0b0e15;
+                    background: white;
+                    cursor: pointer;
+                }
+
+            @@media(max - width: 650px)
+
+            {
+                .control {
+                    grid-template-columns: 1fr 55px;
+                }
+
+                    .control input {
+                        grid-column: 1 / -1;
+                        grid-row: 2;
+                    }
+            }
+
+            /* ---------------- CHART ---------------- */
+
+            .chart-card {
+                padding-bottom: 15px;
+            }
+
+            .chart-wrap {
+                position: relative;
+                height: 360px;
+            }
+
+            .chart-legend {
+                display: flex;
+                gap: 18px;
+                flex-wrap: wrap;
+                margin-top: 14px;
+                color: var(--muted);
+                font-size: 11px;
+            }
+
+            .legend-item {
+                display: flex;
+                align-items: center;
+                gap: 7px;
+            }
+
+            .legend-dot {
+                width: 9px;
+                height: 9px;
+                border-radius: 50%;
+            }
+
+            .legend-orange {
+                background: var(--orange);
+            }
+
+            .legend-blue {
+                background: var(--blue);
+            }
+
+            /* ---------------- MILESTONES ---------------- */
+
+            .milestone {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 15px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+                .milestone:last-child {
+                    border-bottom: 0;
+                    padding-bottom: 0;
+                }
+
+                .milestone:first-child {
+                    padding-top: 0;
+                }
+
+            .milestone-label {
+                color: #aeb6c7;
+                font-size: 13px;
+            }
+
+            .milestone-value {
+                font-size: 14px;
+                font-weight: 750;
+                text-align: right;
+            }
+
+            .bad {
+                color: var(--red);
+            }
+
+            .warn {
+                color: var(--yellow);
+            }
+
+            .good {
+                color: var(--green);
+            }
+
+            /* ---------------- BARS ---------------- */
+
+            .impact {
+                display: grid;
+                gap: 18px;
+            }
+
+            .impact-row {
+                display: grid;
+                gap: 7px;
+            }
+
+            .impact-head {
+                display: flex;
+                justify-content: space-between;
+                gap: 10px;
+                color: #adb5c5;
+                font-size: 12px;
+            }
+
+            .impact-status {
+                font-weight: 700;
+            }
+
+            .bar {
+                height: 9px;
+                border-radius: 999px;
+                background: rgba(255,255,255,.06);
+                overflow: hidden;
+            }
+
+            .fill {
+                height: 100%;
+                border-radius: inherit;
+                transition: width .4s ease;
+            }
+
+            .fill-red {
+                background: linear-gradient(90deg, #ff4055, #ff765c);
+            }
+
+            .fill-yellow {
+                background: linear-gradient(90deg, #d99925, #ffd05b);
+            }
+
+            .fill-green {
+                background: linear-gradient(90deg, #3ccf78, #7af2a1);
+            }
+
+            /* ---------------- THEORY ---------------- */
+
+            .theory {
+                border-left: 3px solid var(--orange);
+            }
+
+            .theory-grid {
+                display: grid;
+                gap: 0;
+            }
+
+            .theory-row {
+                display: grid;
+                grid-template-columns: 230px 1fr;
+                gap: 20px;
+                padding: 14px 0;
+                border-bottom: 1px solid var(--border);
+            }
+
+                .theory-row:last-child {
+                    border-bottom: 0;
+                }
+
+            .theory-label {
+                color: var(--muted);
+                font-size: 12px;
+            }
+
+            .theory-value {
+                color: #d9deea;
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            @@media(max - width: 650px)
+
+            {
+                .theory-row {
+                    grid-template-columns: 1fr;
+                    gap: 5px;
+                }
+            }
+
+            /* ---------------- FOOTER ---------------- */
+
+            .footer {
+                color: #626b7e;
+                font-size: 11px;
+                line-height: 1.7;
+                margin-top: 18px;
+                padding: 0 5px;
+            }
+
+            .tag {
+                display: inline-block;
+                padding: 4px 8px;
+                margin-right: 5px;
+                border-radius: 999px;
+                background: rgba(255,255,255,.04);
+                border: 1px solid var(--border);
+                color: #8f98aa;
+            }
+
+            /* ---------------- ANIMATION ---------------- */
+
+            .card,
+            .hero {
+                animation: rise .45s ease both;
+            }
+
+            @@keyframes rise {
+                from {
+                    opacity: 0;
+                    transform: translateY(8px);
+                }
+
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+    </style>
+
+
+<body>
+
+    <div class="app">
+
+        <!-- HERO -->
+
+        <section class="hero">
+
+            <div class="eyebrow">
+                Global resource model · 2026 → 2126
+            </div>
+
+            <h1>Resource Stress<br>Projection</h1>
+
+            <p>
+                An interactive scenario model exploring how changing oil consumption,
+                population growth, and hypothetical steam-vehicle adoption could affect
+                petroleum demand and modeled reserves over the next century.
+            </p>
+
+            <div class="warning">
+                ⚠ Scenario model — not a prediction of human extinction
+            </div>
+
+        </section>
+
+
+        <!-- BASELINE -->
+
+        <div class="section">
+
+            <div class="section-title">
+                <h2>Global oil baseline</h2>
+                <span>2026 starting conditions</span>
+            </div>
+
+            <div class="grid metrics">
+
+                <div class="card metric orange">
+                    <div class="metric-label">Proven reserves</div>
+                    <div class="metric-number">1.76T</div>
+                    <div class="metric-unit">barrels</div>
+                </div>
+
+                <div class="card metric blue">
+                    <div class="metric-label">Daily consumption</div>
+                    <div class="metric-number">103M</div>
+                    <div class="metric-unit">barrels / day</div>
+                </div>
+
+                <div class="card metric yellow">
+                    <div class="metric-label">Static-rate lifetime</div>
+                    <div class="metric-number">~47</div>
+                    <div class="metric-unit">years of proven reserves</div>
+                </div>
+
+                <div class="card metric green">
+                    <div class="metric-label">Modeled total reserves</div>
+                    <div class="metric-number">4.76T</div>
+                    <div class="metric-unit">proven + unproven barrels</div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div class="section">
+
+            <div class="section-title">
+                <h2>Scenario controls</h2>
+                <span>Drag to simulate</span>
+            </div>
+
+            <div class="card controls">
+
+                <div class="control">
+                    <div class="control-name">
+                        Annual consumption growth
+                    </div>
+
+                    <input type="range"
+                           id="growth"
+                           min="0"
+                           max="4"
+                           step="0.1"
+                           value="1.5">
+
+                    <div class="control-value" id="growthOut">
+                        1.5%
+                    </div>
+                </div>
+
+
+                <div class="control">
+                    <div class="control-name">
+                        Population growth contribution
+                    </div>
+
+                    <input type="range"
+                           id="popGrowth"
+                           min="0"
+                           max="2"
+                           step="0.1"
+                           value="0.9">
+
+                    <div class="control-value" id="popOut">
+                        0.9%
+                    </div>
+                </div>
+
+
+                <div class="control">
+                    <div class="control-name">
+                        Steam adoption by 2050
+                    </div>
+
+                    <input type="range"
+                           id="steamAdopt"
+                           min="0"
+                           max="100"
+                           step="5"
+                           value="40">
+
+                    <div class="control-value" id="steamOut">
+                        40%
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- CHART -->
+
+        <div class="section">
+
+            <div class="section-title">
+                <h2>100-year depletion projection</h2>
+                <span>Remaining modeled reserves</span>
+            </div>
+
+            <div class="card chart-card">
+
+                <div class="chart-wrap">
+                    <canvas id="oilChart"></canvas>
+                </div>
+
+                <div class="chart-legend">
+
+                    <div class="legend-item">
+                        <span class="legend-dot legend-orange"></span>
+                        Proven reserves
+                    </div>
+
+                    <div class="legend-item">
+                        <span class="legend-dot legend-blue"></span>
+                        Proven + unproven
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MILESTONES + WATER -->
+
+        <div class="section grid two">
+
+            <div>
+
+                <div class="section-title">
+                    <h2>Model milestones</h2>
+                    <span>Dynamic output</span>
+                </div>
+
+                <div class="card">
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Proven reserves exhausted
+                        </div>
+
+                        <div class="milestone-value bad" id="provenYear">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            All modeled reserves exhausted
+                        </div>
+
+                        <div class="milestone-value bad" id="totalYear">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Daily consumption — 2076
+                        </div>
+
+                        <div class="milestone-value warn" id="cons50">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Daily consumption — 2126
+                        </div>
+
+                        <div class="milestone-value bad" id="cons100">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Total modeled oil burned
+                        </div>
+
+                        <div class="milestone-value bad" id="totalBurned">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            CO₂ from modeled oil
+                        </div>
+
+                        <div class="milestone-value bad" id="co2">
+                            —
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div>
+
+                <div class="section-title">
+                    <h2>Steam water system</h2>
+                    <span>Fleet comparison</span>
+                </div>
+
+                <div class="card">
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Global vehicle fleet
+                        </div>
+
+                        <div class="milestone-value">
+                            1.5B
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Water top-up / car / day
+                        </div>
+
+                        <div class="milestone-value good">
+                            ~4 L
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Fleet daily water
+                        </div>
+
+                        <div class="milestone-value good" id="waterDay">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Fleet annual water
+                        </div>
+
+                        <div class="milestone-value good" id="waterYear">
+                            —
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Ocean volume
+                        </div>
+
+                        <div class="milestone-value">
+                            1.335B km³
+                        </div>
+                    </div>
+
+
+                    <div class="milestone">
+                        <div class="milestone-label">
+                            Oil / water volume ratio
+                        </div>
+
+                        <div class="milestone-value bad" id="oilVsWater">
+                            —
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- IMPACT -->
+
+        <div class="section">
+
+            <div class="section-title">
+                <h2>Environmental impact comparison</h2>
+                <span>Qualitative scenario indicators</span>
+            </div>
+
+            <div class="card impact">
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Oil — extraction-induced seismicity</span>
+                        <span class="impact-status bad">HIGH</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-red" style="width:85%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Steam — seismic disruption</span>
+                        <span class="impact-status good">LOW</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-green" style="width:3%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Oil — atmospheric CO₂</span>
+                        <span class="impact-status bad">VERY HIGH</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-red" style="width:98%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Steam — atmospheric impact</span>
+                        <span class="impact-status good">LOW</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-green" style="width:3%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Oil — ground subsidence</span>
+                        <span class="impact-status warn">SIGNIFICANT</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-yellow" style="width:75%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-row">
+
+                    <div class="impact-head">
+                        <span>Steam — direct ground impact</span>
+                        <span class="impact-status good">LOW</span>
+                    </div>
+
+                    <div class="bar">
+                        <div class="fill fill-green" style="width:2%"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- THEORY -->
+
+        <div class="section">
+
+            <div class="section-title">
+                <h2>Tectonic & geological hypothesis</h2>
+                <span>Interpretation layer</span>
+            </div>
+
+            <div class="card theory">
+
+                <div class="theory-grid">
+
+                    <div class="theory-row">
+                        <div class="theory-label">Oil & porous formations</div>
+
+                        <div class="theory-value">
+                            Hydrocarbon extraction changes fluid pressure and effective
+                            stresses within subsurface formations.
+                        </div>
+                    </div>
+
+
+                    <div class="theory-row">
+                        <div class="theory-label">Extraction effect</div>
+
+                        <div class="theory-value">
+                            Pressure changes can contribute to induced seismicity in some
+                            geological settings.
+                        </div>
+                    </div>
+
+
+                    <div class="theory-row">
+                        <div class="theory-label">Subsidence</div>
+
+                        <div class="theory-value">
+                            Fluid extraction can contribute to ground deformation and
+                            subsidence where geological conditions permit it.
+                        </div>
+                    </div>
+
+
+                    <div class="theory-row">
+                        <div class="theory-label">After extraction stops</div>
+
+                        <div class="theory-value">
+                            Subsurface pressures can change again as formations equilibrate,
+                            but the response varies greatly by geology and reservoir.
+                        </div>
+                    </div>
+
+
+                    <div class="theory-row">
+                        <div class="theory-label">Oil regeneration</div>
+
+                        <div class="theory-value warn">
+                            Natural petroleum formation occurs on geological timescales,
+                            not human timescales.
+                        </div>
+                    </div>
+
+
+                    <div class="theory-row">
+                        <div class="theory-label">Important limitation</div>
+
+                        <div class="theory-value">
+                            This model does not establish that oil depletion would cause
+                            human extinction or destabilise global plate tectonics.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- FOOTER -->
+
+        <div class="footer">
+
+            <span class="tag">SCENARIO MODEL</span>
+            <span class="tag">NOT A FORECAST</span>
+            <span class="tag">2026–2126</span>
+
+            <p>
+                The reserve and consumption figures are model inputs. The projection
+                assumes exponential consumption growth and a simplified hypothetical
+                reduction from steam adoption. Real-world petroleum production depends
+                on discoveries, economics, technology, policy, substitution, demand
+                changes, and resource definitions. Results should therefore be read as
+                scenario outputs rather than a forecast.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+            let chart = null;
+
+
+            /* --------------------------------
+               DOM
+            -------------------------------- */
+
+            const growth = document.getElementById("growth");
+            const popGrowth = document.getElementById("popGrowth");
+            const steamAdopt = document.getElementById("steamAdopt");
+
+            const growthOut = document.getElementById("growthOut");
+            const popOut = document.getElementById("popOut");
+            const steamOut = document.getElementById("steamOut");
+
+
+            /* --------------------------------
+               EVENTS
+            -------------------------------- */
+
+            growth.addEventListener("input", () => {
+                growthOut.textContent = growth.value + "%";
+                calc();
+            });
+
+            popGrowth.addEventListener("input", () => {
+                popOut.textContent = popGrowth.value + "%";
+                calc();
+            });
+
+            steamAdopt.addEventListener("input", () => {
+                steamOut.textContent = steamAdopt.value + "%";
+                calc();
+            });
+
+
+            /* --------------------------------
+               MODEL
+            -------------------------------- */
+
+            function calc() {
+
+                const consumptionGrowth =
+                    parseFloat(growth.value) / 100;
+
+                const populationGrowth =
+                    parseFloat(popGrowth.value) / 100;
+
+                const steam =
+                    parseFloat(steamAdopt.value) / 100;
+
+
+                const provenReserves = 1.76e12;
+                const totalReserves = 4.76e12;
+
+                const dailyBase = 103e6;
+                const annualBase = dailyBase * 365;
+
+
+                let proven = provenReserves;
+                let total = totalReserves;
+
+                let annual = annualBase;
+
+                let provenYear = null;
+                let totalYear = null;
+
+                let totalBurned = 0;
+
+
+                const years = [];
+                const provenArr = [];
+                const totalArr = [];
+                const consumeArr = [];
+
+
+                for (let y = 0; y <= 100; y++) {
+
+                    const year = 2026 + y;
+
+
+                    /*
+                      Population growth is included as an additional
+                      demand pressure. We scale its contribution so that
+                      the two sliders remain separate rather than simply
+                      adding both rates 1:1.
+                    */
+
+                    const effectiveGrowth =
+                        consumptionGrowth +
+                        (populationGrowth * 0.35);
+
+
+                    /*
+                      Hypothetical steam adoption effect.
+
+                      This is intentionally a scenario parameter,
+                      not a claim about real-world adoption.
+                    */
+
+                    let adoptionFactor;
+
+                    if (y <= 24) {
+
+                        adoptionFactor =
+                            1 -
+                            (steam * (y / 24) * 0.5);
+
+                    } else {
+
+                        adoptionFactor =
+                            1 -
+                            (steam * 0.5) -
+                            (
+                                steam *
+                                0.3 *
+                                (Math.min(y - 24, 26) / 26)
+                            );
+                    }
+
+
+                    const adjustedAnnual =
+                        annual *
+                        Math.max(0.2, adoptionFactor);
+
+
+                    years.push(year);
+
+                    provenArr.push(
+                        Math.max(
+                            0,
+                            Math.round(proven / 1e9)
+                        )
+                    );
+
+                    totalArr.push(
+                        Math.max(
+                            0,
+                            Math.round(total / 1e9)
+                        )
+                    );
+
+                    consumeArr.push(
+                        Math.round(
+                            adjustedAnnual / 1e9 * 10
+                        ) / 10
+                    );
+
+
+                    if (
+                        proven > 0 &&
+                        proven - adjustedAnnual <= 0 &&
+                        !provenYear
+                    ) {
+                        provenYear = year;
+                    }
+
+
+                    if (
+                        total > 0 &&
+                        total - adjustedAnnual <= 0 &&
+                        !totalYear
+                    ) {
+                        totalYear = year;
+                    }
+
+
+                    totalBurned += Math.min(
+                        adjustedAnnual,
+                        Math.max(0, total)
+                    );
+
+
+                    proven = Math.max(
+                        0,
+                        proven - adjustedAnnual
+                    );
+
+                    total = Math.max(
+                        0,
+                        total - adjustedAnnual
+                    );
+
+
+                    annual *=
+                        1 + effectiveGrowth;
+                }
+
+
+                /* --------------------------------
+                   OUTPUTS
+                -------------------------------- */
+
+                const cons50 = consumeArr[50];
+                const cons100 = consumeArr[100];
+
+
+                const co2 =
+                    Math.round(
+                        totalBurned *
+                        0.43 /
+                        1e12 *
+                        10
+                    ) / 10;
+
+
+                document.getElementById("provenYear")
+                    .textContent =
+                    provenYear || "Beyond 2126";
+
+
+                document.getElementById("totalYear")
+                    .textContent =
+                    totalYear || "Beyond 2126";
+
+
+                document.getElementById("cons50")
+                    .textContent =
+                    (cons50 * 1000).toFixed(0) +
+                    "M bbl/day";
+
+
+                document.getElementById("cons100")
+                    .textContent =
+                    (cons100 * 1000).toFixed(0) +
+                    "M bbl/day";
+
+
+                document.getElementById("totalBurned")
+                    .textContent =
+                    (totalBurned / 1e12).toFixed(2) +
+                    "T barrels";
+
+
+                document.getElementById("co2")
+                    .textContent =
+                    co2 +
+                    "T tonnes CO₂";
+
+
+                /* --------------------------------
+                   WATER MODEL
+                -------------------------------- */
+
+                const fleet =
+                    1.5e9 *
+                    (1 - steam * 0.5);
+
+
+                const waterDay =
+                    Math.round(
+                        fleet * 4 / 1e9 * 100
+                    ) / 100;
+
+
+                const waterYear =
+                    Math.round(
+                        waterDay * 365 * 100
+                    ) / 100;
+
+
+                document.getElementById("waterDay")
+                    .textContent =
+                    waterDay.toFixed(2) +
+                    "B L/day";
+
+
+                document.getElementById("waterYear")
+                    .textContent =
+                    waterYear.toFixed(0) +
+                    "B L/year";
+
+
+                const oilVolume =
+                    annualBase * 159;
+
+
+                const waterVolume =
+                    waterDay * 1e9 * 365;
+
+
+                document.getElementById("oilVsWater")
+                    .textContent =
+                    Math.round(
+                        oilVolume / waterVolume
+                    ) + "×";
+
+
+                /* --------------------------------
+                   CHART
+                -------------------------------- */
+
+                const dark = true;
+
+                const gridColor =
+                    "rgba(255,255,255,.055)";
+
+                const textColor =
+                    "#778196";
+
+
+                if (chart) {
+                    chart.destroy();
+                }
+
+
+                chart = new Chart(
+                    document.getElementById("oilChart"),
+                    {
+
+                        type: "line",
+
+                        data: {
+
+                            labels: years,
+
+                            datasets: [
+
+                                {
+                                    label: "Proven reserves",
+                                    data: provenArr,
+
+                                    borderColor: "#ff7043",
+
+                                    backgroundColor:
+                                        "rgba(255,112,67,.10)",
+
+                                    borderWidth: 2.5,
+
+                                    pointRadius: 0,
+
+                                    tension: .35,
+
+                                    fill: true
+                                },
+
+
+                                {
+                                    label: "All modeled reserves",
+                                    data: totalArr,
+
+                                    borderColor: "#4da3ff",
+
+                                    backgroundColor:
+                                        "rgba(77,163,255,.04)",
+
+                                    borderWidth: 2,
+
+                                    pointRadius: 0,
+
+                                    tension: .35,
+
+                                    fill: true,
+
+                                    borderDash: [7, 5]
+                                }
+
+                            ]
+                        },
+
+
+                        options: {
+
+                            responsive: true,
+
+                            maintainAspectRatio: false,
+
+                            interaction: {
+                                mode: "index",
+                                intersect: false
+                            },
+
+
+                            plugins: {
+
+                                legend: {
+                                    display: false
+                                },
+
+
+                                tooltip: {
+
+                                    backgroundColor:
+                                        "#111722",
+
+                                    borderColor:
+                                        "rgba(255,255,255,.1)",
+
+                                    borderWidth: 1,
+
+                                    padding: 12,
+
+                                    titleColor: "#fff",
+
+                                    bodyColor: "#b9c1d1",
+
+                                    callbacks: {
+
+                                        label: ctx =>
+                                            ctx.dataset.label +
+                                            ": " +
+                                            ctx.parsed.y.toLocaleString() +
+                                            " Gb"
+
+                                    }
+                                }
+
+                            },
+
+
+                            scales: {
+
+                                x: {
+
+                                    ticks: {
+                                        color: textColor,
+                                        maxTicksLimit: 9
+                                    },
+
+                                    grid: {
+                                        color: gridColor
+                                    }
+
+                                },
+
+
+                                y: {
+
+                                    beginAtZero: true,
+
+                                    ticks: {
+
+                                        color: textColor,
+
+                                        callback: value =>
+                                            value + " Gb"
+
+                                    },
+
+                                    grid: {
+                                        color: gridColor
+                                    },
+
+                                    title: {
+
+                                        display: true,
+
+                                        text:
+                                            "Remaining billion barrels",
+
+                                        color: textColor,
+
+                                        font: {
+                                            size: 11
+                                        }
+                                    }
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+                );
+
+            }
+
+
+            /* INITIALIZE */
+
+            calc();
+
+    </script>
+
+</body>

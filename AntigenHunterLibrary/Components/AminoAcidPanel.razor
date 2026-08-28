@@ -1,0 +1,192 @@
+@* ============================================================
+   AminoAcidPanel.razor
+   AntigenHunter — Interactive Amino Acid Reference Panel
+   Dual mode: Reference (click to see info) / Edit (click to swap)
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+<div class="ah-aa-panel">
+    <button class="ah-aa-panel__toggle"
+            @onclick="TogglePanel"
+            type="button">
+        <span>🧬 Amino Acid Reference Panel</span>
+        <span class="ah-aa-panel__toggle-arrow @(_isOpen ? "open" : "")">▼</span>
+    </button>
+
+    <div class="ah-aa-panel__body @(_isOpen ? "open" : "")">
+
+        @* ── Mode Toggle ─────────────────────────────────── *@
+        @if (AllowEditMode)
+        {
+            <div class="ah-flex-between ah-mb-md">
+                <span class="ah-text-xs ah-text-muted">
+                    @(_editMode
+                                    ? "EDIT MODE — Click a position in the sequence, then click an AA below to swap it"
+                                    : "REFERENCE MODE — Click any amino acid to see its properties")
+                </span>
+                <button class="ah-btn ah-btn--ghost ah-btn--sm"
+                        @onclick="ToggleMode"
+                        type="button">
+                    @(_editMode ? "📖 Reference" : "✏️ Edit Mode")
+                </button>
+            </div>
+        }
+
+        @* ── AA Groups ───────────────────────────────────── *@
+        @foreach (var group in _groups)
+        {
+            <div class="ah-aa-group ah-aa-group--@group.CssKey">
+                <div class="ah-aa-group__label">@group.Label</div>
+                <div class="ah-aa-grid">
+                    @foreach (var aa in group.Residues)
+                    {
+                        <button class="ah-aa-cell @(IsSelected(aa) ? "ah-aa-cell--selected" : "")"
+                                @onclick="() => OnCellClick(aa)"
+                                title="@aa.FullName"
+                                type="button">
+                            <span class="ah-aa-cell__code">@aa.Code</span>
+                            <span class="ah-aa-cell__name">@aa.ThreeLetter</span>
+                        </button>
+                    }
+                </div>
+            </div>
+        }
+
+        @* ── Info Card ───────────────────────────────────── *@
+        @if (_selected != null)
+        {
+            <div class="ah-aa-info">
+                <div class="ah-aa-info__title">
+                    @_selected.Code — @_selected.FullName (@_selected.ThreeLetter)
+                </div>
+                <div class="ah-text-sm ah-mt-sm" style="color:var(--text-secondary)">
+                    @_selected.Description
+                </div>
+                <div class="ah-aa-info__props">
+                    <span class="ah-badge ah-badge--cyan">
+                        H: @_selected.Hydrophobicity.ToString("+0.0;-0.0;0.0")
+                    </span>
+                    <span class="ah-badge @(_selected.Charge > 0 ? "ah-badge--green" : _selected.Charge < 0 ? "ah-badge--orange" : "ah-badge--muted")">
+                        Charge: @(_selected.Charge > 0 ? $"+{_selected.Charge}" : _selected.Charge.ToString())
+                    </span>
+                    <span class="ah-badge ah-badge--muted">
+                        MW: @_selected.MolecularWeight Da
+                    </span>
+                    @if (_selected.IsAromatic)
+                    {
+                        <span class="ah-badge ah-badge--gold">π Aromatic</span>
+                    }
+                    @if (_selected.IsSHMHotspot)
+                    {
+                        <span class="ah-badge ah-badge--green">SHM Hotspot</span>
+                    }
+                    @if (_selected.IsCommonContactResidue)
+                    {
+                        <span class="ah-badge ah-badge--cyan">Contact Residue</span>
+                    }
+                </div>
+
+                @if (_selected.ValidSubstitutions.Any())
+                {
+                    <div class="ah-aa-info__swaps">
+                        <span class="ah-text-xs ah-text-muted">
+                            Common swaps:
+                        </span>
+                        @foreach (var sub in _selected.ValidSubstitutions.Take(4))
+                        {
+                            <span class="ah-badge @GetSubBadgeClass(sub.Type) ah-mt-sm"
+                                  style="margin-left:4px"
+                                  title="@sub.Note">
+                                →@sub.TargetCode
+                            </span>
+                        }
+                    </div>
+                }
+            </div>
+        }
+
+    </div>
+</div>
+
+@code {
+    // ── Parameters ────────────────────────────────────────────
+    [Parameter] public bool AllowEditMode { get; set; } = false;
+    [Parameter] public int? SelectedPosition { get; set; }
+    [Parameter] public EventCallback<(int Position, char NewCode)> OnSwapRequested { get; set; }
+    [Parameter] public bool DefaultOpen { get; set; } = false;
+
+    // ── State ─────────────────────────────────────────────────
+    private bool _isOpen;
+    private bool _editMode;
+    private AminoAcid? _selected;
+    private List<AaGroup> _groups = new();
+
+    protected override void OnInitialized()
+    {
+        _isOpen = DefaultOpen;
+        BuildGroups();
+    }
+
+    private void TogglePanel() => _isOpen = !_isOpen;
+    private void ToggleMode() => _editMode = !_editMode;
+
+    private async Task OnCellClick(AminoAcid aa)
+    {
+        if (_editMode && SelectedPosition.HasValue)
+        {
+            // Emit swap request to parent
+            await OnSwapRequested.InvokeAsync((SelectedPosition.Value, aa.Code));
+        }
+        else
+        {
+            _selected = _selected?.Code == aa.Code ? null : aa;
+        }
+    }
+
+    private bool IsSelected(AminoAcid aa) =>
+        _selected?.Code == aa.Code;
+
+    private static string GetSubBadgeClass(SubstitutionType type) => type switch
+    {
+        SubstitutionType.Conservative => "ah-badge--green",
+        SubstitutionType.SemiConservative => "ah-badge--cyan",
+        SubstitutionType.Radical => "ah-badge--orange",
+        _ => "ah-badge--muted"
+    };
+
+    private void BuildGroups()
+    {
+        _groups = new List<AaGroup>
+        {
+            new("nonpolar", "⬡ Nonpolar / Hydrophobic",
+                AminoAcidGroup.NonpolarAliphatic,
+                AminoAcidGroup.AromaticHydrophobic),
+            new("polar", "◈ Polar Uncharged",
+                AminoAcidGroup.PolarUncharged),
+            new("positive", "⊕ Positively Charged",
+                AminoAcidGroup.PositiveCharged),
+            new("negative", "⊖ Negatively Charged",
+                AminoAcidGroup.NegativeCharged),
+        };
+    }
+
+    // ── Inner Types ───────────────────────────────────────────
+    private class AaGroup
+    {
+        public string CssKey { get; }
+        public string Label { get; }
+        public List<AminoAcid> Residues { get; }
+
+        public AaGroup(string cssKey, string label,
+            params AminoAcidGroup[] groups)
+        {
+            CssKey = cssKey;
+            Label = label;
+            Residues = AminoAcidDatabase.All
+                .Where(aa => groups.Contains(aa.Group))
+                .ToList();
+        }
+    }
+}

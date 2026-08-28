@@ -1,0 +1,140 @@
+@* ============================================================
+   SequenceHighlighter.razor
+   AntigenHunter — CDR Color Highlighting Component
+   Renders a VH sequence with CDR regions highlighted in
+   green (H1), blue (H2), orange (H3).
+   ⚔️ Forged by Claude AI
+   ============================================================ *@
+
+@using AntigenHunterLibrary.Models
+
+@if (Sequence != null && Sequence.Length > 0)
+{
+    <div class="ah-sequence-display">
+        @foreach (var res in Sequence.Residues)
+        {
+            <span class="@res.CssClass
+                          @(res.IsCriticalContact ? "ah-seq-critical" : "")
+                          @(res.Index == SelectedPosition ? "ah-seq-selected" : "")"
+                  @onclick="() => OnResidueClick(res)"
+                  title="@GetTooltip(res)"
+                  style="cursor:@(AllowSelection ? "pointer" : "default")">@res.Code</span>
+        }
+    </div>
+
+    @* ── CDR Legend ──────────────────────────────────────── *@
+    @if (ShowLegend && Sequence.HasCdrs)
+    {
+        <div class="ah-cdr-legend">
+            @foreach (var cdr in Sequence.CdrRegions)
+            {
+                <span class="ah-cdr-badge ah-cdr-badge--@cdr.CssClass">
+                    @cdr.Name: @cdr.Sequence
+                </span>
+            }
+            @if (Sequence.MutationCount > 0)
+            {
+                <span class="ah-badge ah-badge--gold">
+                    @Sequence.MutationCount mutation@(Sequence.MutationCount != 1 ? "s" : "") applied
+                </span>
+            }
+        </div>
+    }
+
+    @* ── Stats Row ───────────────────────────────────────── *@
+    @if (ShowStats)
+    {
+        <div class="ah-flex-wrap ah-mt-sm">
+            <span class="ah-badge ah-badge--muted">
+                Length: @Sequence.Length aa
+            </span>
+            <span class="ah-badge ah-badge--cyan">
+                Aromatic: @Sequence.AromaticFraction.ToString("P0")
+            </span>
+            <span class="ah-badge @(Sequence.NetCharge >= 0 ? "ah-badge--green" : "ah-badge--orange")">
+                Charge: @(Sequence.NetCharge >= 0 ? $"+{Sequence.NetCharge}" : Sequence.NetCharge.ToString())
+            </span>
+            <span class="ah-badge ah-badge--cyan">
+                CDR Aromatics: @Sequence.CdrAromaticFraction.ToString("P0")
+            </span>
+        </div>
+    }
+
+    @* ── Selected Residue Info ───────────────────────────── *@
+    @if (SelectedPosition.HasValue && SelectedPosition < Sequence.Length)
+    {
+        var selRes = Sequence.Residues[SelectedPosition.Value];
+        <div class="ah-aa-info ah-mt-sm">
+            <div class="ah-aa-info__title">
+                Position @(SelectedPosition.Value + 1): @selRes.Code
+                (@(selRes.AminoAcid?.FullName ?? "Unknown"))
+                @if (selRes.IsCdr)
+                {
+                    <span class="ah-badge ah-badge--cyan" style="margin-left:8px">
+                        @selRes.CdrRegion?.Name
+                    </span>
+                }
+                @if (selRes.IsCriticalContact)
+                {
+                    <span class="ah-badge ah-badge--gold" style="margin-left:4px">
+                        ⭐ Critical
+                    </span>
+                }
+            </div>
+            @if (selRes.AminoAcid != null)
+            {
+                <div class="ah-text-sm ah-mt-sm" style="color:var(--text-secondary)">
+                    @selRes.AminoAcid.Description
+                </div>
+            }
+        </div>
+    }
+}
+else
+{
+    <div class="ah-empty">
+        <div class="ah-empty__icon">🧬</div>
+        <div class="ah-empty__text">No sequence loaded</div>
+    </div>
+}
+
+@code {
+    [Parameter] public AntibodySequence? Sequence { get; set; }
+    [Parameter] public bool ShowLegend { get; set; } = true;
+    [Parameter] public bool ShowStats  { get; set; } = true;
+    [Parameter] public bool AllowSelection { get; set; } = false;
+    [Parameter] public int? SelectedPosition { get; set; }
+    [Parameter] public EventCallback<int> OnPositionSelected { get; set; }
+
+    private async Task OnResidueClick(ResidueInfo res)
+    {
+        if (!AllowSelection) return;
+        await OnPositionSelected.InvokeAsync(res.Index);
+    }
+
+    private static string GetTooltip(ResidueInfo res)
+    {
+        var sb = new System.Text.StringBuilder();
+        sb.Append($"Pos {res.Position}: {res.Code}");
+        if (res.AminoAcid != null)
+            sb.Append($" ({res.AminoAcid.FullName})");
+        if (res.IsCdr)
+            sb.Append($" [{res.CdrRegion?.Name}]");
+        if (res.IsCriticalContact)
+            sb.Append(" ⭐ Critical contact");
+        return sb.ToString();
+    }
+}
+
+<style>
+    .ah-seq-critical {
+        text-decoration: underline;
+        text-decoration-color: var(--ah-gold);
+        text-decoration-style: dotted;
+    }
+    .ah-seq-selected {
+        background: rgba(0,229,255,0.25) !important;
+        border-radius: 3px;
+        outline: 1px solid var(--ah-cyan);
+    }
+</style>

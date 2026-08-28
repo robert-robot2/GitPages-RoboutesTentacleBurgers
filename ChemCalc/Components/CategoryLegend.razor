@@ -1,0 +1,54 @@
+@using ChemCalc.Data
+
+@* Category legend with interactive buttons to highlight element types *@
+
+<div class="category-legend">
+    @foreach (var type in ElementTypes)
+    {
+        <button class="category-btn @GetActiveClass(type)"
+                style="background-color: @ElementTypeHelper.GetStandardColor(type);"
+                @onclick="() => OnCategoryClick(type)">
+            @ElementTypeHelper.GetLegendLabel(type)
+        </button>
+    }
+</div>
+
+@code {
+    private List<ElementType> ElementTypes = new List<ElementType>
+    {
+        ElementType.AlkaliMetal,
+        ElementType.AlkalineEarth,
+        ElementType.TransitionMetal,
+        ElementType.BasicMetal,
+        ElementType.Semimetal,
+        ElementType.Nonmetal,
+        ElementType.Halogen,
+        ElementType.NobleGas,
+        ElementType.Lanthanide,
+        ElementType.Actinide
+    };
+
+    [Parameter]
+    public EventCallback<ElementType?> OnCategorySelected { get; set; }
+
+    [Parameter]
+    public ElementType? SelectedCategory { get; set; }
+
+    private async Task OnCategoryClick(ElementType type)
+    {
+        // Toggle: if already selected, deselect it
+        if (SelectedCategory == type)
+        {
+            await OnCategorySelected.InvokeAsync(null);
+        }
+        else
+        {
+            await OnCategorySelected.InvokeAsync(type);
+        }
+    }
+
+    private string GetActiveClass(ElementType type)
+    {
+        return SelectedCategory == type ? "category-active" : "";
+    }
+}

@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="10.0.2" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="BWP\BWPMenu\" />
+    <Folder Include="Shaders\" />
+    <Folder Include="wwwroot\" />
+  </ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Include="Shaders\shadow_pcf.frag" />
+		<EmbeddedResource Include="Shaders\shadow_pcss.frag" />
+		<EmbeddedResource Include="Shaders\spectral_xs_V1.frag" />
+		<EmbeddedResource Include="Shaders\spectral_xs_V2.frag" />
+		<EmbeddedResource Include="Shaders\vsSource.vert" />
+	</ItemGroup>
+
+</Project>

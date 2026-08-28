@@ -1,0 +1,172 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using static SpectralXGLX.BWP.SpectralWaveSys;
+
+namespace SpectralXGLX.SpectralXComponent
+{
+    public partial class SpectralXEngine
+    {
+        public void InitScene13()
+        {
+            Shadow = new SpectralXShadow();
+            Shadow.SoftnessBias = 0.008f;
+            Shadow.KernelSize = 3.0f;
+            Shadow.DepthBias = 0.003f;
+            Shadow.ContactSharpness = 0.0005f;
+            Shadow.TintR = 0.2f;
+            Shadow.TintStrength = 0.3f;
+            Shadow.PenumbraTintStrength = 0.4f;
+
+            Weather = new SpectralXWeatherClass();
+            Weather.Init(Scene13, MeshLibrary, new Dictionary<WeatherParticleType, ParticleVolume>
+    {
+        { WeatherParticleType.Rain,      new ParticleVolume(-64f, 64f, -64f, 64f,  0f, 30f) },
+        { WeatherParticleType.Snow,      new ParticleVolume(-64f, 64f, -64f, 64f,  0f, 30f) },
+        { WeatherParticleType.Cloud,     new ParticleVolume(-64f, 64f, -64f, 64f, 10f, 30f) },
+        { WeatherParticleType.Lightning, new ParticleVolume(-64f, 64f, -64f, 64f,  0f, 30f) },
+    });
+
+            // ── Lighting ─────────────────────────────────────────
+            var light1 = new SpectralXLight(
+                position: new Vector3(0, 0, 2),
+                color: new Vector3(1f, 1f, 1f),
+                intensity: 2.0f,
+                range: 2f);
+            light1.CastsShadows = false;
+            Scene13.AddLight(light1);
+
+            var light2 = new SpectralXLight(
+                position: new Vector3(-5, 5, 4),
+                color: new Vector3(0f, 0.4f, 1f),
+                intensity: 5.0f,
+                range: 8f);
+            light2.CastsShadows = false;
+            Scene13.AddLight(light2);
+
+            var light3 = new SpectralXLight(
+                position: new Vector3(5, 5, 4),
+                color: new Vector3(0.6f, 0f, 1f),
+                intensity: 5.0f,
+                range: 8f);
+            light3.CastsShadows = false;
+            Scene13.AddLight(light3);
+
+            // ── Skysphere ─────────────────────────────────────────
+            var skySphere3 = CreateGizmoFrom("SkySphere", "FBXCube");
+            skySphere3.Name = "SkySphere";
+            skySphere3.Position = new Vector3(Camera.Position.X, Camera.Position.Y, Camera.Position.Z);
+            skySphere3.Size = new Vector3(120f, 120f, 120f);
+            skySphere3.Color = new Vector4(1f, 1f, 1f, 1f);
+            skySphere3.IsEmissive = true;
+            skySphere3.EmissiveIntensity = 1.0f;
+            skySphere3.MaterialTextures.Add("/iAssets/SkyCubeMap012.png");
+            skySphere3.MaterialTextures.Add("/iAssets/StarsCubeMap015.png");
+            skySphere3.Rotation = new Vector3(0f, 0f, 0f);
+            Scene13.AddMesh(skySphere3);
+
+            // ── Sun Directional Light ─────────────────────────────
+            _sunLight = new SpectralXLight(
+                position: new Vector3(0f, -15f, 20f),
+                color: new Vector3(1f, 0.98f, 0.90f),
+                intensity: 5.0f,
+                range: 200f);
+
+            _sunLight.Type = LightType.Directional;
+            _sunLight.Direction = new Vector3(0f, -0.5f, -1f);
+            _sunLight.CastsShadows = true;
+            _sunLight.Enabled = true;
+
+            Sun.Apply(_sunLight);
+            Scene13.AddLight(_sunLight);
+
+            // ── Tile Map ─────────────────────────────────────────
+            TileMap = new SpectralXLandTileMap();
+            TileMap.SetGridSize(128);
+            TileMap.CustomTexturePaths = new[]
+            {
+        "/iAssets/RockTile010.png",
+        "/iAssets/GrassTile010.png",
+        "/iAssets/DirtTile010.png",
+        "/iAssets/SnowTile010.png",
+        "/iAssets/WaterTile010.png",
+        "/iAssets/IceTile010.png",
+    };
+
+            TileMap.CustomNormalMapPaths = new string?[6];
+            TileMap.CustomSpecularMapPaths = new string?[6];
+            TileMap.CustomRoughnessMapPaths = new string?[6];
+            TileMap.CustomMetallicMapPaths = new string?[6];
+            TileMap.CustomAOMapPaths = new string?[6];
+            TileMap.CustomEmissiveMapPaths = new string?[6];
+            TileMap.CustomDisplacementMapPaths = new string?[6];
+
+            TileMap.RoughnessValues = new[] { 0.9f, 0.8f, 0.85f, 0.4f, 0.1f, 0.2f };
+            TileMap.MetallicValues = new[] { 0.0f, 0.0f, 0.0f, 0.3f, 0.0f, 0.4f };
+            TileMap.AOValues = new[] { 1.0f, 1.0f, 1.0f, 1.0f, 1.0f, 1.0f };
+            TileMap.SpecularValues = new[] { 0.3f, 0.4f, 0.2f, 0.6f, 0.8f, 0.9f };
+            TileMap.EmissiveIntensityValues = new[] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+            TileMap.DisplacementStrengthValues = new[] { 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f };
+            TileMap.ParallaxScaleValues = new[] { 0.02f, 0.02f, 0.02f, 0.02f, 0.02f, 0.02f };
+            TileMap.Init();
+            _tileMapTexturesUploaded = false;
+            _tilePBRUploaded = false;
+            _ = LoadLandscape();
+
+            // ── Camera ───────────────────────────────────────────
+            Camera.Position = new CustomVec3(0, -10, 4);
+
+            OrthoCamera.Reset(0f, 0f, 15f);
+            OrthoCamera.LockToPlayer = false;
+
+            // ── BWPScene10 (Caves) ───────────────────────────────────────────────
+            AddSignpost(Scene13, "Scene13_SignpostToForest1",
+                GetTriggerPos(SceneID.BWPScene10, SceneID.BWPScene1));
+
+            StaticProps = new SpectralProps();
+            StaticProps.SpawnScattered(
+                MeshLibrary, Scene13,
+                SpectralPropDefs.CaveDictionary(),
+                SpectralPropDefs.All,
+                spawnRadius: 64f, clearRadius: 3f, seed: 42);
+
+            SpectralDynManager.SpawnAll(Scene13, MeshLibrary, spawnRadius: 60f, seed: 42);
+       
+
+            SpectralUndeadGFRegistry.Spawn(
+                Scene13, MeshLibrary,
+                count: 6,
+                originX: 0f, originY: 0f, originZ: 0.1f,
+                radius: 12f,
+                seed: 99);
+
+            WaveSystem.SetSpawnOrigin(0f, 0f, 1.0f);
+            WaveSystem.SetSpawnCallback(SpawnSkeleton, DespawnSkeleton, SpawnPsychoSkeleton, DespawnPsychoSkeleton);
+            WaveSystem.SetSpawnCallback(SpawnZombiePsycho, DespawnZombiePsycho, SpawnSkeletonWar, DespawnSkeletonWar,
+                SpawnGoatman, DespawnGoatman, SpawnScavBoss, DespawnScavBoss, SpawnSkeletonBoss, DespawnSkeletonBoss);
+            WaveSystem.RegisterSceneWaves(SceneID.BWPScene10, new WaveDefinition[]
+      {
+    new WaveDefinition
+    {
+        Skeletons       = new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        PsychoSkeletons = new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        ZombiePsycho    = new[] { 2, 2, 3, 3, 4, 4, 5, 5, 6, 6 },
+        Goatman         = new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        SkeletonWar     = new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        ScavBoss        = new[] { 1, 1, 2, 2, 3, 3, 4, 4, 5, 6 },
+        SkeletonBoss    = new[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+        OnWaveStart = () => Console.WriteLine("[Scene13] Wave started!")
+    }
+      });
+            WaveSystem.SetScene(SceneID.BWPScene10);
+            WaveSystem.LoadWave(1);
+
+
+            Console.WriteLine("[SpectralXEngine] Skeleton spawned from menu");
+            Console.WriteLine("[InitScene13] Scene13 ready");
+        }
+
+
+
+    }
+}

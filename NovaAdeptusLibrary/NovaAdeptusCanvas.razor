@@ -1,0 +1,593 @@
+@inject IJSRuntime JS
+@inject HttpClient Http
+<!-- ═══════════════════════════════════════════════════════════
+     STARFIELD CANVAS — sits behind everything
+═══════════════════════════════════════════════════════════ -->
+
+<!-- ═══════════════════════════════════════════════════════════
+     SIDEBAR OVERLAY
+═══════════════════════════════════════════════════════════ -->
+<div class="nova-sidebar @(_sidebarOpen ? "sidebar-open" : "sidebar-closed")">
+    <div class="sidebar-header">
+        <span class="sidebar-title">NOVA ADEPTUS</span>
+        <button class="sidebar-toggle" @onclick="ToggleSidebar" title="Close sidebar">✕</button>
+    </div>
+
+    <div class="sidebar-section">
+        <button class="new-chat-btn" @onclick="NewChat">
+            <span class="btn-icon">+</span>
+            <span>New Chat</span>
+        </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+ <div class="sidebar-section">
+    <div class="sidebar-label">OPERATIVE STATUS</div>
+    <div class="sidebar-stat">
+        <span class="stat-key">Mood</span>
+        <span class="stat-val">
+            <span style="display:inline-block;width:9px;height:9px;
+                         border-radius:50%;
+                         background:@_staticEmotionColor;
+                         margin-right:5px;vertical-align:middle;">
+            </span>
+            @_staticEmotionState
+        </span>
+    </div>
+    <div class="sidebar-stat">
+        <span class="stat-key">HP</span>
+        <span class="stat-val"
+              style="color:#ff6b6b">
+            @(_nova?.Session.CurrentHP ?? 100) /
+            @(_nova?.Session.MaxHP ?? 100)
+        </span>
+    </div>
+    <div class="sidebar-stat">
+        <span class="stat-key">Coins</span>
+        <span class="stat-val"
+              style="color:#ffd700">
+            @(_nova?.Session.GalacticCoins ?? 50) GC
+        </span>
+    </div>
+    <div class="sidebar-stat">
+        <span class="stat-key">Rep</span>
+        <span class="stat-val"
+              style="color:var(--lime);font-size:10px;">
+            @(_nova?.Session.ReputationTitle ?? "Neutral")
+        </span>
+    </div>
+</div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section sidebar-footer">
+        <span class="sidebar-tagline">Forged in the void.</span>
+    </div>
+</div>
+
+<!-- Sidebar open toggle (visible when sidebar is closed) -->
+<button class="sidebar-open-btn @(_sidebarOpen ? "hidden" : "")" @onclick="ToggleSidebar" title="Open sidebar">
+    ☰
+</button>
+
+<!-- ═══════════════════════════════════════════════════════════
+     MAIN CHAT AREA
+═══════════════════════════════════════════════════════════ -->
+<div class="nova-main @(_sidebarOpen ? "main-shifted" : "")">
+  
+   
+    <!-- Message feed -->
+    <div class="nova-feed" id="novaFeed">
+        @foreach (var msg in messages)
+        {
+            if (msg.sender == "Nova")
+            {
+                <div class="msg-row msg-nova">
+                    <div class="msg-bubble bubble-nova">
+                        <span class="msg-sender">
+                            NOVA
+                            <span class="emotion-dot"
+                                  style="background:@_staticEmotionColor;"
+                                  title="@_staticEmotionState"></span>
+                        </span>
+                        <span class="msg-text">@msg.text</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="msg-row msg-you">
+                    <div class="msg-bubble bubble-you">
+                        <span class="msg-sender">YOU</span>
+                        <span class="msg-text">@msg.text</span>
+                    </div>
+                </div>
+            }
+        }
+        <!-- Scroll anchor -->
+        <div id="scrollAnchor"></div>
+    </div>
+
+    <!-- Input bar -->
+    <div class="nova-input-bar">
+        <input class="nova-input"
+               @bind="userInput"
+               @bind:event="oninput"
+               @onkeydown="HandleKeyDown"
+               placeholder="Enter the void..." />
+        <button class="nova-send-btn" @onclick="SendMessage">SEND</button>
+    </div>
+
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     STYLES
+═══════════════════════════════════════════════════════════ -->
+<style>
+    /* ── Reset & root ───────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+        --lime:        #39ff14;
+        --lime-dim:    #27b30e;
+        --lime-glow:   rgba(57, 255, 20, 0.25);
+        --void:        #000000;
+        --void-deep:   #020408;
+        --panel:       rgba(0, 8, 20, 0.82);
+        --panel-edge:  rgba(57, 255, 20, 0.18);
+        --text-main:   #c8f0ff;
+        --text-dim:    #5a8aaa;
+        --text-nova:   #39ff14;
+        --text-you:    #7dd8ff;
+        --sidebar-w:   240px;
+        --topbar-h:    48px;
+        --inputbar-h:  70px;
+        --font-main:   'Courier New', 'Lucida Console', monospace;
+    }
+
+    html, body {
+        height: 100%;
+        overflow: hidden;
+        background: var(--void-deep);
+        font-family: var(--font-main);
+    }
+
+    /* ── Starfield canvas ───────────────────────────────────── */
+    #novaStarfield {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100vw; height: 100vh;
+        z-index: 0;
+        pointer-events: none;
+    }
+    /* ── Topbar stats ───────────────────────────────────── */
+.nova-topbar-stats {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.topbar-stat {
+    font-size: 11px;
+    font-family: var(--font-main);
+    letter-spacing: 1px;
+    padding: 3px 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(6px);
+}
+
+.hp-stat {
+    color: #ff6b6b;
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    background: rgba(255, 107, 107, 0.08);
+}
+
+.coin-stat {
+    color: #ffd700;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    background: rgba(255, 215, 0, 0.08);
+}
+    /* ── Sidebar ────────────────────────────────────────────── */
+    .nova-sidebar {
+        position: fixed;
+        top: 60px; left: 0;
+        height: 100vh;
+        width: var(--sidebar-w);
+        background: var(--panel);
+        border-right: 1px solid var(--panel-edge);
+        backdrop-filter: blur(12px);
+        z-index: 100;
+        display: flex;
+        flex-direction: column;
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 30px rgba(57, 255, 20, 0.08);
+    }
+
+    .sidebar-open  { transform: translateX(0); }
+    .sidebar-closed { transform: translateX(calc(-1 * var(--sidebar-w))); }
+
+    .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 14px 12px;
+        border-bottom: 1px solid var(--panel-edge);
+    }
+
+    .sidebar-title {
+        font-size: 11px;
+        letter-spacing: 3px;
+        color: var(--lime);
+        font-weight: bold;
+    }
+
+    .sidebar-toggle {
+        background: none;
+        border: none;
+        color: var(--text-dim);
+        cursor: pointer;
+        font-size: 14px;
+        padding: 2px 4px;
+        transition: color 0.2s;
+    }
+    .sidebar-toggle:hover { color: var(--lime); }
+
+    .sidebar-section {
+        padding: 14px;
+    }
+
+    .sidebar-label {
+        font-size: 9px;
+        letter-spacing: 2.5px;
+        color: var(--text-dim);
+        margin-bottom: 10px;
+    }
+
+    .sidebar-stat {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+    .stat-key { color: var(--text-dim); }
+    .stat-val { color: var(--text-main); text-transform: capitalize; }
+
+    .sidebar-divider {
+        height: 1px;
+        background: var(--panel-edge);
+        margin: 0 14px;
+    }
+
+    .sidebar-footer {
+        margin-top: auto;
+        border-top: 1px solid var(--panel-edge);
+    }
+    .sidebar-tagline {
+        font-size: 10px;
+        color: var(--text-dim);
+        font-style: italic;
+        letter-spacing: 1px;
+    }
+
+    /* New Chat button */
+    .new-chat-btn {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 90%;
+        background: transparent;
+        border: 1px solid var(--lime-dim);
+        color: var(--lime);
+        font-family: var(--font-main);
+        font-size: 12px;
+        letter-spacing: 2px;
+        padding: 10px 14px;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s;
+        text-transform: uppercase;
+    }
+    .new-chat-btn:hover {
+        background: var(--lime-glow);
+        box-shadow: 0 0 12px var(--lime-glow);
+    }
+    .btn-icon {
+        font-size: 18px;
+        line-height: 1;
+        color: var(--lime);
+    }
+
+    /* Sidebar open button (hamburger) */
+    .sidebar-open-btn {
+        position: fixed;
+        top: 68px;
+        left: 14px;
+        z-index: 99;
+        background: var(--panel);
+        border: 1px solid var(--panel-edge);
+        color: var(--lime);
+        font-size: 18px;
+        width: 36px; height: 36px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: opacity 0.2s, box-shadow 0.2s;
+        backdrop-filter: blur(8px);
+    }
+    .sidebar-open-btn:hover { box-shadow: 0 0 10px var(--lime-glow); }
+    .sidebar-open-btn.hidden { opacity: 0; pointer-events: none; }
+
+    /* ── Main area ──────────────────────────────────────────── */
+    .nova-main {
+        position: fixed;
+        top: 0; left: 0;
+        right: 0; bottom: 0;
+        display: flex;
+        flex-direction: column;
+        z-index: 10;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .nova-main.main-shifted { left: var(--sidebar-w); }
+
+    /* ── Top bar ────────────────────────────────────────────── */
+    .nova-topbar {
+        height: var(--topbar-h);
+        background: rgba(0, 6, 16, 0.72);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--panel-edge);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 18px 0 58px;
+        flex-shrink: 0;
+    }
+    .nova-topbar-title {
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: var(--lime);
+        font-weight: bold;
+    }
+    .nova-topbar-time {
+        font-size: 11px;
+        color: var(--text-dim);
+        letter-spacing: 1px;
+    }
+
+    /* ── Message feed ───────────────────────────────────────── */
+    .nova-feed {
+        flex: 1;
+        overflow-y: auto;
+        padding: 20px 18px 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        scroll-behavior: smooth;
+        justify-content: flex-end; 
+    }
+
+    /* Custom scrollbar */
+    .nova-feed::-webkit-scrollbar { width: 5px; }
+    .nova-feed::-webkit-scrollbar-track { background: transparent; }
+    .nova-feed::-webkit-scrollbar-thumb {
+        background: var(--lime-dim);
+        border-radius: 3px;
+    }
+
+    .msg-row {
+        display: flex;
+        width: 100%;
+    }
+    .msg-nova { justify-content: flex-start; }
+    .msg-you  { justify-content: flex-end; }
+
+    .msg-bubble {
+        max-width: 72%;
+        padding: 10px 14px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        backdrop-filter: blur(6px);
+        animation: fadeSlideIn 0.25s ease forwards;
+    }
+
+    @@keyframes fadeSlideIn {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .bubble-nova {
+        background: rgba(0, 20, 10, 0.55);
+        border: 1px solid rgba(57, 255, 20, 0.2);
+        border-left: 3px solid var(--lime);
+        border-radius: 0 6px 6px 0;
+    }
+
+    .bubble-you {
+        background: rgba(0, 30, 60, 0.55);
+        border: 1px solid rgba(100, 180, 255, 0.2);
+        border-right: 3px solid var(--text-you);
+        border-radius: 6px 0 0 6px;
+        align-items: flex-end;
+    }
+
+    .msg-sender {
+        font-size: 10px;
+        letter-spacing: 2.5px;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .bubble-nova .msg-sender { color: var(--lime); }
+    .bubble-you  .msg-sender { color: var(--text-you); }
+
+    .msg-text {
+        font-size: 13px;
+        color: var(--text-main);
+        line-height: 1.55;
+        word-break: break-word;
+       white-space: pre-wrap; /* 👈 ADD THIS LINE */
+    }
+
+    .emotion-dot {
+        display: inline-block;
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        vertical-align: middle;
+        flex-shrink: 0;
+    }
+
+    /* ── Input bar ──────────────────────────────────────────── */
+    .nova-input-bar {
+        height: var(--inputbar-h);
+        background: rgba(0, 6, 16, 0.82);
+        backdrop-filter: blur(12px);
+        border-top: 1px solid var(--panel-edge);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 18px;
+        flex-shrink: 0;
+    }
+
+    .nova-input {
+        flex: 1;
+        background: rgba(0, 20, 10, 0.4);
+        border: 1px solid rgba(57, 255, 20, 0.25);
+        border-radius: 24px;
+        color: var(--text-main);
+        font-family: var(--font-main);
+        font-size: 13px;
+        padding: 10px 20px;
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;     
+    }
+    .nova-input::placeholder { color: var(--text-dim); text-transform: none; letter-spacing: 0; }
+    .nova-input:focus {
+        border-color: var(--lime);
+        box-shadow: 0 0 16px var(--lime-glow), inset 0 0 8px rgba(57, 255, 20, 0.05);
+    }
+
+    .nova-send-btn {
+        background: transparent;
+        border: 1px solid var(--lime);
+        color: var(--lime);
+        font-family: var(--font-main);
+        font-size: 11px;
+        letter-spacing: 3px;
+        padding: 10px 20px;
+        border-radius: 24px;
+        cursor: pointer;
+        transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+        text-transform: uppercase;
+        flex-shrink: 0;
+    }
+    .nova-send-btn:hover {
+        background: var(--lime-glow);
+        box-shadow: 0 0 16px var(--lime-glow);
+    }
+    .nova-send-btn:active { transform: scale(0.97); }
+</style>
+
+
+
+@code {
+    // ── Dependencies ─────────────────────────────────────────
+    private NovaCortex _nova = default!;
+    private List<(string sender, string text)> messages = new();
+    private string userInput = "";
+    private bool _sidebarOpen = false;
+    private string _currentTime = "";
+    private System.Threading.Timer? _clockTimer;
+
+    // ── Emotion state ─────────────────────────────────────────
+    private string _staticEmotionColor = "#39ff14";
+    private string _staticEmotionEmoji  = "🔵";
+    private string _staticEmotionState  = "calm";
+  
+
+
+    // ── Init ──────────────────────────────────────────────────
+    protected override void OnInitialized()
+    {
+        _currentTime = DateTime.Now.ToString("ddd MMM dd yyyy — hh:mm tt").ToUpper();
+        _clockTimer = new System.Threading.Timer(_ =>
+        {
+            _currentTime = DateTime.Now.ToString("ddd MMM dd yyyy — hh:mm tt").ToUpper();
+            InvokeAsync(StateHasChanged);
+        }, null, 0, 30000);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            _nova = new NovaCortex(JS, Http);
+            await _nova.LoadSession();
+            await _nova.LoadAPIContent();
+            StateHasChanged();
+        }
+    }
+
+    // ── Send message ──────────────────────────────────────────
+    private async Task SendMessage()
+    {
+        if (string.IsNullOrWhiteSpace(userInput)) return;
+        var input = userInput;
+        userInput = "";
+        messages.Add(("You", input));
+        StateHasChanged();
+        await ScrollToBottom();
+
+        var reply = await _nova.Respond(input);
+        messages.Add(("Nova", reply));
+
+        _staticEmotionColor = _nova.GetEmotionalColor();
+        _staticEmotionState = _nova.GetEmotionalState();
+        _staticEmotionEmoji = _nova.GetEmotionalEmoji();
+
+        StateHasChanged();
+        await ScrollToBottom();
+    }
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SendMessage();
+    }
+
+    // ── Auto scroll ───────────────────────────────────────────
+    private async Task ScrollToBottom()
+    {
+        await JS.InvokeVoidAsync("eval",
+            "var a=document.getElementById('scrollAnchor');" +
+            "if(a)a.scrollIntoView({behavior:'smooth'});");
+    }
+
+    // ── Sidebar ───────────────────────────────────────────────
+    private void ToggleSidebar() => _sidebarOpen = !_sidebarOpen;
+
+    // ── New Chat ──────────────────────────────────────────────
+   private async Task NewChat()
+{
+    messages.Clear();
+
+    // Full cortex reset — preserves nothing
+    _nova = new NovaCortex(JS, Http);
+    await _nova.LoadAPIContent();
+
+    // Clear localStorage so HP/coins/rep start fresh
+    await JS.InvokeVoidAsync(
+        "localStorage.removeItem", "nova_session");
+
+    _staticEmotionColor = "#39ff14";
+    _staticEmotionState = "calm";
+    _staticEmotionEmoji = "🔵";
+    _sidebarOpen = false;
+    StateHasChanged();
+}
+
+    // ── Cleanup ───────────────────────────────────────────────
+    public void Dispose() => _clockTimer?.Dispose();
+}
