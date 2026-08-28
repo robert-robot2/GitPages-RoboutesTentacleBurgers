@@ -18,12 +18,11 @@
 
   <ItemGroup>
     <Folder Include="BWP\BWPMenu\" />
-    <Folder Include="Shaders\" />
     <Folder Include="wwwroot\" />
   </ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Shaders\shadow_pcf.frag" />
+		<EmbeddedResource Include="Shaders\shadow_PCF.frag" />
 		<EmbeddedResource Include="Shaders\shadow_pcss.frag" />
 		<EmbeddedResource Include="Shaders\spectral_xs_V1.frag" />
 		<EmbeddedResource Include="Shaders\spectral_xs_V2.frag" />

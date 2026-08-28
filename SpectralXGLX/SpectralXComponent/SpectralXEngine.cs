@@ -2756,7 +2756,7 @@ namespace SpectralXGLX.SpectralXComponent
         {
             var bundle = new
             {
-                fsSourcePCF = ShaderLoader.Load("shadow_pcf.frag"),
+                fsSourcePCF = ShaderLoader.Load("shadow_PCF.frag"),
                 fsSourcePCSS = ShaderLoader.Load("shadow_pcss.frag"),
                 fsSourceSpectralXSV1 = ShaderLoader.Load("spectral_xs_V1.frag"),
                 fsSourceSpectralXSV2 = ShaderLoader.Load("spectral_xs_V2.frag"),
