@@ -19,14 +19,14 @@
 
 @font-face {
     font-family: 'Diablo';
-    src: url('/iFonts/Diablo.ttf');
+    src: url('iFonts/Diablo.ttf');
     font-weight: normal;
     font-style: normal;
 }
 
 @font-face {
     font-family: 'Digital';
-    src: url('/iFonts/Digital7-rg1mL.ttf');
+    src: url('iFonts/Digital7-rg1mL.ttf');
     font-weight: normal;
     font-style: normal;
 }
