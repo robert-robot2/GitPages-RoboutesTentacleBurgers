@@ -187,189 +187,189 @@ namespace SnowX
         private Dictionary<string, string> images = new()
         {
             // Backgrounds
-            ["bgForest"] = "/iAssets/ForestCity2.png",
-            ["bgDesert"] = "/iAssets/DesertCity002.png",
-            ["bgSnow"] = "/iAssets/SnowCity2.png",
+            ["bgForest"] = "iAssets/ForestCity2.png",
+            ["bgDesert"] = "iAssets/DesertCity002.png",
+            ["bgSnow"] = "iAssets/SnowCity2.png",
 
             // Engines
-            ["trainEngine"] = "/iAssets/Engine005A.png",
+            ["trainEngine"] = "iAssets/Engine005A.png",
 
             // Resources
-            ["trainResource"] = "/iAssets/CoalCar009A.png",
+            ["trainResource"] = "iAssets/CoalCar009A.png",
             // Rhino Armor
-            ["trainRhinoarmor"] = "/iAssets/RhinoCar002A.png",
-            ["trainElephant"] = "/iAssets/EleCar001A.png",
+            ["trainRhinoarmor"] = "iAssets/RhinoCar002A.png",
+            ["trainElephant"] = "iAssets/EleCar001A.png",
             // Cars
-            ["trainCannon"] = "/iAssets/Cannoncar005A.png",
-            ["trainMissile"] = "/iAssets/Misslecar003A.png",
-            ["trainTurret"] = "/iAssets/Turretcar003A.png",
-            ["trainDrone"] = "/iAssets/Dronecar003A.png",
-            ["trainFlame"] = "/iAssets/fthowercar002.png",
-            ["trainAaflak"] = "/iAssets/FlakCar002A.png",
-            ["trainAajavelin"] = "/iAssets/USARMY003A.png",
-            ["trainFlare"] = "/iAssets/Flarecar002A.png",
-            ["trainGatlin"] = "/iAssets/Gatlincar002A.png",           
-            ["trainGrenade"] = "/iAssets/GrenadeCar001.png",
-            ["trainClustergrenade"] = "/iAssets/RusskeCar002A.png",
-            ["trainTesla"] = "/iAssets/TeslaCar001A.png",
+            ["trainCannon"] = "iAssets/Cannoncar005A.png",
+            ["trainMissile"] = "iAssets/Misslecar003A.png",
+            ["trainTurret"] = "iAssets/Turretcar003A.png",
+            ["trainDrone"] = "iAssets/Dronecar003A.png",
+            ["trainFlame"] = "iAssets/fthowercar002.png",
+            ["trainAaflak"] = "iAssets/FlakCar002A.png",
+            ["trainAajavelin"] = "iAssets/USARMY003A.png",
+            ["trainFlare"] = "iAssets/Flarecar002A.png",
+            ["trainGatlin"] = "iAssets/Gatlincar002A.png",           
+            ["trainGrenade"] = "iAssets/GrenadeCar001.png",
+            ["trainClustergrenade"] = "iAssets/RusskeCar002A.png",
+            ["trainTesla"] = "iAssets/TeslaCar001A.png",
 
-            ["trainChina"] = "/iAssets/ChinaCar001.png",
-            ["trainChinaku"] = "/iAssets/ChinaKuCar001.png",
+            ["trainChina"] = "iAssets/ChinaCar001.png",
+            ["trainChinaku"] = "iAssets/ChinaKuCar001.png",
 
             // Car Attack Animations
-            ["trainGatlinAttack"] = "/iAssets/Gatlincar002T.png",
-            ["trainGrenadeAttack"] = "/iAssets/GrenadeCar001.png",
-            ["trainClustergrenadeAttack"] = "/iAssets/RusskeCar002A.png",
-            ["trainAaflakAttack"] = "/iAssets/FlakCar002AT.png",
-            ["trainTurretAttack"] = "/iAssets/Turretcar003AT.png",
-            ["trainMissileAttack"] = "/iAssets/Misslecar003T.png",
-            ["trainDroneAttack"] = "/iAssets/Dronecar003T.png",
-            ["trainChinaAttack"] = "/iAssets/ChinaCar001.png",
-            ["trainCannonAttack"] = "/iAssets/Cannoncar005AT.png",
-            ["trainChinakuAttack"] = "/iAssets/ChinaKuCar001.png",
-            ["trainFlareAttack"] = "/iAssets/Flarecar002T.png",
-            ["trainAajavelinAttack"] = "/iAssets/USARMY003T.png",
-            ["trainTeslaAttack"] = "/iAssets/TeslaCar001A.png",
+            ["trainGatlinAttack"] = "iAssets/Gatlincar002T.png",
+            ["trainGrenadeAttack"] = "iAssets/GrenadeCar001.png",
+            ["trainClustergrenadeAttack"] = "iAssets/RusskeCar002A.png",
+            ["trainAaflakAttack"] = "iAssets/FlakCar002AT.png",
+            ["trainTurretAttack"] = "iAssets/Turretcar003AT.png",
+            ["trainMissileAttack"] = "iAssets/Misslecar003T.png",
+            ["trainDroneAttack"] = "iAssets/Dronecar003T.png",
+            ["trainChinaAttack"] = "iAssets/ChinaCar001.png",
+            ["trainCannonAttack"] = "iAssets/Cannoncar005AT.png",
+            ["trainChinakuAttack"] = "iAssets/ChinaKuCar001.png",
+            ["trainFlareAttack"] = "iAssets/Flarecar002T.png",
+            ["trainAajavelinAttack"] = "iAssets/USARMY003T.png",
+            ["trainTeslaAttack"] = "iAssets/TeslaCar001A.png",
             // Projectiles
-            ["projGrenade"] = "/iAssets/GrenadeFX01.png",
-            ["projClustergrenade"] = "/iAssets/GrenadeFX02.png",
+            ["projGrenade"] = "iAssets/GrenadeFX01.png",
+            ["projClustergrenade"] = "iAssets/GrenadeFX02.png",
             // Explosion effect
-            ["projExplosion"] = "/iAssets/GrenExplode002.png",
-            ["projFlareExplosion"] = "/iAssets/Flaregfx.png",    
-            ["projChina"] = "/iAssets/ChinaFire001A.png",
+            ["projExplosion"] = "iAssets/GrenExplode002.png",
+            ["projFlareExplosion"] = "iAssets/Flaregfx.png",    
+            ["projChina"] = "iAssets/ChinaFire001A.png",
 
             // Cocaine Bear
-            ["trainCocainebear"] = "/iAssets/BearCar001.png",
-            ["trainCocainebearAttack"] = "/iAssets/BearCar001.png",  // Can use same for now
-            ["projBuffbear"] = "/iAssets/Healtiki002.png",  // new white texture
+            ["trainCocainebear"] = "iAssets/BearCar001.png",
+            ["trainCocainebearAttack"] = "iAssets/BearCar001.png",  // Can use same for now
+            ["projBuffbear"] = "iAssets/Healtiki002.png",  // new white texture
 
             // Medic Car
-            ["trainMedic"] = "/iAssets/Mediccar002.png",
-            ["trainMedicAttack"] = "/iAssets/Mediccar002.png",  // Can use same sprite or healing animation
+            ["trainMedic"] = "iAssets/Mediccar002.png",
+            ["trainMedicAttack"] = "iAssets/Mediccar002.png",  // Can use same sprite or healing animation
 
             // Shaman 
-            ["trainShaman"] = "/iAssets/TikiCar001.png",
-            ["trainShamanAttack"] = "/iAssets/TikiCar001.png",
+            ["trainShaman"] = "iAssets/TikiCar001.png",
+            ["trainShamanAttack"] = "iAssets/TikiCar001.png",
 
             // Heal effects
-            ["projHeal"] = "/iAssets/Healcross001.png",  // Green cross or plus sign
-            ["projAura"] = "/iAssets/Healtiki001.png",  // Purple mystical glow
+            ["projHeal"] = "iAssets/Healcross001.png",  // Green cross or plus sign
+            ["projAura"] = "iAssets/Healtiki001.png",  // Purple mystical glow
 
 
             // Caboose
-            ["trainCaboose"] = "/iAssets/Caboose002A.png",
+            ["trainCaboose"] = "iAssets/Caboose002A.png",
 
 
 
             // Drone Projectile Textures
-            ["projDroneBullet"] = "/iAssets/DroneBullet001.png",  // 🚁 NEW: Drone's weapon projectile
+            ["projDroneBullet"] = "iAssets/DroneBullet001.png",  // 🚁 NEW: Drone's weapon projectile
 
             // === PROJECTILES ===
             // Train Projectiles
-            ["projEngine"] = "/iAssets/GOkuCloud002.png",
-            ["projCannon"] = "/iAssets/CannonB002A.png",
-            ["projMissile"] = "/iAssets/Missle001.png",
-            ["projTurret"] = "/iAssets/Gunfire001.png",
-            ["projDrone"] = "/iAssets/Drone001.png",
-            ["projFlame"] = "/iAssets/Fthrowergfx.png",
-            ["projAaflak"] = "/iAssets/FlakCloud001.png",
-            ["projAajavelin"] = "/iAssets/Javelin001.png",
-            ["projFlare"] = "/iAssets/Flare002.png",
-            ["projGatlin"] = "/iAssets/Gatlingfx.png",
-            ["projChinaku"] = "/iAssets/ChinaKufx.png",
-            ["projTesla"] = "/iAssets/Teslafx.png",
+            ["projEngine"] = "iAssets/GOkuCloud002.png",
+            ["projCannon"] = "iAssets/CannonB002A.png",
+            ["projMissile"] = "iAssets/Missle001.png",
+            ["projTurret"] = "iAssets/Gunfire001.png",
+            ["projDrone"] = "iAssets/Drone001.png",
+            ["projFlame"] = "iAssets/Fthrowergfx.png",
+            ["projAaflak"] = "iAssets/FlakCloud001.png",
+            ["projAajavelin"] = "iAssets/Javelin001.png",
+            ["projFlare"] = "iAssets/Flare002.png",
+            ["projGatlin"] = "iAssets/Gatlingfx.png",
+            ["projChinaku"] = "iAssets/ChinaKufx.png",
+            ["projTesla"] = "iAssets/Teslafx.png",
 
 
 
             // === ENEMY SPRITES ===
             // Tree Enemy (move, attack, death)
-            ["enemyTree"] = "/iAssets/TreeMonster001.png",
-            ["enemyTreeMove"] = "/iAssets/TreeMonster001.png",     // Optional: walking animation
-            ["enemyTreeAttack"] = "/iAssets/TreeMonster001.png",  // Optional: attack animation
-            ["enemyTreeDeath"] = "/iAssets/PixelDeath001.png",   // Optional: death animation
+            ["enemyTree"] = "iAssets/TreeMonster001.png",
+            ["enemyTreeMove"] = "iAssets/TreeMonster001.png",     // Optional: walking animation
+            ["enemyTreeAttack"] = "iAssets/TreeMonster001.png",  // Optional: attack animation
+            ["enemyTreeDeath"] = "iAssets/PixelDeath001.png",   // Optional: death animation
 
             // Rock Enemy (move, attack, death)
-            ["enemyRock"] = "/iAssets/RockMonster001.png",
-            ["enemyRockMove"] = "/iAssets/RockMonster001.png",
-            ["enemyRockAttack"] = "/iAssets/RockMonster001.png",
-            ["enemyRockDeath"] = "/iAssets/PixelDeath001.png",
+            ["enemyRock"] = "iAssets/RockMonster001.png",
+            ["enemyRockMove"] = "iAssets/RockMonster001.png",
+            ["enemyRockAttack"] = "iAssets/RockMonster001.png",
+            ["enemyRockDeath"] = "iAssets/PixelDeath001.png",
 
             // Monster1 Enemy (move, attack, death)
-            ["enemyMonster1"] = "/iAssets/PoopMonster001.png",
-            ["enemyMonster1Move"] = "/iAssets/PoopMonster001.png",
-            ["enemyMonster1Attack"] = "/iAssets/PoopMonster001.png",
-            ["enemyMonster1Death"] = "/iAssets/PixelDeath001.png",
+            ["enemyMonster1"] = "iAssets/PoopMonster001.png",
+            ["enemyMonster1Move"] = "iAssets/PoopMonster001.png",
+            ["enemyMonster1Attack"] = "iAssets/PoopMonster001.png",
+            ["enemyMonster1Death"] = "iAssets/PixelDeath001.png",
 
             // Monster2 Enemy (move, attack, death)
-            ["enemyMonster2"] = "/iAssets/PinkMonster001.png",
-            ["enemyMonster2Move"] = "/iAssets/PinkMonster001.png",
-            ["enemyMonster2Attack"] = "/iAssets/PinkMonster001.png",
-            ["enemyMonster2Death"] = "/iAssets/PixelDeath001.png",
+            ["enemyMonster2"] = "iAssets/PinkMonster001.png",
+            ["enemyMonster2Move"] = "iAssets/PinkMonster001.png",
+            ["enemyMonster2Attack"] = "iAssets/PinkMonster001.png",
+            ["enemyMonster2Death"] = "iAssets/PixelDeath001.png",
 
             // Bat Enemy (move, attack, death)
-            ["enemyBat"] = "/iAssets/BatMonster002.png",
-            ["enemyBatMove"] = "/iAssets/BatMonster002.png",
-            ["enemyBatAttack"] = "/iAssets/BatMonster002.png",
-            ["enemyBatDeath"] = "/iAssets/PixelDeath001.png",
+            ["enemyBat"] = "iAssets/BatMonster002.png",
+            ["enemyBatMove"] = "iAssets/BatMonster002.png",
+            ["enemyBatAttack"] = "iAssets/BatMonster002.png",
+            ["enemyBatDeath"] = "iAssets/PixelDeath001.png",
 
             // Thrower Enemy (NEW - ranged enemy)
-            ["enemyThrower"] = "/iAssets/SpaceMonster002.png",
-            ["enemyThrowerMove"] = "/iAssets/SpaceMonster002.png",
-            ["enemyThrowerAttack"] = "/iAssets/SpaceMonster002.png",// Throwing animation
-            ["enemyThrowerDeath"] = "/iAssets/PixelDeath001.png",
+            ["enemyThrower"] = "iAssets/SpaceMonster002.png",
+            ["enemyThrowerMove"] = "iAssets/SpaceMonster002.png",
+            ["enemyThrowerAttack"] = "iAssets/SpaceMonster002.png",// Throwing animation
+            ["enemyThrowerDeath"] = "iAssets/PixelDeath001.png",
             // 🆕 ADD BIRD ENEMY:
-            ["enemyBird"] = "/iAssets/AlienBird001.png",         // You'll need to create this
-            ["enemyBirdMove"] = "/iAssets/AlienBird001.png",
-            ["enemyBirdAttack"] = "/iAssets/AlienBird001.png",
-            ["enemyBirdDeath"] = "/iAssets/PixelDeath001.png",
+            ["enemyBird"] = "iAssets/AlienBird001.png",         // You'll need to create this
+            ["enemyBirdMove"] = "iAssets/AlienBird001.png",
+            ["enemyBirdAttack"] = "iAssets/AlienBird001.png",
+            ["enemyBirdDeath"] = "iAssets/PixelDeath001.png",
             // Boss Tree (optional - can reuse tree sprites but scaled)
-            ["enemyBossTree"] = "/iAssets/TreeMonster001.png", // Reuses tree sprite, just scaled bigger
+            ["enemyBossTree"] = "iAssets/TreeMonster001.png", // Reuses tree sprite, just scaled bigger
 
             // === ENEMY PROJECTILES ===
-            ["enemyProj_thrower"] = "/iAssets/Spear001.png",  // ✅ Fixed underscore naming
-            ["enemyProj_tree"] = "/iAssets/Rock001.png",       // If trees ever shoot (future)
-            ["enemyProj_rock"] = "/iAssets/Rock001.png",       // If rocks ever shoot (future)
-            ["enemyProj_monster1"] = "/iAssets/Spear001.png",  // Fallback
-            ["enemyProj_monster2"] = "/iAssets/Spear001.png",  // Fallback
-            ["enemyProj_bat"] = "/iAssets/Spear001.png",       // Fallback
-            ["enemyProj_bird"] = "/iAssets/Spear001.png",      // Fallback
-            ["enemyProj_generic"] = "/iAssets/Spear001.png",   // Generic fallback
+            ["enemyProj_thrower"] = "iAssets/Spear001.png",  // ✅ Fixed underscore naming
+            ["enemyProj_tree"] = "iAssets/Rock001.png",       // If trees ever shoot (future)
+            ["enemyProj_rock"] = "iAssets/Rock001.png",       // If rocks ever shoot (future)
+            ["enemyProj_monster1"] = "iAssets/Spear001.png",  // Fallback
+            ["enemyProj_monster2"] = "iAssets/Spear001.png",  // Fallback
+            ["enemyProj_bat"] = "iAssets/Spear001.png",       // Fallback
+            ["enemyProj_bird"] = "iAssets/Spear001.png",      // Fallback
+            ["enemyProj_generic"] = "iAssets/Spear001.png",   // Generic fallback
 
             // === RAIL TEXTURES ===
-            ["railsForest"] = "/iAssets/SnowRail001.png",
-            ["railsDesert"] = "/iAssets/SnowRail001.png",
-            ["railsSnow"] = "/iAssets/SnowRail001.png",
+            ["railsForest"] = "iAssets/SnowRail001.png",
+            ["railsDesert"] = "iAssets/SnowRail001.png",
+            ["railsSnow"] = "iAssets/SnowRail001.png",
 
             // === WOOD TIES TEXTURES ===
-            ["tiesForest"] = "/iAssets/Forestwood001.png",
-            ["tiesDesert"] = "/iAssets/Forestwood001.png",
-            ["tiesSnow"] = "/iAssets/Forestwood001.png",
+            ["tiesForest"] = "iAssets/Forestwood001.png",
+            ["tiesDesert"] = "iAssets/Forestwood001.png",
+            ["tiesSnow"] = "iAssets/Forestwood001.png",
 
             // === GROUND TEXTURES ===
-            ["groundForest"] = "/iAssets/ForestGround002.png",
-            ["groundDesert"] = "/iAssets/DesertGround002.png",
-            ["groundSnow"] = "/iAssets/SnowGround002.png",
+            ["groundForest"] = "iAssets/ForestGround002.png",
+            ["groundDesert"] = "iAssets/DesertGround002.png",
+            ["groundSnow"] = "iAssets/SnowGround002.png",
 
             // === BALLAST TEXTURES ===
-            ["ballastForest"] = "/iAssets/ForestBallast001.png",
-            ["ballastDesert"] = "/iAssets/ForestBallast001.png",
-            ["ballastSnow"] = "/iAssets/ForestBallast001.png",
+            ["ballastForest"] = "iAssets/ForestBallast001.png",
+            ["ballastDesert"] = "iAssets/ForestBallast001.png",
+            ["ballastSnow"] = "iAssets/ForestBallast001.png",
 
             // === FOLIAGE LAYER TEXTURES ===
             // Layer 1 - Mid-distance (y=675)
-            ["foliageForestLayer1"] = "/iAssets/ForestFoliageLay102.png",
-            ["foliageDesertLayer1"] = "/iAssets/DesertFoliageLay102.png",
-            ["foliageSnowLayer1"] = "/iAssets/SnowFoliageLay102.png",
+            ["foliageForestLayer1"] = "iAssets/ForestFoliageLay102.png",
+            ["foliageDesertLayer1"] = "iAssets/DesertFoliageLay102.png",
+            ["foliageSnowLayer1"] = "iAssets/SnowFoliageLay102.png",
 
             // Layer 2 - Far distance (y=500)
-            ["foliageForestLayer2"] = "/iAssets/ForestFoliageLay2.png",
-            ["foliageDesertLayer2"] = "/iAssets/DesertFoliageLay2.png",
-            ["foliageSnowLayer2"] = "/iAssets/SnowFoliageLay2.png",
+            ["foliageForestLayer2"] = "iAssets/ForestFoliageLay2.png",
+            ["foliageDesertLayer2"] = "iAssets/DesertFoliageLay2.png",
+            ["foliageSnowLayer2"] = "iAssets/SnowFoliageLay2.png",
 
             // Layer 3 - Foreground (y=720)
-            ["foliageForestLayer3"] = "/iAssets/ForestFoliageLay302.png",
-            ["foliageDesertLayer3"] = "/iAssets/DesertFoliageLay302.png",
-            ["foliageSnowLayer3"] = "/iAssets/SnowFoliageLay302.png",
+            ["foliageForestLayer3"] = "iAssets/ForestFoliageLay302.png",
+            ["foliageDesertLayer3"] = "iAssets/DesertFoliageLay302.png",
+            ["foliageSnowLayer3"] = "iAssets/SnowFoliageLay302.png",
         };
 
 
