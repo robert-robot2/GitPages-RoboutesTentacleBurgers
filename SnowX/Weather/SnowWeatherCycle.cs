@@ -66,12 +66,12 @@ namespace SnowX.Weather
         // Image paths (can be overridden)
         public Dictionary<string, string> WeatherImages = new Dictionary<string, string>
         {
-            ["rain"] = "/iAssets/RainDrop01.png",
-            ["snow"] = "/iAssets/SnowFlake06.png",
-            ["dust"] = "/iAssets/DustParticle01.png",
-            ["cloud"] = "/iAssets/GOkuCloud001.png",
-            ["lightning"] = "/iAssets/LBolt002.png",
-            ["fog"] = "/iAssets/fog01SL.png"
+            ["rain"] = "iAssets/RainDrop01.png",
+            ["snow"] = "iAssets/SnowFlake06.png",
+            ["dust"] = "iAssets/DustParticle01.png",
+            ["cloud"] = "iAssets/GOkuCloud001.png",
+            ["lightning"] = "iAssets/LBolt002.png",
+            ["fog"] = "iAssets/fog01SL.png"
         };
 
         public void Update(double deltaTime)
