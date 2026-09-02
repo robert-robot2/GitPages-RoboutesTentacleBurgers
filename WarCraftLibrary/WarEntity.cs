@@ -36,7 +36,7 @@ namespace WarCraftLibrary
         public Tree(int gridX, int gridY)
         {
             PlaceholderName = "Tree";
-            SpritePath = "/wc1sprites/objects/TreeWC1.png";
+            SpritePath = "wc1sprites/objects/TreeWC1.png";
             Width = 32;
             Height = 32;
 
@@ -52,7 +52,7 @@ namespace WarCraftLibrary
             {
                 LumberRemaining = 0;
                 IsChopped = true;
-                SpritePath = "/wc1sprites/objects/DeadTree002.png";
+                SpritePath = "wc1sprites/objects/DeadTree002.png";
 
                 // ===== NEW: CLEAR TREE FROM GRID (now walkable) =====
                 GridOccupancyMap.ClearTree(this);
@@ -70,7 +70,7 @@ namespace WarCraftLibrary
         public GoldMine(int gridX, int gridY)
         {
             PlaceholderName = "GoldMine";
-            SpritePath = "/wc1sprites/buildings/GoldMineWChasgold001.png";
+            SpritePath = "wc1sprites/buildings/GoldMineWChasgold001.png";
 
             Width = 96;
             Height = 96;
@@ -90,7 +90,7 @@ namespace WarCraftLibrary
             {
                 GoldRemaining = 0;
                 IsDepleted = true;
-                SpritePath = "/wc1sprites/buildings/GoldMineWC1.png";
+                SpritePath = "wc1sprites/buildings/GoldMineWC1.png";
 
                 // ===== NEW: KEEP MINE ON GRID (still blocks movement) =====
                 // Gold mines stay as obstacles even when depleted
@@ -181,8 +181,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "TownHall_Human" : "Stronghold_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/TownHall001.png"
-                : "/wc1sprites/buildings/OrcSH001.png";
+                ? "wc1sprites/buildings/TownHall001.png"
+                : "wc1sprites/buildings/OrcSH001.png";
 
             MaxHP = 1200;
             HP = 1200;
@@ -223,8 +223,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Castle_Human" : "Fortress_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/Castle001.png"
-                : "/wc1sprites/buildings/OrcFortress001.png";
+                ? "wc1sprites/buildings/Castle001.png"
+                : "wc1sprites/buildings/OrcFortress001.png";
 
             MaxHP = 2000;  // More HP than Town Hall
             HP = 2000;
@@ -251,8 +251,8 @@ namespace WarCraftLibrary
             Race = townHall.Race;
             PlaceholderName = townHall.Race == RaceType.Human ? "Castle_Human" : "Fortress_Orc";
             SpritePath = townHall.Race == RaceType.Human
-                ? "/wc1sprites/buildings/Castle001.png"
-                : "/wc1sprites/buildings/OrcFortress001.png";
+                ? "wc1sprites/buildings/Castle001.png"
+                : "wc1sprites/buildings/OrcFortress001.png";
 
             MaxHP = 2000;
             HP = townHall.HP + 800; // Heal +800 HP on upgrade
@@ -287,8 +287,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Barracks_Human" : "Barracks_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/HumanBar001.png"
-                : "/wc1sprites/buildings/OrcBar001.png";
+                ? "wc1sprites/buildings/HumanBar001.png"
+                : "wc1sprites/buildings/OrcBar001.png";
 
             MaxHP = 800;
             HP = 800;
@@ -331,8 +331,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Farm_Human" : "PigFarm_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/HumanFarm001.png"
-                : "/wc1sprites/buildings/OrcFarm001.png";
+                ? "wc1sprites/buildings/HumanFarm001.png"
+                : "wc1sprites/buildings/OrcFarm001.png";
 
             MaxHP = 400;
             HP = 400;
@@ -558,8 +558,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Peasant_Human" : "Peon_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/units/Peasant001T.png"
-                : "/wc1sprites/units/Peon001T.png";
+                ? "wc1sprites/units/Peasant001T.png"
+                : "wc1sprites/units/Peon001T.png";
 
             MaxHP = 30;
             HP = 30;
@@ -584,8 +584,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Footman_Human" : "Grunt_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/units/Footman1T.png"
-                : "/wc1sprites/units/Grunt001T.png";
+                ? "wc1sprites/units/Footman1T.png"
+                : "wc1sprites/units/Grunt001T.png";
 
             MaxHP = 60;
             HP = 60;
@@ -608,8 +608,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "LumberMill_Human" : "LumberMill_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/HumanLumberMill001.png"
-                : "/wc1sprites/buildings/OrcLumberMill001.png";
+                ? "wc1sprites/buildings/HumanLumberMill001.png"
+                : "wc1sprites/buildings/OrcLumberMill001.png";
 
             MaxHP = 600;
             HP = 600;
@@ -650,8 +650,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "ArcheryRange_Human" : "ArcheryRange_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/HumanArchRange001.png"
-                : "/wc1sprites/buildings/OrcAxeRange001.png";
+                ? "wc1sprites/buildings/HumanArchRange001.png"
+                : "wc1sprites/buildings/OrcAxeRange001.png";
 
             MaxHP = 800;
             HP = 800;
@@ -691,7 +691,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Archer_Human";
-            SpritePath = "/wc1sprites/units/Archer00122.png";
+            SpritePath = "wc1sprites/units/Archer00122.png";
 
             MaxHP = 40;
             HP = 40;
@@ -713,7 +713,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "TrollAxeThrower_Orc";
-            SpritePath = "/wc1sprites/units/Axethrower001.png";
+            SpritePath = "wc1sprites/units/Axethrower001.png";
 
             MaxHP = 40;
             HP = 40;
@@ -734,8 +734,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "Blacksmith_Human" : "Blacksmith_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/HumanBlackSmith001.png"
-                : "/wc1sprites/buildings/OrcBlackSmith001.png";
+                ? "wc1sprites/buildings/HumanBlackSmith001.png"
+                : "wc1sprites/buildings/OrcBlackSmith001.png";
 
             MaxHP = 600;
             HP = 600;
@@ -774,7 +774,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Church_Human";
-            SpritePath = "/wc1sprites/buildings/Church001.png";
+            SpritePath = "wc1sprites/buildings/Church001.png";
 
             MaxHP = 600;
             HP = 600;
@@ -812,7 +812,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "CultistHut_Orc";
-            SpritePath = "/wc1sprites/buildings/CultistHut001.png";
+            SpritePath = "wc1sprites/buildings/CultistHut001.png";
 
             MaxHP = 600;
             HP = 600;
@@ -857,8 +857,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "WoodTower_Human" : "WoodTower_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/WoodTower003.png"
-                : "/wc1sprites/buildings/OrcWoodTower002.png";
+                ? "wc1sprites/buildings/WoodTower003.png"
+                : "wc1sprites/buildings/OrcWoodTower002.png";
 
             MaxHP = 400;
             HP = 400;
@@ -904,8 +904,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "StoneTower_Human" : "StoneTower_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/StoneTower001.png"
-                : "/wc1sprites/buildings/OrcStoneTower001.png";
+                ? "wc1sprites/buildings/StoneTower001.png"
+                : "wc1sprites/buildings/OrcStoneTower001.png";
 
             MaxHP = 800; // Double Wood Tower
             HP = 800;
@@ -944,8 +944,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "WoodenWall_Human" : "WoodenWall_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/WoodenWall001.png"
-                : "/wc1sprites/buildings/OrcWoodenWall001.png";
+                ? "wc1sprites/buildings/WoodenWall001.png"
+                : "wc1sprites/buildings/OrcWoodenWall001.png";
 
             MaxHP = 50;
             HP = 50;
@@ -985,8 +985,8 @@ namespace WarCraftLibrary
             Race = race;
             PlaceholderName = race == RaceType.Human ? "StoneWall_Human" : "StoneWall_Orc";
             SpritePath = race == RaceType.Human
-                ? "/wc1sprites/buildings/StoneWall001.png"
-                : "/wc1sprites/buildings/OrcStoneWall001.png";
+                ? "wc1sprites/buildings/StoneWall001.png"
+                : "wc1sprites/buildings/OrcStoneWall001.png";
 
             MaxHP = 150; // 3x stronger than wooden
             HP = 150;
@@ -1023,7 +1023,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Road"; // Same for both races
-            SpritePath = "/wc1sprites/buildings/Road001.png"; // Same sprite for both
+            SpritePath = "wc1sprites/buildings/Road001.png"; // Same sprite for both
 
             MaxHP = 100;
             HP = 100;
@@ -1062,7 +1062,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Stables_Human";
-            SpritePath = "/wc1sprites/buildings/Stables001.png";
+            SpritePath = "wc1sprites/buildings/Stables001.png";
 
             MaxHP = 400;
             HP = 400;
@@ -1100,7 +1100,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Pen_Orc";
-            SpritePath = "/wc1sprites/buildings/Pens001.png";
+            SpritePath = "wc1sprites/buildings/Pens001.png";
 
             MaxHP = 400;
             HP = 400;
@@ -1138,7 +1138,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "KnightsHold_Human";
-            SpritePath = "/wc1sprites/buildings/KnightsHold001.png";
+            SpritePath = "wc1sprites/buildings/KnightsHold001.png";
 
             MaxHP = 800;
             HP = 800;
@@ -1176,7 +1176,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "RaiderLair_Orc";
-            SpritePath = "/wc1sprites/buildings/RaiderLair001.png";
+            SpritePath = "wc1sprites/buildings/RaiderLair001.png";
 
             MaxHP = 800;
             HP = 800;
@@ -1213,7 +1213,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Brigand_Human";
-            SpritePath = "/wc1sprites/units/Brigand001.png";
+            SpritePath = "wc1sprites/units/Brigand001.png";
 
             MaxHP = 80;
             HP = 80;
@@ -1235,7 +1235,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Ogre_Orc";
-            SpritePath = "/wc1sprites/units/Ogre001.png";
+            SpritePath = "wc1sprites/units/Ogre001.png";
 
             MaxHP = 90;
             HP = 90;
@@ -1256,7 +1256,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Priest_Human";
-            SpritePath = "/wc1sprites/units/Priest001.png";
+            SpritePath = "wc1sprites/units/Priest001.png";
 
             MaxHP = 40;
             HP = 40;
@@ -1296,7 +1296,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Cultist_Orc";
-            SpritePath = "/wc1sprites/units/Cultist001.png";
+            SpritePath = "wc1sprites/units/Cultist001.png";
 
             MaxHP = 40;
             HP = 40;
@@ -1337,7 +1337,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Horse_Human";
-            SpritePath = "/wc1sprites/units/Horse002.png";
+            SpritePath = "wc1sprites/units/Horse002.png";
 
             MaxHP = 50;
             HP = 50;
@@ -1362,7 +1362,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Wolf_Orc";
-            SpritePath = "/wc1sprites/units/Wolf002.png";
+            SpritePath = "wc1sprites/units/Wolf002.png";
 
             MaxHP = 50;
             HP = 50;
@@ -1387,7 +1387,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "Knight_Human";
-            SpritePath = "/wc1sprites/units/Knight002.png";
+            SpritePath = "wc1sprites/units/Knight002.png";
 
             MaxHP = 90;  // More HP than Footman
             HP = 90;
@@ -1411,7 +1411,7 @@ namespace WarCraftLibrary
         {
             Race = race;
             PlaceholderName = "OrcRaider_Orc";
-            SpritePath = "/wc1sprites/units/OrcRaider002.png";
+            SpritePath = "wc1sprites/units/OrcRaider002.png";
 
             MaxHP = 90;  // More HP than Grunt
             HP = 90;
@@ -1468,8 +1468,8 @@ namespace WarCraftLibrary
                 SpritePath = spellType switch
                 {
                     "Heal" => "/iAssets/Healtiki001.png",        // Holy light effect
-                    "Bloodlust" => "/wc1sprites/projectiles/BloodlustSpell001.png", // Red energy
-                    _ => "/wc1sprites/projectiles/MagicSpell001.png"               // Generic magic
+                    "Bloodlust" => "wc1sprites/projectiles/BloodlustSpell001.png", // Red energy
+                    _ => "wc1sprites/projectiles/MagicSpell001.png"               // Generic magic
                 };
 
                 PlaceholderName = spellType ?? "Spell";
@@ -1479,8 +1479,8 @@ namespace WarCraftLibrary
             {
                 // Attack projectiles (existing logic)
                 SpritePath = race == RaceType.Human
-                    ? "/wc1sprites/projectiles/Arrow001.png"
-                    : "/wc1sprites/projectiles/ThrowAxe001.png";
+                    ? "wc1sprites/projectiles/Arrow001.png"
+                    : "wc1sprites/projectiles/ThrowAxe001.png";
 
                 PlaceholderName = race == RaceType.Human ? "Arrow" : "Axe";
                 Speed = 8;

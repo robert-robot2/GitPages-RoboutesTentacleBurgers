@@ -499,32 +499,32 @@ private void TrainCultist(WarBuilding building)
             return unit.PlaceholderName switch
             {
                 // Workers
-                "Peasant_Human" => "/wc1sprites/icons/Peasant001.png",
-                "Peon_Orc" => "/wc1sprites/icons/Peon001.png",
+                "Peasant_Human" => "wc1sprites/icons/Peasant001.png",
+                "Peon_Orc" => "wc1sprites/icons/Peon001.png",
 
                 // Basic Infantry
-                "Footman_Human" => "/wc1sprites/icons/Footmantiny001.png",
-                "Grunt_Orc" => "/wc1sprites/icons/Grunttiny001.png",
+                "Footman_Human" => "wc1sprites/icons/Footmantiny001.png",
+                "Grunt_Orc" => "wc1sprites/icons/Grunttiny001.png",
 
                 // Ranged Units
-                "Archer_Human" => "/wc1sprites/icons/Archertiny001.png",
-                "TrollAxeThrower_Orc" => "/wc1sprites/icons/AxeThrowertiny001.png",
+                "Archer_Human" => "wc1sprites/icons/Archertiny001.png",
+                "TrollAxeThrower_Orc" => "wc1sprites/icons/AxeThrowertiny001.png",
 
                 // Advanced Infantry
-                "Brigand_Human" => "/wc1sprites/icons/BriganTiny001.png",
-                "Ogre_Orc" => "/wc1sprites/icons/OgredTiny001.png",
+                "Brigand_Human" => "wc1sprites/icons/BriganTiny001.png",
+                "Ogre_Orc" => "wc1sprites/icons/OgredTiny001.png",
                 // Advanced Infantry
-                "Priest_Human" => "/wc1sprites/icons/PriestIcon001.png",
-                "Cultist_Orc" => "/wc1sprites/icons/CultistIcon001.png",
+                "Priest_Human" => "wc1sprites/icons/PriestIcon001.png",
+                "Cultist_Orc" => "wc1sprites/icons/CultistIcon001.png",
                 // Mounts
-                "Horse_Human" => "/wc1sprites/icons/NightmareIcon001.png",
-                "Wolf_Orc" => "/wc1sprites/icons/HellHoundsIcon001.png",
+                "Horse_Human" => "wc1sprites/icons/NightmareIcon001.png",
+                "Wolf_Orc" => "wc1sprites/icons/HellHoundsIcon001.png",
 
                 // Mounted Units
-                "Knight_Human" => "/wc1sprites/icons/KnightIcon001.png",
-                "OrcRaider_Orc" => "/wc1sprites/icons/OrcRaiderIcon001.png",
+                "Knight_Human" => "wc1sprites/icons/KnightIcon001.png",
+                "OrcRaider_Orc" => "wc1sprites/icons/OrcRaiderIcon001.png",
                 // Default fallback
-                _ => "/wc1sprites/icons/Peasant001.png"
+                _ => "wc1sprites/icons/Peasant001.png"
             };
         }
 
@@ -533,57 +533,57 @@ private void TrainCultist(WarBuilding building)
             return building.PlaceholderName switch
             {
                 // Town Halls
-                "TownHall_Human" => "/wc1sprites/icons/TownHallTiny001.png",
-                "Stronghold_Orc" => "/wc1sprites/icons/OrcSHTiny001.png",
+                "TownHall_Human" => "wc1sprites/icons/TownHallTiny001.png",
+                "Stronghold_Orc" => "wc1sprites/icons/OrcSHTiny001.png",
 
                 // Castles
-                "Castle_Human" => "/wc1sprites/icons/CastleTiny001.png",
-                "Fortress_Orc" => "/wc1sprites/icons/OrcFortressTiny001.png",
+                "Castle_Human" => "wc1sprites/icons/CastleTiny001.png",
+                "Fortress_Orc" => "wc1sprites/icons/OrcFortressTiny001.png",
 
                 // Barracks
-                "Barracks_Human" => "/wc1sprites/icons/Barrackstiny001.png",
-                "Barracks_Orc" => "/wc1sprites/icons/OrcBTiny001.png",
+                "Barracks_Human" => "wc1sprites/icons/Barrackstiny001.png",
+                "Barracks_Orc" => "wc1sprites/icons/OrcBTiny001.png",
 
-                "Church_Human" => "/wc1sprites/icons/ChurchIcon001.png",
-                "CultistHut_Orc" => "/wc1sprites/icons/CultistHutIcon001.png",
+                "Church_Human" => "wc1sprites/icons/ChurchIcon001.png",
+                "CultistHut_Orc" => "wc1sprites/icons/CultistHutIcon001.png",
                 // Stables/Pen
-                "Stables_Human" => "/wc1sprites/icons/StablesIcon001.png",
-                "Pen_Orc" => "/wc1sprites/icons/PensIcon001.png",
+                "Stables_Human" => "wc1sprites/icons/StablesIcon001.png",
+                "Pen_Orc" => "wc1sprites/icons/PensIcon001.png",
 
                 // Knights Hold/Raider Lair
-                "KnightsHold_Human" => "/wc1sprites/icons/KnightsHoldIcon001.png",
-                "RaiderLair_Orc" => "/wc1sprites/icons/RaiderLairIcon001.png",
+                "KnightsHold_Human" => "wc1sprites/icons/KnightsHoldIcon001.png",
+                "RaiderLair_Orc" => "wc1sprites/icons/RaiderLairIcon001.png",
 
                 // Farms
-                "Farm_Human" => "/wc1sprites/icons/FarmTiny001.png",
-                "PigFarm_Orc" => "/wc1sprites/icons/OrcFarmTiny001.png",
-                "Road" => "/wc1sprites/buildings/Road001.png", // Temp until you have road icon
+                "Farm_Human" => "wc1sprites/icons/FarmTiny001.png",
+                "PigFarm_Orc" => "wc1sprites/icons/OrcFarmTiny001.png",
+                "Road" => "wc1sprites/buildings/Road001.png", // Temp until you have road icon
 
-                "WoodenWall_Human" => "/wc1sprites/buildings/WoodenWall001.png",
+                "WoodenWall_Human" => "wc1sprites/buildings/WoodenWall001.png",
 
-                "WoodenWall_Orc" => "/wc1sprites/buildings/OrcWoodenWall001.png",
-                "StoneWall_Human" => "/wc1sprites/buildings/StoneWall001.png",
-                "StoneWall_Orc" => "/wc1sprites/buildings/OrcStoneWall001.png",
+                "WoodenWall_Orc" => "wc1sprites/buildings/OrcWoodenWall001.png",
+                "StoneWall_Human" => "wc1sprites/buildings/StoneWall001.png",
+                "StoneWall_Orc" => "wc1sprites/buildings/OrcStoneWall001.png",
                 // Lumber Mills
-                "LumberMill_Human" => "/wc1sprites/icons/LumberHumantiny001.png",
-                "LumberMill_Orc" => "/wc1sprites/icons/LumberOrctiny001.png",
+                "LumberMill_Human" => "wc1sprites/icons/LumberHumantiny001.png",
+                "LumberMill_Orc" => "wc1sprites/icons/LumberOrctiny001.png",
 
                 // Archery Ranges
-                "ArcheryRange_Human" => "/wc1sprites/icons/Archerytiny001.png",
-                "ArcheryRange_Orc" => "/wc1sprites/icons/AxeBuildingtiny001.png",
+                "ArcheryRange_Human" => "wc1sprites/icons/Archerytiny001.png",
+                "ArcheryRange_Orc" => "wc1sprites/icons/AxeBuildingtiny001.png",
 
                 // Blacksmiths
-                "Blacksmith_Human" => "/wc1sprites/icons/HumanBStiny001.png",
-                "Blacksmith_Orc" => "/wc1sprites/icons/OrcBStiny001.png",
+                "Blacksmith_Human" => "wc1sprites/icons/HumanBStiny001.png",
+                "Blacksmith_Orc" => "wc1sprites/icons/OrcBStiny001.png",
 
                 // ✅ NEW: TOWERS
-                "WoodTower_Human" => "/wc1sprites/icons/TinyHumanWoodTower002.png",
-                "WoodTower_Orc" => "/wc1sprites/icons/TinyOrcWoodTower002.png",
-                "StoneTower_Human" => "/wc1sprites/icons/TinyHumanStoneTower001.png",
-                "StoneTower_Orc" => "/wc1sprites/icons/TinyOrcStoneTower001.png",
+                "WoodTower_Human" => "wc1sprites/icons/TinyHumanWoodTower002.png",
+                "WoodTower_Orc" => "wc1sprites/icons/TinyOrcWoodTower002.png",
+                "StoneTower_Human" => "wc1sprites/icons/TinyHumanStoneTower001.png",
+                "StoneTower_Orc" => "wc1sprites/icons/TinyOrcStoneTower001.png",
          
                 // Default fallback
-                _ => "/wc1sprites/icons/TownHallTiny001.png"
+                _ => "wc1sprites/icons/TownHallTiny001.png"
             };
         }
         // ===== SELECT SINGLE UNIT FROM MULTI-SELECT =====

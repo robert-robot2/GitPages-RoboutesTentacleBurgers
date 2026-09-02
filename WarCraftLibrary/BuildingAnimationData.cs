@@ -11,17 +11,17 @@ namespace WarCraftLibrary
     public static class BuildingAnimationData
     {
         // ===== SPRITE PATH TEMPLATE =====
-        // Construction: /wc1sprites/buildings/{BuildingType}_{Race}_Construction_{Sheet}.png
-        //   Example: /wc1sprites/buildings/TownHall_Human_Construction_0.png (0%)
-        //   Example: /wc1sprites/buildings/Barracks_Orc_Construction_2.png (50%)
-        //   Example: /wc1sprites/buildings/Farm_Human_Construction_4.png (100%)
+        // Construction: wc1sprites/buildings/{BuildingType}_{Race}_Construction_{Sheet}.png
+        //   Example: wc1sprites/buildings/TownHall_Human_Construction_0.png (0%)
+        //   Example: wc1sprites/buildings/Barracks_Orc_Construction_2.png (50%)
+        //   Example: wc1sprites/buildings/Farm_Human_Construction_4.png (100%)
         //
-        // Damage: /wc1sprites/buildings/{BuildingType}_{Race}_Damage_{Level}.png
-        //   Example: /wc1sprites/buildings/TownHall_Human_Damage_1.png (light)
-        //   Example: /wc1sprites/buildings/Barracks_Orc_Damage_3.png (heavy)
+        // Damage: wc1sprites/buildings/{BuildingType}_{Race}_Damage_{Level}.png
+        //   Example: wc1sprites/buildings/TownHall_Human_Damage_1.png (light)
+        //   Example: wc1sprites/buildings/Barracks_Orc_Damage_3.png (heavy)
         //
-        // Destroyed: /wc1sprites/buildings/{BuildingType}_{Race}_Destroyed.png
-        //   Example: /wc1sprites/buildings/TownHall_Human_Destroyed.png (rubble)
+        // Destroyed: wc1sprites/buildings/{BuildingType}_{Race}_Destroyed.png
+        //   Example: wc1sprites/buildings/TownHall_Human_Destroyed.png (rubble)
 
         // ===== WHITELIST: AVAILABLE SPRITE SHEETS =====
         // Add sprite paths here as you create them (like WarAnimations.cs)
@@ -310,7 +310,7 @@ namespace WarCraftLibrary
             // Check if sprite exists in whitelist
             if (_availableSprites.Contains(key))
             {
-                return $"/wc1sprites/buildings/{key}.png";
+                return $"wc1sprites/buildings/{key}.png";
             }
 
             // Fallback: Return empty (controller will use original sprite)
@@ -336,7 +336,7 @@ namespace WarCraftLibrary
 
             if (_availableSprites.Contains(key))
             {
-                return $"/wc1sprites/buildings/{key}.png";
+                return $"wc1sprites/buildings/{key}.png";
             }
 
             return ""; // No damage sprite available - use pristine sprite
@@ -355,7 +355,7 @@ namespace WarCraftLibrary
 
             if (_availableSprites.Contains(key))
             {
-                return $"/wc1sprites/buildings/{key}.png";
+                return $"wc1sprites/buildings/{key}.png";
             }
 
             return ""; // No destroyed sprite - building just disappears

@@ -260,6 +260,6 @@
             $"{x.index}:{x.slot.Name}:{x.slot.Race}:{x.slot.Team}"));
 
         var timestamp = DateTime.Now.Ticks;
-        NavManager.NavigateTo($"/WarMap?map={selectedMapId}&players={Uri.EscapeDataString(playerData)}&teamTogether={teamTogether}&t={timestamp}");
+        NavManager.NavigateTo($"WarMap?map={selectedMapId}&players={Uri.EscapeDataString(playerData)}&teamTogether={teamTogether}&t={timestamp}");
     }
 }

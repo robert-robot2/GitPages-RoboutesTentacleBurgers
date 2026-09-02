@@ -109,8 +109,8 @@ namespace WarCraftLibrary
             // Get base unit type name
             string unitType = unit.PlaceholderName.Split('_')[0]; // "Peasant_Human" -> "Peasant"
 
-            // Construct path: /wc1sprites/units/Peon_Move_N.png
-            string path = $"/wc1sprites/units/{unitType}_{state}_{direction}.png";
+            // Construct path: wc1sprites/units/Peon_Move_N.png
+            string path = $"wc1sprites/units/{unitType}_{state}_{direction}.png";
 
             return path;
         }

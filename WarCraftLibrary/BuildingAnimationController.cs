@@ -169,7 +169,7 @@ namespace WarCraftLibrary
         /// This is called by WarMap.razor to render the building
         /// </summary>
         /// <param name="building">The building to get sprite for</param>
-        /// <returns>Full sprite path (e.g., "/wc1sprites/buildings/TownHall_Human_Construction_2.png")</returns>
+        /// <returns>Full sprite path (e.g., "wc1sprites/buildings/TownHall_Human_Construction_2.png")</returns>
         public static string GetCurrentSprite(WarBuilding building)
         {
             // Extract building type from PlaceholderName (e.g., "TownHall_Human" → "TownHall")

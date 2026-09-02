@@ -148,8 +148,8 @@ namespace WarCraftLibrary
             Race = RaceType.Human,
             Name = "Kingdom of Azeroth",
             Description = "The noble humans defend their lands with knights and paladins. Masters of architecture and holy magic.",
-            BannerPath = "/wc1sprites/factions/HumanBanner001.png",
-            IconPath = "/wc1sprites/factions/human_icon.png",
+            BannerPath = "wc1sprites/factions/HumanBanner001.png",
+            IconPath = "wc1sprites/factions/human_icon.png",
             IsPlayable = true
         },
 
@@ -158,8 +158,8 @@ namespace WarCraftLibrary
             Race = RaceType.Orc,
             Name = "Orcish Horde",
             Description = "Brutal orc warriors from the dark portal. Savage fighters with powerful shamanic magic.",
-            BannerPath = "/wc1sprites/factions/OrcBanner001.png",
-            IconPath = "/wc1sprites/factions/orc_icon.png",
+            BannerPath = "wc1sprites/factions/OrcBanner001.png",
+            IconPath = "wc1sprites/factions/orc_icon.png",
             IsPlayable = true
         },
 
@@ -168,8 +168,8 @@ namespace WarCraftLibrary
             Race = RaceType.Undead,
             Name = "Scourge",
             Description = "COMING SOON - The undead legions rise from their graves.",
-            BannerPath = "/wc1sprites/factions/undead_banner.png",
-            IconPath = "/wc1sprites/factions/undead_icon.png",
+            BannerPath = "wc1sprites/factions/undead_banner.png",
+            IconPath = "wc1sprites/factions/undead_icon.png",
             IsPlayable = false // Not implemented yet
         }
     };
@@ -206,10 +206,10 @@ namespace WarCraftLibrary
             MapId = "forest",
             MapName = "Forest of Elwynn",
             Description = "A lush forest valley rich with gold and timber. Ideal for new commanders.",
-           // TilesetPath = "/wc1sprites/tilesets/forest_4096004.png",
-            TilesetPath = "/wc1sprites/tilesets/TestMap0004.png",
+           // TilesetPath = "wc1sprites/tilesets/forest_4096004.png",
+            TilesetPath = "wc1sprites/tilesets/TestMap0004.png",
             // also for default in wargameervice.cs will change
-            PreviewPath = "/wc1sprites/tilesets/forest_4096004.png",
+            PreviewPath = "wc1sprites/tilesets/forest_4096004.png",
             PlayerSpawn = (16, 16),   // Top-left area
             AISpawn = (112, 112)       // Bottom-right area
         },
@@ -219,8 +219,8 @@ namespace WarCraftLibrary
             MapId = "swamp",
             MapName = "Swamp of Sorrows",
             Description = "Dark wetlands shrouded in fog. Treacherous terrain with scattered resources.",
-                   TilesetPath = "/wc1sprites/tilesets/TestMap0005.png",
-            PreviewPath = "/wc1sprites/tilesets/swamp_4096004.png",
+                   TilesetPath = "wc1sprites/tilesets/TestMap0005.png",
+            PreviewPath = "wc1sprites/tilesets/swamp_4096004.png",
             PlayerSpawn = (8, 8),
             AISpawn = (108, 108)
         },
@@ -230,8 +230,8 @@ namespace WarCraftLibrary
             MapId = "dungeon",
             MapName = "Dead Mines",
             Description = "Abandoned mines filled with darkness. High risk, high reward gold veins.",
-                 TilesetPath = "/wc1sprites/tilesets/TestMap0006.png",
-            PreviewPath = "/wc1sprites/tilesets/Mines_4096004.png",
+                 TilesetPath = "wc1sprites/tilesets/TestMap0006.png",
+            PreviewPath = "wc1sprites/tilesets/Mines_4096004.png",
             PlayerSpawn = (12, 12),
             AISpawn = (116, 116)
         }

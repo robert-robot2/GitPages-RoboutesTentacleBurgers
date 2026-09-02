@@ -7,7 +7,7 @@ namespace WarCraftLibrary
     public class WarTileAtlas
     {
         // Atlas image path
-        public string AtlasPath { get; set; } = "/wc1sprites/tilesets/tile_atlas_256.png";
+        public string AtlasPath { get; set; } = "wc1sprites/tilesets/tile_atlas_256.png";
 
         // Atlas dimensions
         public int AtlasWidth { get; set; } = 256;  // 8 tiles * 32px
@@ -19,7 +19,7 @@ namespace WarCraftLibrary
         private Dictionary<int, WarTile> _tileRegistry = new();
 
         // Constructor
-        public WarTileAtlas(string atlasPath = "/wc1sprites/tilesets/tile_atlas_256.png")
+        public WarTileAtlas(string atlasPath = "wc1sprites/tilesets/tile_atlas_256.png")
         {
             AtlasPath = atlasPath;
             InitializeDefaultTiles();

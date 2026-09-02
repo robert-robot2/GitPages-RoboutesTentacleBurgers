@@ -34,7 +34,7 @@
     transform: translateX(-50%);
     width: 800px;
     height: 200px;
-    background: url('/wc1sprites/ui/WarUI001.png');
+    background: url('wc1sprites/ui/WarUI001.png');
     background-size: cover;
     background-position: center;
     border: 3px solid #8B4513;
