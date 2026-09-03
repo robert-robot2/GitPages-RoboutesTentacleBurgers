@@ -701,7 +701,7 @@ namespace WarCraftLibrary
             // ✅ Reset initialization flag so new game can initialize
             hasInitialized = false;
 
-            NavManager.NavigateTo("/WarMainMenu");
+            NavManager.NavigateTo("WarMainMenu");
             Console.WriteLine("🏠 Returned to menu with full cleanup");
         }
         // ===== GET VISION CIRCLES FOR SVG RENDERING =====
