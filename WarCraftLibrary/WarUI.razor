@@ -4,11 +4,11 @@
 <!-- Resource Display (Top) -->
 <div class="resource-panel">
     <div class="resource-item">
-        <img src="/wc1sprites/ui/Gold001.png" alt="Gold" />
+        <img src="wc1sprites/ui/Gold001.png" alt="Gold" />
         <span class="DiabloRedGlowWarUI">@Game.PlayerGold</span>
     </div>
     <div class="resource-item">
-        <img src="/wc1sprites/ui/Woood001.png" alt="Lumber" />
+        <img src="wc1sprites/ui/Woood001.png" alt="Lumber" />
         <span class="DiabloRedGlowWarUI">@Game.PlayerLumber</span>
     </div>
     <div class="resource-item">
@@ -167,20 +167,20 @@
                         @if (unit is Peasant && unit.OwnerPlayerIndex == 0)
                         {
                         
-                            var farmIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/FarmTiny001.png" : "/wc1sprites/icons/OrcFarmTiny001.png";
+                            var farmIcon = displayRace == RaceType.Human ? "wc1sprites/icons/FarmTiny001.png" : "wc1sprites/icons/OrcFarmTiny001.png";
                             var farmName = displayRace == RaceType.Human ? "Farm" : "Pig Farm";
-                            var barracksIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Barrackstiny001.png" : "/wc1sprites/icons/OrcBTiny001.png";
-                            var lumberIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/LumberHumantiny001.png" : "/wc1sprites/icons/LumberOrctiny001.png";
-                            var archeryIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Archerytiny001.png" : "/wc1sprites/icons/AxeBuildingtiny001.png";
-                            var blacksmithIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/HumanBStiny001.png" : "/wc1sprites/icons/OrcBStiny001.png";
-                            var stonetowericon = displayRace == RaceType.Human ? "/wc1sprites/icons/TinyHumanStoneTower001.png" : "/wc1sprites/icons/TinyOrcStoneTower001.png";
-                            var woodtowericon = displayRace == RaceType.Human ? "/wc1sprites/icons/TinyHumanWoodTower002.png" : "/wc1sprites/icons/TinyOrcWoodTower002.png";
-                            var roadicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/Road001.png" : "/wc1sprites/buildings/Road001.png";
-                            var woodwallicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/WoodenWall001.png" : "/wc1sprites/buildings/OrcWoodenWall001.png";
-                            var stonewallicon = displayRace == RaceType.Human ? "/wc1sprites/buildings/StoneWall001.png" : "/wc1sprites/buildings/OrcStoneWall001.png";
-                            var Priesticon = displayRace == RaceType.Human ? "/wc1sprites/icons/ChurchIcon001.png" : "/wc1sprites/icons/CultistHutIcon001.png";
-                            var stablesIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/StablesIcon001.png" : "/wc1sprites/icons/PensIcon001.png";
-                            var knightsHoldIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/KnightsHoldIcon001.png" : "/wc1sprites/icons/RaiderLairIcon001.png";
+                            var barracksIcon = displayRace == RaceType.Human ? "wc1sprites/icons/Barrackstiny001.png" : "wc1sprites/icons/OrcBTiny001.png";
+                            var lumberIcon = displayRace == RaceType.Human ? "wc1sprites/icons/LumberHumantiny001.png" : "wc1sprites/icons/LumberOrctiny001.png";
+                            var archeryIcon = displayRace == RaceType.Human ? "wc1sprites/icons/Archerytiny001.png" : "wc1sprites/icons/AxeBuildingtiny001.png";
+                            var blacksmithIcon = displayRace == RaceType.Human ? "wc1sprites/icons/HumanBStiny001.png" : "wc1sprites/icons/OrcBStiny001.png";
+                            var stonetowericon = displayRace == RaceType.Human ? "wc1sprites/icons/TinyHumanStoneTower001.png" : "wc1sprites/icons/TinyOrcStoneTower001.png";
+                            var woodtowericon = displayRace == RaceType.Human ? "wc1sprites/icons/TinyHumanWoodTower002.png" : "wc1sprites/icons/TinyOrcWoodTower002.png";
+                            var roadicon = displayRace == RaceType.Human ? "wc1sprites/buildings/Road001.png" : "wc1sprites/buildings/Road001.png";
+                            var woodwallicon = displayRace == RaceType.Human ? "wc1sprites/buildings/WoodenWall001.png" : "wc1sprites/buildings/OrcWoodenWall001.png";
+                            var stonewallicon = displayRace == RaceType.Human ? "wc1sprites/buildings/StoneWall001.png" : "wc1sprites/buildings/OrcStoneWall001.png";
+                            var Priesticon = displayRace == RaceType.Human ? "wc1sprites/icons/ChurchIcon001.png" : "wc1sprites/icons/CultistHutIcon001.png";
+                            var stablesIcon = displayRace == RaceType.Human ? "wc1sprites/icons/StablesIcon001.png" : "wc1sprites/icons/PensIcon001.png";
+                            var knightsHoldIcon = displayRace == RaceType.Human ? "wc1sprites/icons/KnightsHoldIcon001.png" : "wc1sprites/icons/RaiderLairIcon001.png";
 
                             <button class="cmd-btn-compact" @onclick="BuildFarm" @onclick:stopPropagation="true" title="Farm - 500g 250w">
                                 <img src="@farmIcon" />
@@ -233,7 +233,7 @@
                             }
                             <!-- ✅ NEW: BUILD TOWN HALL (REQUIRES CASTLE) -->
                             var hasCastleForTownHall = WarRegistry.Buildings.OfType<Castle>().Any(c => c.Race == Game.PlayerFaction?.Race && c.IsConstructed);
-                            var townHallIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/TownHallTiny001.png" : "/wc1sprites/icons/OrcSHTiny001.png";
+                            var townHallIcon = displayRace == RaceType.Human ? "wc1sprites/icons/TownHallTiny001.png" : "wc1sprites/icons/OrcSHTiny001.png";
                             var townHallName = displayRace == RaceType.Human ? "Town Hall" : "Stronghold";
 
                             <button class="cmd-btn-compact"
@@ -477,16 +477,16 @@ else
                 <div class="command-row">
                     <div class="command-scroll-container">
                         @{
-                            var workerIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Peasant001.png" : "/wc1sprites/icons/Peon001.png";
-                            var soldierIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Footmantiny001.png" : "/wc1sprites/icons/Grunttiny001.png";
+                            var workerIcon = displayRace == RaceType.Human ? "wc1sprites/icons/Peasant001.png" : "wc1sprites/icons/Peon001.png";
+                            var soldierIcon = displayRace == RaceType.Human ? "wc1sprites/icons/Footmantiny001.png" : "wc1sprites/icons/Grunttiny001.png";
                             var soldierName = displayRace == RaceType.Human ? "Footman" : "Grunt";
                             var brigandName = displayRace == RaceType.Human ? "Brigand" : "Ogre";
-                            var brigandIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/BriganTiny001.png" : "/wc1sprites/icons/OgredTiny001.png";
+                            var brigandIcon = displayRace == RaceType.Human ? "wc1sprites/icons/BriganTiny001.png" : "wc1sprites/icons/OgredTiny001.png";
                             var archerName = displayRace == RaceType.Human ? "Archer" : "Troll Axe";
-                            var archerIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/Archertiny001.png" : "/wc1sprites/icons/AxeThrowertiny001.png";
-                            var castleIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/CastleTiny001.png" : "/wc1sprites/icons/OrcFortressTiny001.png";
-                            var cultistIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/PriestIcon001.png" : "/wc1sprites/icons/CultistIcon001.png";
-                            var HorseIcon = displayRace == RaceType.Human ? "/wc1sprites/icons/NightmareIcon001.png" : "/wc1sprites/icons/HellHoundsIcon001.png";
+                            var archerIcon = displayRace == RaceType.Human ? "wc1sprites/icons/Archertiny001.png" : "wc1sprites/icons/AxeThrowertiny001.png";
+                            var castleIcon = displayRace == RaceType.Human ? "wc1sprites/icons/CastleTiny001.png" : "wc1sprites/icons/OrcFortressTiny001.png";
+                            var cultistIcon = displayRace == RaceType.Human ? "wc1sprites/icons/PriestIcon001.png" : "wc1sprites/icons/CultistIcon001.png";
+                            var HorseIcon = displayRace == RaceType.Human ? "wc1sprites/icons/NightmareIcon001.png" : "wc1sprites/icons/HellHoundsIcon001.png";
 
 
                         }
