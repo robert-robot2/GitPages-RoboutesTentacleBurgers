@@ -80,7 +80,7 @@ namespace WarCraftLibrary
 
 
         // ===== MAP CONFIGURATION =====
-        public string CurrentMapTileset { get; set; } = "wc1sprites/tilesets/TestMap0004.png";
+        public string CurrentMapTileset { get; set; } = "/wc1sprites/tilesets/TestMap0004.png";
 
         // ===== TILE SYSTEM (ADD THESE NEW PROPERTIES) =====
         public WarTileAtlas TileAtlas { get; set; }

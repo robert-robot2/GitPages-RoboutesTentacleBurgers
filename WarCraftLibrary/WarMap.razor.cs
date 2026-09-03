@@ -196,8 +196,8 @@ namespace WarCraftLibrary
             return Game.BuildingToBuild switch
             {
                 "Barracks" => Game.PlayerFaction?.Race == RaceType.Human
-                    ? "wc1sprites/buildings/HumanBar001.png"
-                    : "wc1sprites/buildings/OrcBar001.png",
+                    ? "/wc1sprites/buildings/HumanBar001.png"
+                    : "/wc1sprites/buildings/OrcBar001.png",
                 _ => ""
             };
         }
