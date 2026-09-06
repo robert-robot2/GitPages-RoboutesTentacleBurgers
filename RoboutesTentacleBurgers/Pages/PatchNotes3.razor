@@ -51,7 +51,51 @@
     },
 },
 
+new PatchNoteEntry
+{
+    Title = "RTB VX5.388 Nova Adeptus Updates Phase 1 and Phase 2 Complete ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "First official gitpages patch!",
+        "── OPERATIVE IDENTITY SYSTEM ──────────────────────────",
+        "Nova Adeptus sidebar redesigned with dual identity panels.",
+        "OPERATIVE IDENTITY panel added — Nova portrait, status, HP, mood, rep, funds.",
+        "OPERATIVE panel added — player portrait, class, HP, mood, rep, funds.",
+        "All portraits 48x48 pixel art style, served from /IAssets/.",
+        "Mood and funds placeholders added to both panels for Phase 3 hookup.",
 
+        "── CHARACTER REGISTRATION ─────────────────────────────",
+        "New NovaCharacterSelect.razor component — operative registration panel.",
+        "Sequential gender, type, and class selection with portrait previews.",
+        "Six classes available — Civilian, Ultramarine, Doctor, Mechanic, Hacker, Scientist.",
+        "Male Biological portraits fully wired. Placeholder slots for all other combinations.",
+        "Character select now opens only when player asks Nova — no auto popup.",
+        "Class, gender and type saved to session and persist across sessions.",
+
+        "── NOVA CLASS REACTIONS ───────────────────────────────",
+        "Nova responds in character to each of the six class selections.",
+        "SYSTEM message bypass added — class select no longer triggers keyword collisions.",
+        "Player portrait updates in sidebar and chat feed on class selection.",
+
+        "── NAVIGATION & MENUS ─────────────────────────────────",
+        "Chapter select menu added — chapter / chapters / menu keywords.",
+        "Chapter 1 Nova Adeptus active. Chapter 2 Earth Apocalypse listed as coming soon.",
+        "Class change keyword wired — choose class / pick a class / select class.",
+        "Help menu updated with Chapters section.",
+
+        "── CHAT FEED ──────────────────────────────────────────",
+        "Player portrait now displays beside all outgoing messages.",
+        "Player name displays above chat bubbles once set.",
+        "Portrait updates dynamically when class is changed mid-session.",
+        "Updated Novas Portrait for in chat",
+
+        "── DEFERRED TO PHASE 4 POLISH ─────────────────────────",
+        "Bare 'class' keyword occasionally falls through — minor routing fix pending.",
+        "Previously saved name loads on new chat — intentional for now.",
+        "Nova sidebar HP, Rep and Funds live wiring — pending Phase 3.",
+        "Remaining 29 operative portraits pending art completion.",
+    }
+},
 
 
 new PatchNoteEntry

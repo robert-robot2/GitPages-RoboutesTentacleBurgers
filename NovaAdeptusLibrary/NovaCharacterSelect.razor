@@ -1,0 +1,298 @@
+@if (Visible)
+{
+    <div class="charselect-overlay">
+        <div class="charselect-panel">
+
+            <div class="charselect-title">OPERATIVE REGISTRATION</div>
+            <div class="charselect-sub">Choose your identity, operative.</div>
+
+            <!-- ── STEP 1: GENDER ─────────────────────────── -->
+            @if (_step == 1)
+            {
+                <div class="charselect-label">SELECT GENDER</div>
+                <div class="charselect-row">
+                    <div class="char-option @(_gender == "male" ? "selected" : "")"
+                         @onclick='() => Pick("gender", "male")'>
+                        <img src="/IAssets/male-bio-civilian.png" class="char-portrait" />
+                        <span>MALE</span>
+                    </div>
+                    <div class="char-option @(_gender == "female" ? "selected" : "")"
+                         @onclick='() => Pick("gender", "female")'>
+                        <!-- PLACEHOLDER: female portrait not yet made -->
+                        <div class="char-portrait-placeholder">?</div>
+                        <span>FEMALE</span>
+                    </div>
+                </div>
+                <button class="charselect-btn"
+                        disabled="@(string.IsNullOrEmpty(_gender))"
+                        @onclick="NextStep">
+                    CONFIRM →
+                </button>
+            }
+
+            <!-- ── STEP 2: TYPE ───────────────────────────── -->
+            @if (_step == 2)
+            {
+                <div class="charselect-label">SELECT TYPE</div>
+                <div class="charselect-row">
+                    <div class="char-option @(_type == "biological" ? "selected" : "")"
+                         @onclick='() => Pick("type", "biological")'>
+                        <img src="/IAssets/male-bio-civilian.png" class="char-portrait" />
+                        <span>BIOLOGICAL</span>
+                    </div>
+                    <div class="char-option @(_type == "mechanical" ? "selected" : "")"
+                         @onclick='() => Pick("type", "mechanical")'>
+                        <div class="char-portrait-placeholder">?</div>
+                        <span>MECHANICAL</span>
+                    </div>
+                    <div class="char-option @(_type == "synthetic" ? "selected" : "")"
+                         @onclick='() => Pick("type", "synthetic")'>
+                        <div class="char-portrait-placeholder">?</div>
+                        <span>SYNTHETIC</span>
+                    </div>
+                </div>
+                <div class="charselect-btn-row">
+                    <button class="charselect-btn secondary" @onclick="PrevStep">← BACK</button>
+                    <button class="charselect-btn"
+                            disabled="@(string.IsNullOrEmpty(_type))"
+                            @onclick="NextStep">
+                        CONFIRM →
+                    </button>
+                </div>
+            }
+
+            <!-- ── STEP 3: CLASS ──────────────────────────── -->
+            @if (_step == 3)
+            {
+                <div class="charselect-label">SELECT CLASS</div>
+                <div class="charselect-grid">
+                    @foreach (var cls in _classes)
+                    {
+                        <div class="char-option @(_class == cls.Key ? "selected" : "")"
+                             @onclick='() => Pick("class", cls.Key)'>
+                            @if (cls.Portrait != null)
+                            {
+                                <img src="/IAssets/@cls.Portrait"
+                                     class="char-portrait" />
+                            }
+                            else
+                            {
+                                <div class="char-portrait-placeholder">?</div>
+                            }
+                            <span>@cls.Key.ToUpper()</span>
+                            <span class="char-bonus">@cls.Bonus</span>
+                        </div>
+                    }
+                </div>
+                <div class="charselect-btn-row">
+                    <button class="charselect-btn secondary" @onclick="PrevStep">← BACK</button>
+                    <button class="charselect-btn"
+                            disabled="@(string.IsNullOrEmpty(_class))"
+                            @onclick="Confirm">
+                        ENTER THE VOID →
+                    </button>
+                </div>
+            }
+
+        </div>
+    </div>
+}
+
+<style>
+    .charselect-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.85);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        backdrop-filter: blur(6px);
+    }
+
+    .charselect-panel {
+        background: rgba(0, 8, 20, 0.95);
+        border: 1px solid rgba(57,255,20,0.25);
+        padding: 30px 28px;
+        width: 420px;
+        max-width: 95vw;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        box-shadow: 0 0 40px rgba(57,255,20,0.08);
+        font-family: 'Courier New', monospace;
+    }
+
+    .charselect-title {
+        font-size: 13px;
+        letter-spacing: 4px;
+        color: #39ff14;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .charselect-sub {
+        font-size: 11px;
+        color: #5a8aaa;
+        text-align: center;
+        letter-spacing: 1px;
+    }
+
+    .charselect-label {
+        font-size: 9px;
+        letter-spacing: 3px;
+        color: #5a8aaa;
+        margin-bottom: 4px;
+    }
+
+    .charselect-row {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .charselect-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    }
+
+    .char-option {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        padding: 10px 8px;
+        border: 1px solid rgba(57,255,20,0.15);
+        cursor: pointer;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        color: #5a8aaa;
+        transition: all 0.2s;
+    }
+
+        .char-option:hover {
+            border-color: rgba(57,255,20,0.5);
+            color: #39ff14;
+            background: rgba(57,255,20,0.05);
+        }
+
+        .char-option.selected {
+            border-color: #39ff14;
+            color: #39ff14;
+            background: rgba(57,255,20,0.08);
+            box-shadow: 0 0 10px rgba(57,255,20,0.1);
+        }
+
+    .char-portrait {
+        width: 48px;
+        height: 48px;
+        image-rendering: pixelated;
+    }
+
+    .char-portrait-placeholder {
+        width: 48px;
+        height: 48px;
+        border: 1px dashed rgba(57,255,20,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #5a8aaa;
+        font-size: 18px;
+    }
+
+    .char-bonus {
+        font-size: 8px;
+        color: #ffd700;
+        letter-spacing: 1px;
+        text-align: center;
+    }
+
+    .charselect-btn {
+        background: transparent;
+        border: 1px solid #39ff14;
+        color: #39ff14;
+        font-family: 'Courier New', monospace;
+        font-size: 11px;
+        letter-spacing: 2px;
+        padding: 10px 20px;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-transform: uppercase;
+        width: 100%;
+    }
+
+        .charselect-btn:hover:not([disabled]) {
+            background: rgba(57,255,20,0.1);
+            box-shadow: 0 0 12px rgba(57,255,20,0.2);
+        }
+
+        .charselect-btn[disabled] {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .charselect-btn.secondary {
+            border-color: #5a8aaa;
+            color: #5a8aaa;
+            width: auto;
+        }
+
+    .charselect-btn-row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+</style>
+
+@code {
+    [Parameter] public bool Visible { get; set; }
+    [Parameter] public EventCallback<CharSelectResult> OnConfirm { get; set; }
+
+    private int _step = 1;
+    private string _gender = "";
+    private string _type = "";
+    private string _class = "";
+
+    private record ClassDef(string Key, string? Portrait, string Bonus);
+
+    private List<ClassDef> _classes => _gender == "male" && _type == "biological"
+        ? new()
+        {
+            new("civilian",    "male-bio-civilian.png",    "Balanced"),
+            new("ultramarine", "male-bio-ultramarine.png", "Combat +3"),
+            new("doctor",      "male-bio-doctor.png",      "HP +20"),
+            new("mechanic",    "male-bio-mechanic.png",    "Repair +3"),
+            new("hacker",      "male-bio-hacker.png",      "Hack +3"),
+            new("scientist",   "male-bio-scientist.png",   "Analysis +3"),
+        }
+        : new()  // placeholder for all other combos
+        {
+            new("civilian",    null, "Balanced"),
+            new("ultramarine", null, "Combat +3"),
+            new("doctor",      null, "HP +20"),
+            new("mechanic",    null, "Repair +3"),
+            new("hacker",      null, "Hack +3"),
+            new("scientist",   null, "Analysis +3"),
+        };
+
+    private void Pick(string category, string value)
+    {
+        if (category == "gender") _gender = value;
+        if (category == "type") _type = value;
+        if (category == "class") _class = value;
+    }
+
+    private void NextStep() => _step++;
+    private void PrevStep() => _step--;
+
+    private async Task Confirm()
+    {
+        await OnConfirm.InvokeAsync(new CharSelectResult(
+            _gender, _type, _class));
+    }
+
+    public record CharSelectResult(
+        string Gender, string Type, string Class);
+}

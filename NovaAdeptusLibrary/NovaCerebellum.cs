@@ -416,7 +416,21 @@ namespace NovaAdeptusLibrary
     "what have you called me",
     "have you got my name",
 },
-
+            ["class_request"] = new()
+{
+    "how do i choose my class",
+    "how do i change my class",
+    "can i change my class",
+    "what class should i pick",
+    "show me the classes",
+    "i want to change class",
+    "choose class",
+    "pick a class",
+    "change my class",
+    "what are the classes",
+    "class select",
+    "open class select",
+},
             ["vague_engagement"] = new()
             {
                 "i am bored",

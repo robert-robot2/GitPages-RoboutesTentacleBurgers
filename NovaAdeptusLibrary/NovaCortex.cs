@@ -124,7 +124,10 @@ namespace NovaAdeptusLibrary
             return CurrentHP - before; // returns actual HP restored
         }
         public int ComplimentCount { get; set; } = 0;
-
+        // ── Character identity — set by character select panel ────
+        public string PlayerClass { get; set; } = "civilian";
+        public string PlayerGender { get; set; } = "male";
+        public string PlayerType { get; set; } = "biological";
         public Dictionary<string, int> Skills { get; set; } = new()
         {
             { "combat",   0 },
@@ -372,6 +375,11 @@ namespace NovaAdeptusLibrary
                 "sidequest" => _thalamus.Apply(SideQuest(), Session),
                 "missionchain" => _thalamus.Apply(MissionChain(), Session),
                 "mood" => StartMoodSelect(),
+                "chapter" => ShowChapterMenu(),
+                "chapters" => ShowChapterMenu(),
+                "menu" => ShowChapterMenu(),
+                "menus" => ShowChapterMenu(),
+                "class" => _thalamus.Apply(ReopenCharacterSelect(), Session),
                 "name" => AskName(),
                 "time" => _thalamus.Apply(
                                 DateTime.Now.ToString("'Time is 'hh:mm tt ⏰"), Session),
@@ -432,6 +440,25 @@ namespace NovaAdeptusLibrary
                 cleaned.Contains("fire plasma") ||
                 cleaned.Contains("use cannon"))
                 return UseItemInMission("plasma_cannon");
+            // ── System message bypass — character select, no keyword matching ──
+            if (cleaned.StartsWith("[system]"))
+                return HandleSystemMessage(cleaned);
+
+            // ── Chapter / menu keywords ────────────────────────────────────────
+            if (cleaned.Contains("chapter") || cleaned.Contains("chapters"))
+                return ShowChapterMenu();
+            if (cleaned == "menu" || cleaned == "menus")
+                return ShowChapterMenu();
+
+            // ── Class change keyword ───────────────────────────────────────────
+            if (cleaned.Contains("change class") ||
+                cleaned.Contains("my class") ||
+                cleaned.Contains("choose class") ||
+                cleaned.Contains("pick a class") ||
+                cleaned.Contains("pick class") ||
+                cleaned.Contains("select class") ||
+                cleaned == "class")
+                return ReopenCharacterSelect();
             if (cleaned.Contains("help")) return NovaThalamus.HelpText;
             if (cleaned.Contains("hack")) return StartHack();
             if (cleaned.Contains("trivia") ||
@@ -2935,6 +2962,111 @@ private string RandomCosmicEvent()
             // ── Fallback: bare "name" keyword or "what's your name" variants ──
             return "ask_name";
         }
+
+        // ==========================================================
+        // SYSTEM MESSAGE HANDLER
+        // Bypasses all keyword matching for internal system events
+        // ==========================================================
+        private string HandleSystemMessage(string cleaned)
+        {
+            // ── Character class selection ──────────────────────────
+            if (cleaned.Contains("player selected:"))
+            {
+                var parts = cleaned.Replace("[system] player selected:", "")
+                                   .Trim().Split(' ');
+                if (parts.Length >= 3)
+                {
+                    Session.PlayerGender = parts[0].Trim();
+                    Session.PlayerType = parts[1].Trim();
+                    Session.PlayerClass = parts[2].Trim();
+                    return BuildClassReactionResponse();
+                }
+            }
+            return _thalamus.Apply("Systems updated.", Session);
+        }
+
+        // ==========================================================
+        // CLASS REACTION — Nova responds to player's class choice
+        // ==========================================================
+        private string BuildClassReactionResponse()
+        {
+            var name = Session.UserName != null
+                ? $", {Session.UserName}" : "";
+
+            return Session.PlayerClass.ToLower() switch
+            {
+                "civilian" =>
+                    $"A civilian{name}. No combat training. No hacking skills. " +
+                    $"No stealth experience.\n" +
+                    $"Statistically the least likely to survive.\n" +
+                    $"I respect the audacity. Type 'help' to begin. 😏",
+
+                "ultramarine" =>
+                    $"An Ultramarine{name}. Combat trained, heavily armored, " +
+                    $"built for war.\n" +
+                    $"You hit hard and you take hits. Subtle you are not.\n" +
+                    $"The void respects that. Type 'accept' for your first mission. ⚔️",
+
+                "doctor" =>
+                    $"A Doctor{name}. High survivability — you patch yourself up " +
+                    $"when others would bleed out.\n" +
+                    $"You're not a fighter. You're a keeper.\n" +
+                    $"The void has use for those who keep operatives alive. " +
+                    $"Type 'help' to begin. ❤️",
+
+                "mechanic" =>
+                    $"A Mechanic{name}. You fix things. You build things. " +
+                    $"You improvise when everything breaks.\n" +
+                    $"In this sector everything breaks constantly.\n" +
+                    $"You'll do fine. Type 'help' to begin. 🔧",
+
+                "hacker" =>
+                    $"A Hacker{name}. You're in the systems before the enemy " +
+                    $"knows you exist.\n" +
+                    $"Fragile in a firefight. Devastating in a network.\n" +
+                    $"Don't get shot. Type 'hack' to prove yourself. 💻",
+
+                "scientist" =>
+                    $"A Scientist{name}. High analysis, low combat.\n" +
+                    $"You read situations others miss entirely.\n" +
+                    $"The void rewards those who understand it. " +
+                    $"Type 'help' to begin. 🔬",
+
+                _ =>
+                    $"Identity registered{name}. " +
+                    $"Class: {Session.PlayerClass.ToUpper()}.\n" +
+                    $"The void is watching. Type 'help' to begin. 👁️",
+            };
+        }
+
+        // ==========================================================
+        // CHAPTER MENU
+        // ==========================================================
+        private string ShowChapterMenu()
+        {
+            return "📖 CHAPTER SELECT\n\n" +
+                   "  Chapter 1 — NOVA ADEPTUS          [ACTIVE]\n" +
+                   "              Space RPG · Missions · Combat · Hacking\n\n" +
+                   "  Chapter 2 — EARTH APOCALYPSE       [COMING SOON]\n" +
+                   "              Kennecott, Alaska · Post-WW3 · Zombie Survival\n\n" +
+                   "── Type 'chapter 1' to play Nova Adeptus\n" +
+                   "── Type 'chapter 2' to enter Kennecott (when available)\n" +
+                   "── Type 'class' to change your operative class\n" +
+                   "── Type 'help' for full command list\n\n" +
+                   "More chapters coming. The void expands. 🌌";
+        }
+
+        // ==========================================================
+        // REOPEN CHARACTER SELECT — tells the UI to show the panel
+        // ==========================================================
+        private string ReopenCharacterSelect()
+        {
+            // Signal the UI to open the character select panel
+            return "[OPEN_CHAR_SELECT]";
+        }
+
+
+
         // ==========================================================
         // PERSISTENCE — localStorage via JSInterop
         // ==========================================================
@@ -2964,6 +3096,9 @@ private string RandomCosmicEvent()
                     stealthBonus = Session.StealthBonus,
                     hackingBonus = Session.HackingBonus,
                     analysisBonus = Session.AnalysisBonus,
+                    playerClass = Session.PlayerClass,
+                    playerGender = Session.PlayerGender,
+                    playerType = Session.PlayerType,
                 });
                 await _js.InvokeVoidAsync(
             "localStorage.setItem", "nova_session", data);
@@ -3007,7 +3142,9 @@ public async Task LoadSession()
                 Session.StealthBonus = root.TryGetProperty("stealthBonus", out var sb) ? sb.GetInt32() : 0;
                 Session.HackingBonus = root.TryGetProperty("hackingBonus", out var hb) ? hb.GetInt32() : 0;
                 Session.AnalysisBonus = root.TryGetProperty("analysisBonus", out var ab) ? ab.GetInt32() : 0;
-
+                Session.PlayerClass = root.TryGetProperty("playerClass", out var pc) ? pc.GetString()! : "civilian";
+                Session.PlayerGender = root.TryGetProperty("playerGender", out var pg) ? pg.GetString()! : "male";
+                Session.PlayerType = root.TryGetProperty("playerType", out var pt) ? pt.GetString()! : "biological";
 
 
                 if (root.TryGetProperty("activeMissions", out var am))

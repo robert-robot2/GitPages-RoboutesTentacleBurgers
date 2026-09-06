@@ -52,7 +52,11 @@ namespace NovaAdeptusLibrary
      "🕐   time/date   — current time and date\n\n" +
      "── CHAT ──────────────────────────────\n" +
      "💬   just talk   — Nova always responds\n" +
-     "👁️   name        — tell Nova your name\n";
+     "👁️   name        — tell Nova your name\n\n" +
+     "── CHAPTERS ──────────────────────────\n" +
+     "📖   chapter     — chapter select menu\n" +
+     "🎭   class       — change operative class\n" +
+     "📋   menu        — main menu overview\n";
 
         // ==========================================================
         // PERSONALITY POOLS

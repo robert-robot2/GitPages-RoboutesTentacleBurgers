@@ -1,5 +1,6 @@
 @inject IJSRuntime JS
 @inject HttpClient Http
+
 <!-- ═══════════════════════════════════════════════════════════
      STARFIELD CANVAS — sits behind everything
 ═══════════════════════════════════════════════════════════ -->
@@ -7,6 +8,8 @@
 <!-- ═══════════════════════════════════════════════════════════
      SIDEBAR OVERLAY
 ═══════════════════════════════════════════════════════════ -->
+<NovaCharacterSelect Visible="_showCharSelect"
+                     OnConfirm="HandleCharSelect" />
 <div class="nova-sidebar @(_sidebarOpen ? "sidebar-open" : "sidebar-closed")">
     <div class="sidebar-header">
         <span class="sidebar-title">NOVA ADEPTUS</span>
@@ -22,8 +25,26 @@
 
     <div class="sidebar-divider"></div>
 
- <div class="sidebar-section">
-    <div class="sidebar-label">OPERATIVE STATUS</div>
+    <div class="sidebar-section">
+        <!-- ── NOVA IDENTITY PANEL ─────────────────────────── -->
+        <div class="sidebar-label">OPERATIVE IDENTITY</div>
+        <div class="portrait-row">
+            <img src="IAssets/nova-portrait.png"
+                 class="portrait-img"
+                 alt="Nova Adeptus" />
+            <span class="identity-name">NOVA ADEPTUS</span>
+        </div>
+
+        <!-- PHASE 3 HOOKUP: Nova RPG stats -->
+        <div class="sidebar-stat">
+            <span class="stat-key">Status</span>
+            <span class="stat-val" style="color:var(--lime)">ONLINE</span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">HP</span>
+            <span class="stat-val" style="color:#ff6b6b">100 / 100</span>
+        </div>
+
     <div class="sidebar-stat">
         <span class="stat-key">Mood</span>
         <span class="stat-val">
@@ -35,29 +56,66 @@
             @_staticEmotionState
         </span>
     </div>
-    <div class="sidebar-stat">
-        <span class="stat-key">HP</span>
-        <span class="stat-val"
-              style="color:#ff6b6b">
-            @(_nova?.Session.CurrentHP ?? 100) /
-            @(_nova?.Session.MaxHP ?? 100)
-        </span>
+           <div class="sidebar-stat">
+            <span class="stat-key">Rep</span>
+            <span class="stat-val" style="color:var(--lime);font-size:10px;">— —</span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Funds</span>
+            <span class="stat-val" style="color:#ffd700">$— —</span>
+        </div>
+
+
     </div>
-    <div class="sidebar-stat">
-        <span class="stat-key">Coins</span>
-        <span class="stat-val"
-              style="color:#ffd700">
-            @(_nova?.Session.GalacticCoins ?? 50) GC
-        </span>
+
+    <div class="sidebar-divider"></div>
+
+    <!-- ── HUMAN IDENTITY PANEL ───────────────────────────── -->
+    <div class="sidebar-section">
+        <div class="sidebar-label">OPERATIVE</div>
+        <div class="portrait-row">
+            <img src="IAssets/@(_playerPortrait)"
+                 class="portrait-img"
+                 alt="Player" />
+            <span class="identity-name">
+                @(_nova?.Session.UserName?.ToUpper() ?? "UNKNOWN")
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Class</span>
+            <span class="stat-val" style="color:var(--text-you)">
+                @(_playerClass)
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">HP</span>
+            <span class="stat-val" style="color:#ff6b6b">
+                @(_nova?.Session.CurrentHP ?? 100) /
+                @(_nova?.Session.MaxHP ?? 100)
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Mood</span>
+            <span class="stat-val" style="color:#9b59b6">
+                — —
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Rep</span>
+            <span class="stat-val"
+                  style="color:var(--lime);font-size:10px;">
+                @(_nova?.Session.ReputationTitle ?? "Neutral")
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Funds</span>
+            <span class="stat-val" style="color:#ffd700">
+                $@(_nova?.Session.GalacticCoins ?? 0)
+            </span>
+        </div>
+      
+      
     </div>
-    <div class="sidebar-stat">
-        <span class="stat-key">Rep</span>
-        <span class="stat-val"
-              style="color:var(--lime);font-size:10px;">
-            @(_nova?.Session.ReputationTitle ?? "Neutral")
-        </span>
-    </div>
-</div>
 
     <div class="sidebar-divider"></div>
 
@@ -86,10 +144,14 @@
                 <div class="msg-row msg-nova">
                     <div class="msg-bubble bubble-nova">
                         <span class="msg-sender">
-                            NOVA
+                            <span class="identity-name">NOVA ADEPTUS</span>
                             <span class="emotion-dot"
                                   style="background:@_staticEmotionColor;"
                                   title="@_staticEmotionState"></span>
+                            <img src="IAssets/nova-portrait.png"
+                                 class="portrait-img"
+                                 alt="Nova Adeptus" />
+                       
                         </span>
                         <span class="msg-text">@msg.text</span>
                     </div>
@@ -98,8 +160,13 @@
             else
             {
                 <div class="msg-row msg-you">
+                    <img src="IAssets/@(_playerPortrait)"
+                         class="chat-portrait-you"
+                         alt="Player" />
                     <div class="msg-bubble bubble-you">
-                        <span class="msg-sender">YOU</span>
+                        <span class="msg-sender">
+                            @(_nova?.Session.UserName?.ToUpper() ?? "YOU")
+                        </span>
                         <span class="msg-text">@msg.text</span>
                     </div>
                 </div>
@@ -270,7 +337,29 @@
         font-style: italic;
         letter-spacing: 1px;
     }
+    /* ── Portrait row ───────────────────────────────────────── */
+    .portrait-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+    }
 
+    .portrait-img {
+        width: 48px;
+        height: 48px;
+        image-rendering: pixelated;
+        border: 1px solid var(--panel-edge);
+        flex-shrink: 0;
+    }
+
+    .identity-name {
+        font-size: 10px;
+        letter-spacing: 2px;
+        color: var(--lime);
+        font-weight: bold;
+        word-break: break-word;
+    }
     /* New Chat button */
     .new-chat-btn {
         display: flex;
@@ -438,7 +527,17 @@
         vertical-align: middle;
         flex-shrink: 0;
     }
-
+    /* ── Chat portraits ─────────────────────────────────────── */
+    .chat-portrait-you {
+        width: 32px;
+        height: 32px;
+        image-rendering: pixelated;
+        border: 1px solid rgba(125, 216, 255, 0.3);
+        align-self: flex-end;
+        flex-shrink: 0;
+        margin-left: 6px;
+        order: 2;
+    }
     /* ── Input bar ──────────────────────────────────────────── */
     .nova-input-bar {
         height: var(--inputbar-h);
@@ -506,7 +605,10 @@
     private string _staticEmotionColor = "#39ff14";
     private string _staticEmotionEmoji  = "🔵";
     private string _staticEmotionState  = "calm";
-  
+    // ── Player identity — updated in Phase 1.b/1.c ────────────
+    private string _playerPortrait = "male-bio-civilian.png";
+    private string _playerClass = "CIVILIAN";
+    private bool _showCharSelect = false;
 
 
     // ── Init ──────────────────────────────────────────────────
@@ -527,6 +629,11 @@
             _nova = new NovaCortex(JS, Http);
             await _nova.LoadSession();
             await _nova.LoadAPIContent();
+
+            // Show character select if no name set yet
+            // Character select opens only when player asks Nova
+            // _showCharSelect triggered via chat keywords only
+
             StateHasChanged();
         }
     }
@@ -542,7 +649,17 @@
         await ScrollToBottom();
 
         var reply = await _nova.Respond(input);
-        messages.Add(("Nova", reply));
+
+        if (reply == "[OPEN_CHAR_SELECT]")
+        {
+            _showCharSelect = true;
+            messages.Add(("Nova",
+                "Opening operative registration. Choose your class, operative."));
+        }
+        else
+        {
+            messages.Add(("Nova", reply));
+        }
 
         _staticEmotionColor = _nova.GetEmotionalColor();
         _staticEmotionState = _nova.GetEmotionalState();
@@ -567,7 +684,22 @@
 
     // ── Sidebar ───────────────────────────────────────────────
     private void ToggleSidebar() => _sidebarOpen = !_sidebarOpen;
+    private async Task HandleCharSelect(
+    NovaCharacterSelect.CharSelectResult result)
+    {
+        _showCharSelect = false;
+        _playerClass = result.Class.ToUpper();
+        _playerPortrait = result.Gender == "male" && result.Type == "biological"
+            ? $"male-bio-{result.Class}.png"
+            : "male-bio-civilian.png"; // fallback until other PNGs exist
 
+        // Feed the class into Nova so she can react
+        var reply = await _nova.Respond(
+            $"[SYSTEM] Player selected: {result.Gender} {result.Type} {result.Class}");
+        messages.Add(("Nova", reply));
+        StateHasChanged();
+        await ScrollToBottom();
+    }
     // ── New Chat ──────────────────────────────────────────────
    private async Task NewChat()
 {
