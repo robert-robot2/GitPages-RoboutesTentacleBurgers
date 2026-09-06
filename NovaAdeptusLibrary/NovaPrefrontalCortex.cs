@@ -44,11 +44,11 @@ namespace NovaAdeptusLibrary
 
             ["frustration"] = new()
             {
-                "Your frustration is valid. I am still not going to apologize.",
+                "Your valid. I am still not going to apologize.",
                 "I hear you. I simply do not care. Try 'help' for clearer options.",
-                "Anger noted. Channel it into a mission — type 'accept'.",
-                "I understand your frustration. Now do something useful with it.",
-                "The void does not bend to your frustration. Neither do I.",
+                "Noted. Channel it into a mission — type 'accept'.",
+                "I understand your kinda gay. Now do something useful with it.",
+                "The void does not bend over but i willl.... to your Gheyness. Neither do I.",
                 "Noted. Disregarded. Try 'help' if you need actual guidance.",
             },
 
@@ -105,7 +105,6 @@ namespace NovaAdeptusLibrary
 
         // ── Context Window ────────────────────────────────────
         // Tracks the last N user messages for Python context awareness.
-        // Python uses this to detect repeated frustration, topic shifts, etc.
         private static readonly Queue<string> _messageHistory = new();
         // REPLACE the MaxHistory property
         private static int MaxHistory => 5; // was pulling from MLConfig

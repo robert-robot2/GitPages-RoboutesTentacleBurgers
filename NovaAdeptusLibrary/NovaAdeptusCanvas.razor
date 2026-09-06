@@ -215,10 +215,15 @@
 
     html, body {
         height: 100%;
-        overflow: hidden;
         background: var(--void-deep);
         font-family: var(--font-main);
     }
+
+    .nova-main {
+        overflow: hidden;
+    }
+
+ 
 
     /* ── Starfield canvas ───────────────────────────────────── */
     #novaStarfield {
@@ -447,21 +452,32 @@
     /* ── Message feed ───────────────────────────────────────── */
     .nova-feed {
         flex: 1;
+        min-height: 0;
         overflow-y: auto;
         padding: 20px 18px 10px;
         display: flex;
         flex-direction: column;
         gap: 10px;
         scroll-behavior: smooth;
-        justify-content: flex-end; 
+        justify-content: flex-end;
     }
 
-    /* Custom scrollbar */
-    .nova-feed::-webkit-scrollbar { width: 5px; }
-    .nova-feed::-webkit-scrollbar-track { background: transparent; }
-    .nova-feed::-webkit-scrollbar-thumb {
-        background: var(--lime-dim);
-        border-radius: 3px;
+    /* ── Nova feed scrollbar override ───────────────────────── */
+    #novaFeed::-webkit-scrollbar-thumb {
+        background: #27b30e !important;
+        border-radius: 3px !important;
+    }
+
+    #novaFeed::-webkit-scrollbar {
+        width: 5px !important;
+    }
+
+    #novaFeed::-webkit-scrollbar-track {
+        background: transparent !important;
+    }
+
+    #novaFeed::-webkit-scrollbar-thumb:hover {
+        background: #39ff14 !important;
     }
 
     .msg-row {

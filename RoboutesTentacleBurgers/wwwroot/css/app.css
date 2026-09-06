@@ -23,15 +23,10 @@ input[type="button"] {
     cursor: url('iAssets/Cursor002.png') 16 16, pointer;
 }
 */
-body.no-scroll {
-    overflow: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+body {
+    background-color: rgba(0,0,0,1);
 }
 
-    body.no-scroll::-webkit-scrollbar {
-        display: none;
-    }
 button,
 .btn,
 .btn-primary,
@@ -153,9 +148,7 @@ button,
     font-style: normal;
 }
 
-body {
-    background-color: rgba(0,0,0,1);
-}
+
 
 .DiabloRedGlowIndex {
     font-family: 'Digital', sans-serif;

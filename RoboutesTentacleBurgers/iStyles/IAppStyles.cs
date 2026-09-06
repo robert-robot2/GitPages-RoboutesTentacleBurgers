@@ -86,6 +86,7 @@ namespace RoboutesTentacleBurgers.iStyles
 
 main {
     flex: 1;
+    overflow-y: auto;
 }
 
 .top-row {
