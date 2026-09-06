@@ -13,7 +13,7 @@
                 <div class="charselect-row">
                     <div class="char-option @(_gender == "male" ? "selected" : "")"
                          @onclick='() => Pick("gender", "male")'>
-                        <img src="/IAssets/male-bio-civilian.png" class="char-portrait" />
+                        <img src="/iAssets/male-bio-civilian.png" class="char-portrait" />
                         <span>MALE</span>
                     </div>
                     <div class="char-option @(_gender == "female" ? "selected" : "")"
@@ -37,7 +37,7 @@
                 <div class="charselect-row">
                     <div class="char-option @(_type == "biological" ? "selected" : "")"
                          @onclick='() => Pick("type", "biological")'>
-                        <img src="/IAssets/male-bio-civilian.png" class="char-portrait" />
+                        <img src="/iAssets/male-bio-civilian.png" class="char-portrait" />
                         <span>BIOLOGICAL</span>
                     </div>
                     <div class="char-option @(_type == "mechanical" ? "selected" : "")"
@@ -72,7 +72,7 @@
                              @onclick='() => Pick("class", cls.Key)'>
                             @if (cls.Portrait != null)
                             {
-                                <img src="/IAssets/@cls.Portrait"
+                                <img src="/iAssets/@cls.Portrait"
                                      class="char-portrait" />
                             }
                             else
