@@ -118,7 +118,10 @@
     </div>
 
     <div class="sidebar-divider"></div>
-
+    <div class="sidebar-stat">
+        <span class="stat-key">Liability for using AI: Do not allow AI To brainwash, control or manipulate you, if any way whatsoever this AI makes you feel uncomfortable in tell you how to live your life or feel please let me know and i will update it. Do not use the AI to make Decisions in real life. This AI is for learning and entertainment purpoises.</span>
+       
+    </div>
     <div class="sidebar-section sidebar-footer">
         <span class="sidebar-tagline">Forged in the void.</span>
     </div>
@@ -451,7 +454,7 @@
 
     /* ── Message feed ───────────────────────────────────────── */
     .nova-feed {
-        flex: 1;
+        flex: 1 1 auto;
         min-height: 0;
         overflow-y: auto;
         padding: 20px 18px 10px;
@@ -459,8 +462,8 @@
         flex-direction: column;
         gap: 10px;
         scroll-behavior: smooth;
-        justify-content: flex-end;
     }
+
 
     /* ── Nova feed scrollbar override ───────────────────────── */
     #novaFeed::-webkit-scrollbar-thumb {
@@ -645,11 +648,6 @@
             _nova = new NovaCortex(JS, Http);
             await _nova.LoadSession();
             await _nova.LoadAPIContent();
-
-            // Show character select if no name set yet
-            // Character select opens only when player asks Nova
-            // _showCharSelect triggered via chat keywords only
-
             StateHasChanged();
         }
     }
@@ -693,10 +691,14 @@
     // ── Auto scroll ───────────────────────────────────────────
     private async Task ScrollToBottom()
     {
-        await JS.InvokeVoidAsync("eval",
-            "var a=document.getElementById('scrollAnchor');" +
-            "if(a)a.scrollIntoView({behavior:'smooth'});");
+        await JS.InvokeVoidAsync("eval", @"
+        const feed = document.getElementById('novaFeed');
+        if (feed) {
+            feed.scrollTop = feed.scrollHeight;
+        }
+    ");
     }
+
 
     // ── Sidebar ───────────────────────────────────────────────
     private void ToggleSidebar() => _sidebarOpen = !_sidebarOpen;
