@@ -35,7 +35,9 @@ namespace NovaAdeptusLibrary
      "📊   stats       — XP, HP, coins, rep, level\n" +
      "⭐   rep         — your reputation report\n" +
      "🎯   skills      — skill levels\n" +
-     "🎒   inventory   — items, coins, gear bonuses\n" +
+  "── INVENTORY ─────────────────────────\n" +
+"🎒   my inventory   — your gear and loadout\n" +
+"🗂   nova inventory — Nova's loadout (display only)\n\n" +
      "💡   name        — set your operative name\n\n" +
      "── ECONOMY ───────────────────────────\n" +
      "🏪   market      — buy gear and consumables\n" +
@@ -49,6 +51,7 @@ namespace NovaAdeptusLibrary
      "── WORLD ─────────────────────────────\n" +
      "🌌   event       — random cosmic event\n" +
      "🚀   ship        — ship AI interaction\n" +
+            "🚀   ship inventory        — view/upgrade your ship\n" +
      "🕐   time/date   — current time and date\n\n" +
      "── CHAT ──────────────────────────────\n" +
      "💬   just talk   — Nova always responds\n" +

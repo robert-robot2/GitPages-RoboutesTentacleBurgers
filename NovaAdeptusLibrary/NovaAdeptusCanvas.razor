@@ -64,7 +64,49 @@
             <span class="stat-key">Funds</span>
             <span class="stat-val" style="color:#ffd700">$— —</span>
         </div>
+        <!-- ── NOVA INVENTORY PANEL ─────────────────────────── -->
+        <div class="sidebar-section inv-section">
+            <button class="inv-toggle-btn" @onclick="ToggleNovaInv">
+                <span>🗂 NOVA LOADOUT</span>
+                <span>@(_novaInvOpen ? "▲" : "▼")</span>
+            </button>
 
+            @if (_novaInvOpen)
+            {
+                var novaSlots = ParseInventory(_nova?.NovaInventory ?? new());
+                <div class="inv-grid">
+                    @for (int i = 0; i < 9; i++)
+                    {
+                        var slot = i < novaSlots.Count ? novaSlots[i] : null;
+                        var slotCopy = slot; // capture for lambda
+                        <div class="inv-slot @(slot != null ? "inv-slot-filled" : "")"
+                             style="border-color: @(slot != null ? SlotBorderColor(slot.Category) : "rgba(57,255,20,0.1)")"
+                             @onmouseenter="@(() => SetHover(slotCopy?.Name + "|" + slotCopy?.Description + "|" + slotCopy?.Stat))"
+                             @onmouseleave="@(() => SetHover(null))">
+                            @if (slot != null)
+                            {
+                                <img src="/iAssets/@slot.Image"
+                                     class="inv-item-img"
+                                     alt="@slot.Name"
+                                     onerror="this.src='/iAssets/inventory-default.png'" />
+                                <span class="inv-cat-dot"
+                                      style="background:@SlotBorderColor(slot.Category)"></span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (_hoveredItem != null && _hoveredItem.Length > 1)
+                {
+                    var parts = _hoveredItem.Split('|');
+                    <div class="inv-tooltip">
+                        <span class="inv-tt-name">@(parts.Length > 0 ? parts[0] : "")</span>
+                        <span class="inv-tt-desc">@(parts.Length > 1 ? parts[1] : "")</span>
+                        <span class="inv-tt-stat">@(parts.Length > 2 ? parts[2] : "")</span>
+                    </div>
+                }
+            }
+        </div>
 
     </div>
 
@@ -113,7 +155,50 @@
                 $@(_nova?.Session.GalacticCoins ?? 0)
             </span>
         </div>
-      
+        <!-- ── PLAYER INVENTORY PANEL ────────────────────────── -->
+        <div class="sidebar-section inv-section">
+            <button class="inv-toggle-btn" @onclick="TogglePlayerInv">
+                <span>🎒 LOADOUT</span>
+                <span class="inv-coin-mini">💰@(_nova?.Session.GalacticCoins ?? 0)gc</span>
+                <span>@(_playerInvOpen ? "▲" : "▼")</span>
+            </button>
+
+            @if (_playerInvOpen)
+            {
+                var playerSlots = ParseInventory(_nova?.Session.Inventory ?? new());
+                <div class="inv-grid">
+                    @for (int i = 0; i < 9; i++)
+                    {
+                        var slot = i < playerSlots.Count ? playerSlots[i] : null;
+                        var slotCopy = slot;
+                        <div class="inv-slot @(slot != null ? "inv-slot-filled" : "")"
+                             style="border-color: @(slot != null ? SlotBorderColor(slot.Category) : "rgba(57,255,20,0.1)")"
+                             @onmouseenter="@(() => SetHover(slotCopy?.Name + "|" + slotCopy?.Description + "|" + slotCopy?.Stat))"
+                             @onmouseleave="@(() => SetHover(null))">
+                            @if (slot != null)
+                            {
+                                <img src="/iAssets/@slot.Image"
+                                     class="inv-item-img"
+                                     alt="@slot.Name"
+                                     onerror="this.src='/iAssets/inventory-default.png'" />
+                                <span class="inv-cat-dot"
+                                      style="background:@SlotBorderColor(slot.Category)"></span>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (_hoveredItem != null)
+                {
+                    var parts = _hoveredItem.Split('|');
+                    <div class="inv-tooltip">
+                        <span class="inv-tt-name">@(parts.Length > 0 ? parts[0] : "")</span>
+                        <span class="inv-tt-desc">@(parts.Length > 1 ? parts[1] : "")</span>
+                        <span class="inv-tt-stat">@(parts.Length > 2 ? parts[2] : "")</span>
+                    </div>
+                }
+            }
+        </div>
       
     </div>
 
@@ -156,7 +241,7 @@
                                  alt="Nova Adeptus" />
                        
                         </span>
-                        <span class="msg-text">@msg.text</span>
+                        <span class="msg-text">@FormatNovaBubble(msg.text)</span>
                     </div>
                 </div>
             }
@@ -607,6 +692,133 @@
         box-shadow: 0 0 16px var(--lime-glow);
     }
     .nova-send-btn:active { transform: scale(0.97); }
+
+    .chapter-banner-img {
+        width: 100%;
+        max-width: 320px;
+        height: 80px;
+        object-fit: cover;
+        border: 1px solid var(--panel-edge);
+        display: block;
+        margin: 6px 0;
+        image-rendering: pixelated;
+    }
+
+    /* ── Inventory toggle button ───────────────────────── */
+    .inv-toggle-btn {
+        width: 100%;
+        background: transparent;
+        border: 1px solid var(--panel-edge);
+        color: var(--lime);
+        font-family: var(--font-main);
+        font-size: 10px;
+        letter-spacing: 1.5px;
+        padding: 6px 10px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        text-transform: uppercase;
+        transition: background 0.2s;
+    }
+
+        .inv-toggle-btn:hover {
+            background: var(--lime-glow);
+        }
+
+    .inv-coin-mini {
+        font-size: 9px;
+        color: #ffd700;
+        letter-spacing: 0;
+    }
+
+    /* ── 3×3 inventory grid ────────────────────────────── */
+    .inv-section {
+        padding: 8px 14px;
+    }
+
+    .inv-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+        margin-top: 8px;
+    }
+
+    .inv-slot {
+        width: 100%;
+        aspect-ratio: 1;
+        background: rgba(0,8,20,0.6);
+        border: 1px solid rgba(57,255,20,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        cursor: default;
+        transition: border-color 0.2s, background 0.2s;
+    }
+
+        .inv-slot:hover {
+            background: rgba(57,255,20,0.06);
+        }
+
+    .inv-slot-filled {
+        cursor: pointer;
+    }
+
+    .inv-item-img {
+        width: 80%;
+        height: 80%;
+        object-fit: contain;
+        image-rendering: pixelated;
+    }
+
+    .inv-cat-dot {
+        position: absolute;
+        bottom: 3px;
+        right: 3px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+    }
+
+    /* ── Hover tooltip ─────────────────────────────────── */
+    .inv-tooltip {
+        margin-top: 6px;
+        background: rgba(0,8,20,0.95);
+        border: 1px solid var(--panel-edge);
+        padding: 7px 9px;
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        font-size: 10px;
+        animation: fadeSlideIn 0.15s ease forwards;
+    }
+
+    .inv-tt-name {
+        color: var(--lime);
+        font-weight: bold;
+        letter-spacing: 1px;
+        font-size: 10px;
+    }
+
+    .inv-tt-desc {
+        color: var(--text-main);
+        font-size: 9px;
+    }
+
+    .inv-tt-stat {
+        color: #ffd700;
+        font-size: 9px;
+        font-weight: bold;
+    }
+    .bubble-item-img {
+        width: 28px;
+        height: 28px;
+        image-rendering: pixelated;
+        vertical-align: middle;
+        margin-right: 6px;
+        border: 1px solid rgba(57,255,20,0.3);
+    }
 </style>
 
 
@@ -737,6 +949,58 @@
     _sidebarOpen = false;
     StateHasChanged();
 }
+    private MarkupString FormatNovaBubble(string text)
+    {
+        text = text.Replace("[CHAPTER1_BANNER]",
+            "<img src='/iAssets/chapter1-banner.png' class='chapter-banner-img' alt='Chapter 1' />");
+        text = text.Replace("[CHAPTER2_BANNER]",
+            "<img src='/iAssets/chapter2-banner.png' class='chapter-banner-img' alt='Chapter 2' />");
+
+        // NEW: inline item/ship PNG rendering — [IMG:filename.png]
+        text = System.Text.RegularExpressions.Regex.Replace(
+            text, @"\[IMG:([a-zA-Z0-9\-_]+\.png)\]",
+            m => $"<img src='/iAssets/{m.Groups[1].Value}' class='bubble-item-img' " +
+                 $"alt='item' onerror=\"this.src='/iAssets/inventory-default.png'\" />");
+
+        return new MarkupString(text);
+    }
+
+    private record InventorySlot(
+    string Id, string Name, string Description,
+    string Stat, string Image, string Category);
+
+    private List<InventorySlot> ParseInventory(List<string> raw)
+    {
+        var result = new List<InventorySlot>();
+        foreach (var entry in raw)
+        {
+            var p = entry.Split('|');
+            if (p.Length >= 6)
+                result.Add(new InventorySlot(p[0], p[1], p[2], p[3], p[4], p[5]));
+            else
+                // Legacy format fallback (plain string)
+                result.Add(new InventorySlot("ITEM", entry, "", "", "inventory-default.png", "misc"));
+        }
+        return result;
+    }
+
+    private bool _playerInvOpen = false;
+    private bool _novaInvOpen = false;
+    private string? _hoveredItem = null;
+
+    private void TogglePlayerInv() => _playerInvOpen = !_playerInvOpen;
+    private void ToggleNovaInv() => _novaInvOpen = !_novaInvOpen;
+    private void SetHover(string? item) => _hoveredItem = item;
+
+    private string SlotBorderColor(string category) => category switch
+    {
+        "weapon" => "rgba(255,107,107,0.6)",
+        "armor" => "rgba(100,180,255,0.6)",
+        "consumable" => "rgba(57,255,20,0.6)",
+        "upgrade" => "rgba(255,215,0,0.6)",
+        _ => "rgba(90,138,170,0.4)",
+    };
+
 
     // ── Cleanup ───────────────────────────────────────────────
     public void Dispose() => _clockTimer?.Dispose();

@@ -50,8 +50,14 @@ namespace NovaAdeptusLibrary
         // ── Market + Inventory ──────────────────────────
         AwaitMarketChoice,       // player seeing market menu
         AwaitInventoryAction,    // player using an item
+        AwaitShipMenu,       // player browsing ship inventory/parts
+        AwaitShipPartsBuy,   // player buying a new ship part
     }
-
+    public enum NovaChapter
+    {
+        Chapter1_NovaAdeptus = 1,
+        Chapter2_EarthApocalypse = 2,
+    }
     // ==========================================================
     // NOVA SESSION — runtime state for one play session
     // ==========================================================
@@ -78,6 +84,16 @@ namespace NovaAdeptusLibrary
         public int HackingBonus { get; set; } = 0;
         public int AnalysisBonus { get; set; } = 0;
 
+        // ── Ship System ──────────────────────────────────────────
+        public string ShipHullId { get; set; } = "frigate";
+        public int ShipWeightTons { get; set; } = 2500;
+        public List<string> ShipInventory { get; set; } = new()
+{
+    "autocannon|Autocannon|Rapid-fire kinetic weapon system.|+6 Ship Combat|ship-parts-autocannon.png|weapon|400",
+    "ecm_sensors|ECM Sensors|Electronic countermeasure sensor suite.|+5 Ship Detection/Evasion|ship-parts-ecmsensors.png|sensor|250",
+    "afterburner|Afterburner|Short-burst thrust module.|+8 Ship Speed|ship-parts-afterburner.png|engine|350",
+};
+
         // ── Effective skill helpers (base + equipment bonus) ───────
         public int EffectiveCombat => Skills.GetValueOrDefault("combat") + CombatBonus;
         public int EffectiveStealth => Skills.GetValueOrDefault("stealth") + StealthBonus;
@@ -92,7 +108,57 @@ namespace NovaAdeptusLibrary
         public int GoodRep { get; set; } = 0;
         public int BadRep { get; set; } = 0;
         public string ReputationTitle => GetReputationTitle();
+        // ── Chapter tracking ───────────────────────────────────────
+        public NovaChapter ActiveChapter { get; set; } = NovaChapter.Chapter1_NovaAdeptus;
+        public int Chapter1MissionsCompleted { get; set; } = 0;
+        public int Chapter2MissionsCompleted { get; set; } = 0;
+        public bool Chapter1Complete { get; set; } = false;
+        public bool Chapter2Complete { get; set; } = false;
 
+        // Chapter completion threshold — change this later as you add more missions
+        public const int Chapter1MissionsRequired = 10;
+        public const int Chapter2MissionsRequired = 10;
+        private string AppendChapterCompletion(string baseMessage, string? signal)
+        {
+            if (signal == "CHAPTER_1_COMPLETE")
+                return baseMessage + "\n\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "🌌 CHAPTER 1 COMPLETE — NOVA ADEPTUS\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "All assigned missions executed.\n" +
+                       "The High Order acknowledges your service.\n\n" +
+                       "Type 'chapter' to select your next assignment.";
+
+            if (signal == "CHAPTER_2_COMPLETE")
+                return baseMessage + "\n\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "☠️ CHAPTER 2 COMPLETE — EARTH APOCALYPSE\n" +
+                       "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                       "Kennecott has been survived.\n" +
+                       "The void expands. More chapters coming.\n\n" +
+                       "Type 'chapter' for the main menu.";
+
+            return baseMessage;
+        }
+        // Helper: check and mark chapter complete
+        public string? CheckChapterCompletion()
+        {
+            if (ActiveChapter == NovaChapter.Chapter1_NovaAdeptus
+                && !Chapter1Complete
+                && Chapter1MissionsCompleted >= Chapter1MissionsRequired)
+            {
+                Chapter1Complete = true;
+                return "CHAPTER_1_COMPLETE";
+            }
+            if (ActiveChapter == NovaChapter.Chapter2_EarthApocalypse
+                && !Chapter2Complete
+                && Chapter2MissionsCompleted >= Chapter2MissionsRequired)
+            {
+                Chapter2Complete = true;
+                return "CHAPTER_2_COMPLETE";
+            }
+            return null;
+        }
         private string GetReputationTitle()
         {
             int net = GoodRep - BadRep;
@@ -205,10 +271,18 @@ namespace NovaAdeptusLibrary
         private NovaContent.MissionDef? _activeMission = null;
         private string _missionStage = "";    // tracks where in the branch we are
         private int _missionEnemyHP = 0;  // enemy HP for combat encounters
+
+        // Nova's own inventory — cosmetic/display, not gameplay
+        public List<string> NovaInventory { get; } = new()
+{
+    "MEDKIT|Nano Medkit|Restores 25 HP|25 HP heal|inventory-medical-medkit.png|consumable",
+    "WEAPON|Silenced USP|Close quarters precision|+4 Combat|inventory-weapon-silencedusp.png|weapon",
+    "ARMOR|Synthetic Kevlar|Light ballistic protection|+3 Armor|inventory-armor-malehumanarmor001.png|armor",
+};
         // ==========================================================
         // CONSTRUCTOR
         // ==========================================================
-
+        private NovaFSMState _lastNonShipState = NovaFSMState.Idle; // for ship menu return
         public NovaCortex(IJSRuntime js, HttpClient http)
         {
             _js = js;
@@ -385,8 +459,13 @@ namespace NovaAdeptusLibrary
                                 DateTime.Now.ToString("'Time is 'hh:mm tt ⏰"), Session),
                 "date" => _thalamus.Apply(
                                 DateTime.Now.ToString("'Date is 'MMMM dd, yyyy 📅"), Session),
-                "inventory" => ShowInventory(),
-                "inv" => ShowInventory(),
+                "inventory" => ShowInventory("player"),
+                "inv" => ShowInventory("player"),
+                "ship inventory" => OpenShipScreen(),
+                "myinventory" => ShowInventory("player"),
+                "my inventory" => ShowInventory("player"),
+                "novainventory" => ShowInventory("nova"),
+                "nova inventory" => ShowInventory("nova"),
                 "market" => _thalamus.Apply(TradeMarket(), Session),
                 "rep" => ShowRep(),
                 _ => null,
@@ -443,7 +522,25 @@ namespace NovaAdeptusLibrary
             // ── System message bypass — character select, no keyword matching ──
             if (cleaned.StartsWith("[system]"))
                 return HandleSystemMessage(cleaned);
+            // ── Chapter switch commands ───────────────────────────────
+            if (cleaned == "chapter 1")
+            {
+                Session.ActiveChapter = NovaChapter.Chapter1_NovaAdeptus;
+                return _thalamus.Apply(
+                    "Chapter 1 — Nova Adeptus. Operative active.\n" +
+                    "Type 'accept' to receive your next mission. ⚔️",
+                    Session);
+            }
 
+            if (cleaned == "chapter 2")
+            {
+                // TODO: Remove the early-return when Chapter 2 is built
+                return _thalamus.Apply(
+                    "Chapter 2 — Earth Apocalypse is not yet available.\n" +
+                    "Kennecott is waiting. It will not wait forever. 🌌",
+                    Session);
+                // FUTURE: Session.ActiveChapter = NovaChapter.Chapter2_EarthApocalypse;
+            }
             // ── Chapter / menu keywords ────────────────────────────────────────
             if (cleaned.Contains("chapter") || cleaned.Contains("chapters"))
                 return ShowChapterMenu();
@@ -475,8 +572,20 @@ namespace NovaAdeptusLibrary
             if (cleaned.Contains("upgrade")) return _thalamus.Apply(ShipUpgrade(), Session);
             if (cleaned.Contains("market"))
                 return TradeMarket();
-            if (cleaned.Contains("inventory") || cleaned == "inv")
-                return ShowInventory();
+            if (cleaned.Contains("nova inventory") || cleaned.Contains("nova's inventory") ||
+        cleaned.Contains("nova loadout") || cleaned.Contains("show nova"))
+                return ShowInventory("nova");
+
+            if (cleaned.Contains("my inventory") || cleaned.Contains("player inventory") ||
+                cleaned.Contains("show my inventory") || cleaned == "inv")
+                return ShowInventory("player");
+
+            if (cleaned.Contains("ship inventory") || cleaned.Contains("ship parts") ||
+                cleaned.Contains("ship loadout"))
+                return OpenShipScreen();
+
+            if (cleaned.Contains("inventory")) return ShowInventory("player");
+            return ShowInventory();
             if (cleaned.Contains("endgame")) return _thalamus.Apply(EndgameMission(), Session);
             if (cleaned.Contains("cosmic")) return _thalamus.Apply(CosmicEventFinal(), Session);
             if (cleaned.Contains("event")) return _thalamus.Apply(RandomCosmicEvent(), Session);
@@ -563,6 +672,8 @@ namespace NovaAdeptusLibrary
                 NovaFSMState.AwaitMissionSubAction => AnswerActiveMission(input),
                 NovaFSMState.AwaitGameOver => AnswerGameOver(input),
                 NovaFSMState.AwaitMarketChoice => AnswerMarketChoice(input),
+                NovaFSMState.AwaitShipMenu => AnswerShipMenu(input),
+                NovaFSMState.AwaitShipPartsBuy => AnswerShipPartsBuy(input),
                 _ => ResetFSM("FSM error — resetting.")
             };
         }
@@ -956,23 +1067,37 @@ public void InjectTrivia(List<TriviaQuestion> questions)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
 
-            // Abort
             if (key == 'E' || input.Trim().ToLower() == "abort")
             {
                 Session.FSMState = NovaFSMState.Idle;
                 return _thalamus.Apply("Mission aborted. Back to base.", Session);
             }
 
-            // Map letter to mission
+            // Get the filtered mission list stored by AcceptMission()
+            List<NovaContent.MissionDef> missionList;
+
+            if (Session.FSMContext.TryGetValue("chapterMissions", out var stored)
+                && stored is List<NovaContent.MissionDef> cached)
+            {
+                missionList = cached;
+            }
+            else
+            {
+                // Fallback: filter live
+                missionList = NovaContent.MissionMenu
+                    .Where(m => m.Chapter == Session.ActiveChapter)
+                    .ToList();
+            }
+
             int index = key - 'A';
-            if (index < 0 || index >= NovaContent.MissionMenu.Count)
+            if (index < 0 || index >= missionList.Count)
             {
                 return "Invalid choice. Type A through " +
-                       (char)('A' + NovaContent.MissionMenu.Count - 1) +
+                       (char)('A' + missionList.Count - 1) +
                        " — or E to abort.";
             }
 
-            _activeMission = NovaContent.MissionMenu[index];
+            _activeMission = missionList[index];
             Session.FSMState = NovaFSMState.AwaitMissionAction;
             _missionStage = "start";
 
@@ -1087,6 +1212,14 @@ public void InjectTrivia(List<TriviaQuestion> questions)
         {
             ResetMissionState();
             Session.MissionsCompleted++;
+            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                Session.Chapter1MissionsCompleted++;
+            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                Session.Chapter2MissionsCompleted++;
+
+            // Check for chapter completion
+            var completionSignal = Session.CheckChapterCompletion();
+            // (use completionSignal to append a completion message — see Snippet 8)
             Session.GoodRep += 2;
             int coins = bonusIntel ? 30 : 20;
             Session.GalacticCoins += coins;
@@ -1145,6 +1278,14 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                         {
                             ResetMissionState();
                             Session.MissionsCompleted++;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+
+                            // Check for chapter completion
+                            var completionSignal = Session.CheckChapterCompletion();
+                            // (use completionSignal to append a completion message — see Snippet 8)
                             Session.GoodRep++;
                             Session.GalacticCoins += 15;
                             Session.XP += 10;
@@ -1190,6 +1331,14 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                         {
                             ResetMissionState();
                             Session.MissionsCompleted++;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+
+                            // Check for chapter completion
+                            var completionSignal = Session.CheckChapterCompletion();
+                            // (use completionSignal to append a completion message — see Snippet 8)
                             Session.Skills["combat"]++;
                             Session.EnemiesDefeated++;
                             Session.GalacticCoins += 20;
@@ -1245,6 +1394,14 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                         {
                             ResetMissionState();
                             Session.MissionsCompleted++;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+
+                            // Check for chapter completion
+                            var completionSignal = Session.CheckChapterCompletion();
+                            // (use completionSignal to append a completion message — see Snippet 8)
                             Session.EnemiesDefeated++;
                             Session.Skills["combat"]++;
                             Session.GalacticCoins += 20;
@@ -1329,6 +1486,14 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                         Session.Skills["combat"]++;
                         ResetMissionState();
                         Session.MissionsCompleted++;
+                        if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                            Session.Chapter1MissionsCompleted++;
+                        else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                            Session.Chapter2MissionsCompleted++;
+
+                        // Check for chapter completion
+                        var completionSignal = Session.CheckChapterCompletion();
+                        // (use completionSignal to append a completion message — see Snippet 8)
 
                         return _thalamus.Apply(
                             "🎲 Random: You both stare at each other for 40 seconds. " +
@@ -1341,7 +1506,15 @@ public void InjectTrivia(List<TriviaQuestion> questions)
 {
     ResetMissionState();
     Session.MissionsCompleted++;
-    Session.EnemiesDefeated++;
+            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                Session.Chapter1MissionsCompleted++;
+            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                Session.Chapter2MissionsCompleted++;
+
+            // Check for chapter completion
+            var completionSignal = Session.CheckChapterCompletion();
+            // (use completionSignal to append a completion message — see Snippet 8)
+            Session.EnemiesDefeated++;
     Session.GalacticCoins += 20;
     Session.XP += 15;
     return _thalamus.Apply(
@@ -1393,7 +1566,15 @@ private string AnswerScavengerMission(string input)
                 {
                     ResetMissionState();
                     Session.MissionsCompleted++;
-                    Session.GalacticCoins += 25;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+
+                            // Check for chapter completion
+                            var completionSignal = Session.CheckChapterCompletion();
+                            // (use completionSignal to append a completion message — see Snippet 8)
+                            Session.GalacticCoins += 25;
                     Session.XP += 12;
                     return _thalamus.Apply(
                         "🪨 You heave the rock aside.\n" +
@@ -1456,7 +1637,15 @@ private string AnswerScavengerMission(string input)
                 if (go2 != "") return go2;
                 ResetMissionState();
                 Session.MissionsCompleted++;
-                Session.GalacticCoins += 25;
+                        if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                            Session.Chapter1MissionsCompleted++;
+                        else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                            Session.Chapter2MissionsCompleted++;
+
+                        // Check for chapter completion
+                        var completionSignal = Session.CheckChapterCompletion();
+                        // (use completionSignal to append a completion message — see Snippet 8)
+                        Session.GalacticCoins += 25;
                 Session.XP += 12;
                 return _thalamus.Apply(
                     $"😤 You push through the pain.\n" +
@@ -1467,6 +1656,7 @@ private string AnswerScavengerMission(string input)
             case 'B':
                 ResetMissionState();
                 Session.MissionsCompleted++;
+
                 Session.GalacticCoins += 25;
                 Session.XP += 12;
                 return _thalamus.Apply(
@@ -1492,7 +1682,15 @@ private string AnswerScavengerMission(string input)
                     ResetMissionState();
                     Session.EnemiesDefeated++;
                     Session.MissionsCompleted++;
-                    Session.GalacticCoins += 30;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+
+                            // Check for chapter completion
+                            var completionSignal = Session.CheckChapterCompletion();
+                            // (use completionSignal to append a completion message — see Snippet 8)
+                            Session.GalacticCoins += 30;
                     Session.XP += 15;
                     return _thalamus.Apply(
                         "⚔️ Scavenger down! You grab the relic from their pack.\n" +
@@ -1647,6 +1845,8 @@ private string AnswerScavengerMission(string input)
                         {
                             ResetMissionState();
                             Session.MissionsCompleted++;
+                           
+                            // (use completionSignal to append a completion message — see Snippet 8)
                             Session.Skills["hacking"]++;
                             Session.GalacticCoins += 35;
                             Session.XP += 20;
@@ -1664,6 +1864,14 @@ private string AnswerScavengerMission(string input)
                     case 'D': // Plant virus — safe, low reward
                         ResetMissionState();
                         Session.MissionsCompleted++;
+                        if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                            Session.Chapter1MissionsCompleted++;
+                        else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                            Session.Chapter2MissionsCompleted++;
+
+                        // Check for chapter completion
+                        var completionSignal = Session.CheckChapterCompletion();
+                        // (use completionSignal to append a completion message — see Snippet 8)
                         Session.GalacticCoins += 10;
                         Session.XP += 5;
                         return _thalamus.Apply(
@@ -1687,6 +1895,14 @@ private string AnswerScavengerMission(string input)
                     case 'A': // Fast extract
                         ResetMissionState();
                         Session.MissionsCompleted++;
+                        if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                            Session.Chapter1MissionsCompleted++;
+                        else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                            Session.Chapter2MissionsCompleted++;
+
+                        // Check for chapter completion
+                        var completionSignal = Session.CheckChapterCompletion();
+                        // (use completionSignal to append a completion message — see Snippet 8)
                         Session.Skills["hacking"]++;
                         Session.GalacticCoins += 25;
                         Session.XP += 15;
@@ -2370,21 +2586,43 @@ private void ResetMissionState()
             if (!Session.IsAlive)
                 return "You are dead, operative. Respawn first. ☠️";
 
+            // Check if current chapter is already complete
+            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus
+                && Session.Chapter1Complete)
+                return "Chapter 1 complete. Type 'chapter' to advance to Chapter 2.";
+
+            if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse
+                && Session.Chapter2Complete)
+                return "Chapter 2 complete. The void holds its breath. More coming. 🌌";
+
+            // Filter missions by active chapter
+            var chapterMissions = NovaContent.MissionMenu
+                .Where(m => m.Chapter == Session.ActiveChapter)
+                .ToList();
+
+            if (!chapterMissions.Any())
+                return "No missions available for this chapter yet. Type 'chapter' to check.";
+
             Session.FSMState = NovaFSMState.AwaitMissionChoice;
+
+            // Store the filtered list in FSM context so AnswerMissionChoice uses it
+            Session.FSMContext["chapterMissions"] = chapterMissions;
 
             var lines = new List<string>
     {
-        "🌌 MISSION BRIEFING — Choose your assignment:\n"
+        $"🌌 CHAPTER {(int)Session.ActiveChapter} MISSIONS — Choose your assignment:\n"
     };
 
-            for (int i = 0; i < NovaContent.MissionMenu.Count; i++)
+            for (int i = 0; i < chapterMissions.Count; i++)
             {
-                var m = NovaContent.MissionMenu[i];
+                var m = chapterMissions[i];
                 char letter = (char)('A' + i);
                 lines.Add($"  {letter}. [{m.Planet}] {m.Title}");
             }
 
             lines.Add("  E. Abort — return to base");
+            lines.Add($"\n📊 Chapter progress: {Session.Chapter1MissionsCompleted}" +
+                      $"/{NovaSession.Chapter1MissionsRequired} missions completed");
             lines.Add("\nType a letter to accept your mission, operative.");
             return string.Join("\n", lines);
         }
@@ -2539,48 +2777,79 @@ private string RandomBonus()
         .Select((m, i) => $"  {i + 1}. {m}");
     return "📜 Active missions:\n" + string.Join("\n", lines);
 }
-        private string ShowInventory()
-        {
-            var lines = new List<string>
-    {
-        $"🎒 INVENTORY",
-        $"💰 Galactic Coins: {Session.GalacticCoins} GC",
-        $"❤️  HP: {Session.CurrentHP}/{Session.MaxHP}  " +
-        $"🛡️ Armor: {Session.Armor}",
-        $"⚔️  Combat Bonus: +{Session.CombatBonus}  " +
-        $"💻 Hacking Bonus: +{Session.HackingBonus}",
-        $"👤  Stealth Bonus: +{Session.StealthBonus}  " +
-        $"📊 Analysis Bonus: +{Session.AnalysisBonus}",
-        "",
-    };
 
-            if (!Session.Inventory.Any())
+
+        private string ShowInventory(string who = "player")
+        {
+            bool isNova = who == "nova";
+            var items = isNova ? NovaInventory : Session.Inventory;
+            string title = isNova ? "🗂 NOVA LOADOUT" : "🎒 YOUR INVENTORY";
+
+            var lines = new List<string> { title };
+
+            if (!isNova)
             {
-                lines.Add("Your inventory is empty.");
-                lines.Add("Visit the market to gear up.");
+                lines.Add($"💰 Galactic Coins: {Session.GalacticCoins} GC");
+                lines.Add($"❤️  HP: {Session.CurrentHP}/{Session.MaxHP}  🛡️ Armor: {Session.Armor}");
+                lines.Add($"⚔️  Combat Bonus: +{Session.CombatBonus}  💻 Hacking Bonus: +{Session.HackingBonus}");
+                lines.Add($"👤  Stealth Bonus: +{Session.StealthBonus}  📊 Analysis Bonus: +{Session.AnalysisBonus}");
+            }
+            lines.Add("");
+
+            if (!items.Any())
+            {
+                lines.Add(isNova ? "Nova's loadout is empty." : "Your inventory is empty.");
+                if (!isNova) lines.Add("Visit the market to gear up. Type 'market'.");
             }
             else
             {
-                lines.Add($"Items ({Session.Inventory.Count}):");
-                for (int i = 0; i < Session.Inventory.Count; i++)
-                    lines.Add($"  {i + 1}. {Session.Inventory[i]}");
+                lines.Add($"Items ({items.Count}):");
+                foreach (var raw in items)
+                {
+                    var p = raw.Split('|');
+                    if (p.Length >= 6)
+                    {
+                        // Format: ID|Name|Desc|Stat|Image|Category
+                        lines.Add($"[IMG:{p[4]}] {p[1]} — {p[3]}");
+                        lines.Add($"     {p[2]}");
+                    }
+                    else
+                    {
+                        lines.Add($"  • {raw}");
+                    }
+                }
             }
+
+            if (!isNova)
+                lines.Add("\nType 'nova inventory' to see Nova's loadout.");
+            else
+                lines.Add("\nType 'my inventory' to see your own loadout.");
 
             return string.Join("\n", lines);
         }
 
 
-
+        private static readonly Dictionary<string, string> SkillIcons = new()
+        {
+            ["combat"] = "skill-combat.png",
+            ["hacking"] = "skill-hacking.png",
+            ["stealth"] = "skill-stealth.png",
+            ["analysis"] = "skill-analysis.png",
+        };
 
         private string ListSkills()
-{
-    var lines = new List<string> { "🎯 Skills:" };
-    foreach (var kv in Session.Skills)
-        lines.Add($"  {kv.Key,-10}: {kv.Value}");
-    return string.Join("\n", lines);
-}
+        {
+            var lines = new List<string> { "🎯 SKILLS" };
+            foreach (var kv in Session.Skills)
+            {
+                var icon = SkillIcons.GetValueOrDefault(kv.Key, "inventory-default.png");
+                var bar = BuildBar(kv.Value, 20, 10);
+                lines.Add($"[IMG:{icon}] {kv.Key,-10} {bar} {kv.Value}/20");
+            }
+            return string.Join("\n", lines);
+        }
 
-private string LootDrop()
+        private string LootDrop()
 {
     var items = new[] {
                 "Plasma Blade","Stealth Cloak","Nano Medkit",
@@ -2767,6 +3036,117 @@ private string BossBattle()
     return $"{boss.Name} survived! Prepare for next round ☠️";
 }
 
+        // ══════════════════════════════════════════════════════════
+        // SHIP SCREEN
+        // ══════════════════════════════════════════════════════════
+        private string OpenShipScreen()
+        {
+            Session.FSMState = NovaFSMState.AwaitShipMenu;
+            return BuildShipScreen();
+        }
+
+        private string BuildShipScreen(string? message = null)
+        {
+            var lines = new List<string>();
+            if (message != null) lines.Add(message + "\n");
+
+            var hull = NovaContent.StarterHull; // extend later for multiple hulls
+            lines.Add($"🚀 SHIP STATUS — {hull.Name.ToUpper()} CLASS");
+            lines.Add($"[IMG:{hull.Image}]");
+            lines.Add($"Hull: {hull.Name} | Weight: {Session.ShipWeightTons} tons\n");
+
+            lines.Add("Installed Parts:");
+            if (!Session.ShipInventory.Any())
+                lines.Add("  None installed.");
+            else
+            {
+                foreach (var raw in Session.ShipInventory)
+                {
+                    var p = raw.Split('|');
+                    if (p.Length >= 7)
+                        lines.Add($"  [IMG:{p[4]}] {p[1]} ({p[5]}) — {p[3]} | {p[6]}t");
+                }
+            }
+
+            lines.Add("\n  A. View ship parts market");
+            lines.Add("  B. Ship AI interaction");
+            lines.Add("  E. Leave ship bay\n");
+            lines.Add("Type a letter, operative.");
+
+            return string.Join("\n", lines);
+        }
+
+        private string AnswerShipMenu(string input)
+        {
+            var key = input.Trim().ToUpper().FirstOrDefault();
+            switch (key)
+            {
+                case 'A':
+                    Session.FSMState = NovaFSMState.AwaitShipPartsBuy;
+                    return BuildShipPartsMarket();
+                case 'B':
+                    Session.FSMState = NovaFSMState.Idle;
+                    return _thalamus.Apply(ShipAIInteraction(), Session);
+                case 'E':
+                    Session.FSMState = NovaFSMState.Idle;
+                    return _thalamus.Apply("Leaving the ship bay. Systems on standby.", Session);
+                default:
+                    return "Type A, B, or E, operative.";
+            }
+        }
+
+        private string BuildShipPartsMarket(string? message = null)
+        {
+            var lines = new List<string>();
+            if (message != null) lines.Add(message + "\n");
+
+            lines.Add("🔧 SHIP PARTS DEALER");
+            lines.Add($"💰 Your Coins: {Session.GalacticCoins} GC\n");
+
+            var stock = NovaContent.ShipPartsMarket;
+            for (int i = 0; i < stock.Count; i++)
+            {
+                var part = stock[i];
+                char letter = (char)('A' + i);
+                int cost = part.WeightTons / 5; // simple cost formula, tweak freely
+                lines.Add($"  {letter}. [IMG:{part.Image}] {part.Name} ({part.Slot}) — {cost} GC");
+                lines.Add($"     {part.Description} | {part.Stat} | {part.WeightTons}t");
+            }
+            lines.Add("  E. Back to ship bay\n");
+            lines.Add("Type a letter to install a part.");
+
+            return string.Join("\n", lines);
+        }
+
+        private string AnswerShipPartsBuy(string input)
+        {
+            var key = input.Trim().ToUpper().FirstOrDefault();
+            if (key == 'E')
+            {
+                Session.FSMState = NovaFSMState.AwaitShipMenu;
+                return BuildShipScreen();
+            }
+
+            var stock = NovaContent.ShipPartsMarket;
+            int index = key - 'A';
+            if (index < 0 || index >= stock.Count)
+                return "Invalid choice. Type A through " + (char)('A' + stock.Count - 1) + " or E.";
+
+            var part = stock[index];
+            int cost = part.WeightTons / 5;
+
+            if (Session.GalacticCoins < cost)
+                return $"Not enough coins. {part.Name} costs {cost} GC. You have {Session.GalacticCoins}.\n\n  E. Back";
+
+            Session.GalacticCoins -= cost;
+            Session.ShipWeightTons += part.WeightTons;
+            Session.ShipInventory.Add(
+                $"{part.Id}|{part.Name}|{part.Description}|{part.Stat}|{part.Image}|{part.Slot}|{part.WeightTons}");
+
+            Session.FSMState = NovaFSMState.AwaitShipMenu;
+            return BuildShipScreen($"✅ Installed: {part.Name} (-{cost} GC)");
+        }
+
         private string TradeMarket()
         {
             Session.FSMState = NovaFSMState.AwaitMarketChoice;
@@ -2778,8 +3158,7 @@ private string BossBattle()
             var stock = GetMarketStock();
             var lines = new List<string>();
 
-            if (message != null)
-                lines.Add(message + "\n");
+            if (message != null) lines.Add(message + "\n");
 
             lines.Add($"🏪 BLACK MARKET — Null Station");
             lines.Add($"💰 Your Coins: {Session.GalacticCoins} GC\n");
@@ -2788,7 +3167,7 @@ private string BossBattle()
             {
                 var item = stock[i];
                 char letter = (char)('A' + i);
-                lines.Add($"  {letter}. {item.Name} — {item.Cost} GC");
+                lines.Add($"  {letter}. [IMG:{item.Image}] {item.Name} — {item.Cost} GC");
                 lines.Add($"     {item.Description}");
             }
 
@@ -2799,7 +3178,6 @@ private string BossBattle()
             Session.FSMContext["marketStock"] = string.Join(",", stock.Select(s => s.Id));
             return string.Join("\n", lines);
         }
-
         private List<NovaContent.MarketItem> GetMarketStock()
         {
             // Show 4 random items each visit
@@ -2865,44 +3243,36 @@ private string BossBattle()
         {
             switch (item.Id)
             {
+                // FORMAT: "ID|Name|Description|Stat|ImageFile|Category"
                 case "medkit":
-                    Session.Inventory.Add("Nano Medkit");
+                    Session.Inventory.Add("MEDKIT|Nano Medkit|Restores 25 HP|25 HP heal|inventory-medical-medkit.png|consumable");
                     break;
-
                 case "medkit_large":
-                    Session.Inventory.Add("Military Medkit");
-                    // Military medkit heals more — we store it and
-                    // UseItemInMission checks name for amount
+                    Session.Inventory.Add("MEDKIT_L|Military Medkit|Restores 60 HP|60 HP heal|inventory-medical-medkitmilitary.png|consumable");
                     break;
-
                 case "armor_light":
                     Session.Armor = Math.Max(Session.Armor, 3);
-                    Session.Inventory.Add("Void Weave Vest [Equipped]");
+                    Session.Inventory.Add("ARMOR_L|Void Weave Vest|Light armor|-3 damage|inventory-armor-voidweave.png|armor");
                     break;
-
                 case "armor_heavy":
                     Session.Armor = Math.Max(Session.Armor, 7);
-                    Session.Inventory.Add("Plasma Plate [Equipped]");
+                    Session.Inventory.Add("ARMOR_H|Plasma Plate|Heavy armor|-7 damage|inventory-armor-plasmaplate.png|armor");
                     break;
-
                 case "plasma_cannon":
                     Session.CombatBonus += 5;
-                    Session.Inventory.Add("Plasma Cannon [Equipped]");
+                    Session.Inventory.Add("WEAPON_PC|Plasma Cannon|High damage weapon|+5 Combat|inventory-weapon-plasmacannon.png|weapon");
                     break;
-
                 case "stealth_cloak":
                     Session.StealthBonus += 4;
-                    Session.Inventory.Add("Stealth Cloak [Equipped]");
+                    Session.Inventory.Add("UPGRADE_SC|Stealth Cloak|Ghost protocol gear|+4 Stealth|inventory-upgrade-stealthcloak.png|upgrade");
                     break;
-
                 case "hack_tool":
                     Session.HackingBonus += 4;
-                    Session.Inventory.Add("ICE Breaker Tool [Equipped]");
+                    Session.Inventory.Add("UPGRADE_HT|ICE Breaker Tool|Network intrusion kit|+4 Hacking|inventory-upgrade-icebreaker.png|upgrade");
                     break;
-
                 case "scanner":
                     Session.AnalysisBonus += 4;
-                    Session.Inventory.Add("Quantum Scanner [Equipped]");
+                    Session.Inventory.Add("UPGRADE_QS|Quantum Scanner|Advanced sensor suite|+4 Analysis|inventory-upgrade-scanner.png|upgrade");
                     break;
             }
         }
@@ -3091,16 +3461,39 @@ private string RandomCosmicEvent()
         // ==========================================================
         private string ShowChapterMenu()
         {
+            int ch1Progress = Session.Chapter1MissionsCompleted;
+            string ch1Status = Session.Chapter1Complete
+                ? "✅ COMPLETE"
+                : $"{ch1Progress}/{NovaSession.Chapter1MissionsRequired} missions";
+
+            string ch2Status = Session.Chapter2Complete
+                ? "✅ COMPLETE"
+                : "[LOCKED — COMING SOON]";
+
             return "📖 CHAPTER SELECT\n\n" +
-                   "  Chapter 1 — NOVA ADEPTUS          [ACTIVE]\n" +
-                   "              Space RPG · Missions · Combat · Hacking\n\n" +
-                   "  Chapter 2 — EARTH APOCALYPSE       [COMING SOON]\n" +
-                   "              Kennecott, Alaska · Post-WW3 · Zombie Survival\n\n" +
-                   "── Type 'chapter 1' to play Nova Adeptus\n" +
-                   "── Type 'chapter 2' to enter Kennecott (when available)\n" +
+
+                   // Chapter 1 block
+                   "  ┌─────────────────────────────────────┐\n" +
+                "  │  [CHAPTER1_BANNER] │\n" +
+                   "  │  Chapter 1 — NOVA ADEPTUS            │\n" +
+                   "  │  Space RPG · Missions · Combat       │\n" +
+                   $"  │  Progress: {ch1Status,-27}│\n" +
+                   "  └─────────────────────────────────────┘\n" +
+                   "  Type 'chapter 1' to play\n\n" +
+
+                   // Chapter 2 block
+                   "  ┌─────────────────────────────────────┐\n" +
+                "  │  [CHAPTER2_BANNER] │\n" +
+                   "  │  Chapter 2 — EARTH APOCALYPSE        │\n" +
+                   "  │  Kennecott · Post-WW3 · Survival     │\n" +
+                   $"  │  Status: {ch2Status,-29}│\n" +
+                   "  └─────────────────────────────────────┘\n" +
+                   "  Type 'chapter 2' to enter Kennecott (coming soon)\n\n" +
+
                    "── Type 'class' to change your operative class\n" +
+                   "── Type 'accept' to receive a mission\n" +
                    "── Type 'help' for full command list\n\n" +
-                   "More chapters coming. The void expands. 🌌";
+                   "The void expands. 🌌";
         }
 
         // ==========================================================
@@ -3131,7 +3524,11 @@ private string RandomCosmicEvent()
                     enemiesDefeated = Session.EnemiesDefeated,
                     inventory = Session.Inventory,
                     activeMissions = Session.ActiveMissions,
-
+                    activeChapter = (int)Session.ActiveChapter,
+                    chapter1MissionsCompleted = Session.Chapter1MissionsCompleted,
+                    chapter2MissionsCompleted = Session.Chapter2MissionsCompleted,
+                    chapter1Complete = Session.Chapter1Complete,
+                    chapter2Complete = Session.Chapter2Complete,
                     // ── New fields ──────────────────────────────────
                     galacticCoins = Session.GalacticCoins,
                     currentHP = Session.CurrentHP,
@@ -3163,8 +3560,22 @@ public async Task LoadSession()
 
         using var doc = JsonDocument.Parse(saved);
         var root = doc.RootElement;
+                Session.ActiveChapter = root.TryGetProperty("activeChapter", out var ac)
+                     ? (NovaChapter)ac.GetInt32()
+                     : NovaChapter.Chapter1_NovaAdeptus;
 
-        Session.UserName = root.TryGetProperty("userName", out var un) ? un.GetString() : null;
+                Session.Chapter1MissionsCompleted = root.TryGetProperty("chapter1MissionsCompleted", out var c1m)
+                    ? c1m.GetInt32() : 0;
+
+                Session.Chapter2MissionsCompleted = root.TryGetProperty("chapter2MissionsCompleted", out var c2m)
+                    ? c2m.GetInt32() : 0;
+
+                Session.Chapter1Complete = root.TryGetProperty("chapter1Complete", out var c1c)
+                    && c1c.GetBoolean();
+
+                Session.Chapter2Complete = root.TryGetProperty("chapter2Complete", out var c2c)
+                    && c2c.GetBoolean();
+                Session.UserName = root.TryGetProperty("userName", out var un) ? un.GetString() : null;
         Session.XP = root.TryGetProperty("xp", out var xp) ? xp.GetInt32() : 0;
         Session.Relationship = root.TryGetProperty("relationship", out var rel) ? rel.GetString()! : "neutral";
         Session.MissionsCompleted = root.TryGetProperty("missionsCompleted", out var mc) ? mc.GetInt32() : 0;
@@ -3203,14 +3614,23 @@ public async Task LoadSession()
             Session.Inventory = inv.EnumerateArray()
                 .Select(x => x.GetString()!)
                 .ToList();
-    }
+                // Seed starter gear if inventory is empty (first time)
+                if (Session.Inventory.Count == 0)
+                    SeedStarterInventory();
+            }
     catch { /* corrupted save — start fresh */ }
 }
-
-// ==========================================================
-// UI HELPERS
-// ==========================================================
-public string GetEmotionalColor() => _brain.GetEmotionalColor();
+        private void SeedStarterInventory()
+        {
+            // Male Civilian starter kit
+            Session.Inventory.Add("MEDKIT|Nano Medkit|Restores 25 HP|25 HP heal|inventory-medical-medkit.png|consumable");
+            Session.Inventory.Add("WEAPON|Brass Knuckles|Close combat weapon|+2 Combat|inventory-weapon-brassknuckles.png|weapon");
+            Session.Inventory.Add("ARMOR|Synthetic Kevlar|Light ballistic protection|+3 Armor|inventory-armor-malehumanarmor001.png|armor");
+        }
+        // ==========================================================
+        // UI HELPERS
+        // ==========================================================
+        public string GetEmotionalColor() => _brain.GetEmotionalColor();
 public string GetEmotionalEmoji() => _brain.GetEmotionalEmoji();
 public string GetEmotionalState() => _brain.GetEmotionalState();
 
