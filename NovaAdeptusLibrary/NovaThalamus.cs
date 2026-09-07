@@ -52,7 +52,8 @@ namespace NovaAdeptusLibrary
      "🕐   time/date   — current time and date\n\n" +
      "── CHAT ──────────────────────────────\n" +
      "💬   just talk   — Nova always responds\n" +
-     "👁️   name        — tell Nova your name\n\n" +
+    "💡   name        — set your operative name\n" +
+"👤   profile     — view your operative profile & achievements\n\n" +
      "── CHAPTERS ──────────────────────────\n" +
      "📖   chapter     — chapter select menu\n" +
      "🎭   class       — change operative class\n" +
@@ -610,7 +611,16 @@ namespace NovaAdeptusLibrary
                 // Generic AAVE slang fallback
                 return ApplyMood(AAVESlang[_rng.Next(AAVESlang.Count)]);
             }
-
+            // ── How are you ─────────────────────────────────────
+            if (cleaned.Contains("how are you") ||
+                 cleaned.Contains("how r you") ||
+                 cleaned.Contains("how are u") ||
+                 cleaned.Contains("how r u") ||
+                 cleaned.Contains("how do you feel") ||
+                 cleaned.Contains("how you doing") ||
+                 cleaned.Contains("how r u doing") ||
+                 cleaned.Contains("how are you doing"))
+                return ApplyMood(BuildFeelingResponse(session));
             // ── Greeting ────────────────────────────────────────
             var greetings = new[]
             {
@@ -687,11 +697,7 @@ namespace NovaAdeptusLibrary
                 return ApplyMood(PickFrom(NovaPrefrontalCortex
                     .SocialResponses["thanks"]));
 
-            // ── How are you ─────────────────────────────────────
-            if (cleaned.Contains("how are you") ||
-                cleaned.Contains("you okay") ||
-                cleaned.Contains("how do you feel"))
-                return ApplyMood(BuildFeelingResponse(session));
+    
 
             // ── Topic match ─────────────────────────────────────
             var topics = new[]

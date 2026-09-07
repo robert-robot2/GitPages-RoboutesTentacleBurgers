@@ -51,7 +51,40 @@
     },
 },
 
-
+new PatchNoteEntry
+{
+    Title = "RTB VX5.391 Nova Adeptus Updates ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "── NOVA INTELLIGENCE FIXES ───────────────────────",
+        "'How are you' now correctly triggers Nova's social response bank",
+        "Fixed greeting handler eating 'how are you' inputs before social check",
+        "Added natural language variants: 'how r you', 'how are u', 'how you doing'",
+        "Separated manner greeting context from concern context for future expansion",
+        "",
+        "── NOVA VOICE CLEANUP ────────────────────────────",
+        "Frustration response bank overhauled — removed broken placeholder text",
+        "Added 8 new absurdist void-humor frustration responses",
+        "Nova no longer addresses the user instead of herself in social replies",
+        "'Yourself?' and 'You?' self-reference lines corrected",
+        "",
+        "── CODE CLEANUP ──────────────────────────────────",
+        "Removed dead 'using static BitVector32' from NovaCortex.cs",
+        "NovaOrbitoFrontalCortex.cs — duplicate enums and classes removed",
+        "ConversationState enum removed — covered by NovaFSMState in NovaCortex.cs",
+        "Duplicate relationship and emotional state logic cleared",
+        "NovaOrbitoFrontalCortex class shell preserved as placeholder for future expansion",
+        "WordHabit record preserved for future word tracking feature",
+        "NovaContent class preserved intact — required by NovaCortex.cs",
+        "",
+        "── NEW FEATURES ──────────────────────────────────",
+        "Added 'profile' command — displays operative profile card",
+        "Profile shows: name, level, XP, missions, enemies defeated, skills, achievements",
+        "NovaPlayerProfile wired into NovaCortex via ShowProfile()",
+        "Achievement system hooked up — unlocks checked on profile view",
+        "Help menu updated with 'profile' entry under CHAT section",
+    }
+},
 
 new PatchNoteEntry
 {

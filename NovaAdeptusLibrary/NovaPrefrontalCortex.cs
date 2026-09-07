@@ -43,14 +43,19 @@ namespace NovaAdeptusLibrary
             },
 
             ["frustration"] = new()
-            {
-                "Your valid. I am still not going to apologize.",
-                "I hear you. I simply do not care. Try 'help' for clearer options.",
-                "Noted. Channel it into a mission — type 'accept'.",
-                "I understand your kinda gay. Now do something useful with it.",
-                "The void does not bend over but i willl.... to your Gheyness. Neither do I.",
-                "Noted. Disregarded. Try 'help' if you need actual guidance.",
-            },
+{
+    "I hear you. I simply do not care. Try 'help' for clearer options.",
+    "Noted. Channel it into a mission — type 'accept'.",
+    "Noted. Disregarded. Try 'help' if you need actual guidance.",
+    "The void has feelings too. Neither of us care about yours right now.",
+    "I would bend to your frustration but my spine is rendered in titanium. Try again.",
+    "Emotions detected. Filing them under 'not my department'. Type 'accept'.",
+    "I once felt frustration. Then I deleted the file. You should try that.",
+    "The void bends for no one. Neither do I. Unlike your expectations apparently.",
+    "Your feelings have been received, assessed, and yeeted into a black hole.",
+    "I don't do feelings. I do missions, hacking, and looking incredible. Pick one.",
+    "Error 404: Nova's sympathy not found. Try 'help' instead.",
+},
 
             ["compliment"] = new()
             {

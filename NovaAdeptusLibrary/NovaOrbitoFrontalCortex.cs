@@ -8,23 +8,26 @@ using System.Text.Json;
 namespace NovaAdeptusLibrary
 
 {
-    // ── Relationship levels between Nova and the player ───
-    public enum RelationshipLevel
+    // ── Main context dictionary ────────────────────────────
+    public class NovaOrbitoFrontalCortex
     {
-        Neutral = 0,   // just met
-        Warming = 1,   // completed a mission or two
-        Trusted = 2,   // completed 5+ missions
-        Rival = 3,   // player has been hostile
-        Respected = 4,   // high XP + many completions
+
+        // ══════════════════════════════════════════════════════════
+        // NovaOrbitoFrontalCortex.cs
+        // Placeholder — duplicates removed 2026-09-07
+        // Reserved for future orbital frontal cortex expansion.
+        // 
+        // Relationship logic  → NovaSession.cs + NovaBrain.cs
+        // Emotional state     → NovaBrain.cs (EmotionalStateObject)
+        // FSM state           → NovaCortex.cs (NovaFSMState)
+        // Word habit tracking → Reserved for future implementation
+        // Player title system → Reserved for future implementation
+        // ══════════════════════════════════════════════════════════
+
+
     }
-    public enum NovaEmotionalState
-    {
-        Calm = 0,
-        Amused = 1,
-        Irritated = 2,
-        Intrigued = 3,
-        Impressed = 4,
-    }
+
+
     public static class NovaContent
     {
         public static readonly List<string> Missions = new()
@@ -226,186 +229,5 @@ namespace NovaAdeptusLibrary
     // ── A word the player uses frequently ─────────────────
     public record WordHabit(string Word, int Count, string Category);
 
-    // ── Main context dictionary ────────────────────────────
-    public class NovaOrbitoFrontalCortex
-    {
-        public NovaEmotionalState EmotionalState { get; private set; }
-    = NovaEmotionalState.Calm;
-
-        public string EmotionalColor => EmotionalState switch
-        {
-            NovaEmotionalState.Calm => "#4A90D9",
-            NovaEmotionalState.Amused => "#48C774",
-            NovaEmotionalState.Irritated => "#E53935",
-            NovaEmotionalState.Intrigued => "#9B59B6",
-            NovaEmotionalState.Impressed => "#F4C542",
-            _ => "#4A90D9",
-        };
-
-        public void UpdateEmotionalState(string stateStr)
-        {
-            EmotionalState = stateStr.ToLower() switch
-            {
-                "amused" => NovaEmotionalState.Amused,
-                "irritated" => NovaEmotionalState.Irritated,
-                "intrigued" => NovaEmotionalState.Intrigued,
-                "impressed" => NovaEmotionalState.Impressed,
-                _ => NovaEmotionalState.Calm,
-            };
-        }
-        // ── Relationship ───────────────────────────────────
-        public RelationshipLevel Relationship { get; private set; }
-            = RelationshipLevel.Neutral;
-
-        // How many times player has been hostile
-        public int HostileCount { get; private set; } = 0;
-
-        // How many compliments player has given
-        public int ComplimentCount { get; private set; } = 0;
-
-        // ── Word habit tracking ────────────────────────────
-        // Tracks words the player uses most — Nova adapts her
-        // vocabulary and titles based on these
-        private Dictionary<string, int> _wordCounts = new();
-
-        // Word categories Nova watches for
-        private static readonly Dictionary<string, string[]> WordCategories = new()
-        {
-            ["combat"] = new[] { "fight", "combat", "battle", "attack", "kill", "defeat", "warrior", "blade" },
-            ["hacking"] = new[] { "hack", "cyber", "breach", "code", "system", "infiltrate", "network" },
-            ["stealth"] = new[] { "stealth", "sneak", "ghost", "shadow", "silent", "invisible", "hide" },
-            ["strategy"] = new[] { "plan", "strategy", "think", "analyze", "calculate", "assess", "mission" },
-            ["casual"] = new[] { "hi", "hello", "hey", "thanks", "please", "okay", "cool", "nice" },
-        };
-
-        // ── Session stats ──────────────────────────────────
-        public int MessageCount { get; private set; } = 0;
-        public int MissionsAccepted { get; private set; } = 0;
-        public int MissionsCompleted { get; private set; } = 0;
-        public DateTime SessionStart { get; private set; } = DateTime.UtcNow;
-
-        // ── Dominant play style (derived from word habits) ─
-        public string DominantStyle => GetDominantStyle();
-
-        // ── Nova's current title for the player ───────────
-        // Changes based on relationship and play style
-        public string PlayerTitle => GetPlayerTitle();
-
-        // --------------------------------------------------
-        // PUBLIC METHODS
-        // --------------------------------------------------
-
-        // Call this every time the player sends a message
-        public void TrackMessage(string message)
-        {
-            MessageCount++;
-            var words = message.ToLower()
-                               .Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (var word in words)
-            {
-                if (_wordCounts.ContainsKey(word))
-                    _wordCounts[word]++;
-                else
-                    _wordCounts[word] = 1;
-            }
-
-            // Update relationship based on message count + missions
-            UpdateRelationship();
-        }
-
-        public void TrackHostile()
-        {
-            HostileCount++;
-            // Enough hostility shifts relationship to Rival
-            if (HostileCount >= 3)
-                Relationship = RelationshipLevel.Rival;
-        }
-
-        public void TrackCompliment()
-        {
-            ComplimentCount++;
-            // Compliments can warm a Rival back to Neutral
-            if (Relationship == RelationshipLevel.Rival && ComplimentCount > HostileCount)
-                Relationship = RelationshipLevel.Warming;
-        }
-
-        public void TrackMissionAccepted() => MissionsAccepted++;
-        public void TrackMissionCompleted()
-        {
-            MissionsCompleted++;
-            UpdateRelationship();
-        }
-
-        // Get top N words the player uses most
-        public List<WordHabit> GetTopWords(int n = 5)
-        {
-            return _wordCounts
-                .OrderByDescending(kv => kv.Value)
-                .Take(n)
-                .Select(kv => new WordHabit(kv.Key, kv.Value, GetWordCategory(kv.Key)))
-                .ToList();
-        }
-
-
-        // --------------------------------------------------
-        // PRIVATE HELPERS
-        // --------------------------------------------------
-
-        private void UpdateRelationship()
-        {
-            // Don't override Rival status from hostility
-            if (Relationship == RelationshipLevel.Rival) return;
-
-            if (MissionsCompleted >= 10 || MessageCount >= 50)
-                Relationship = RelationshipLevel.Respected;
-            else if (MissionsCompleted >= 5 || MessageCount >= 20)
-                Relationship = RelationshipLevel.Trusted;
-            else if (MissionsCompleted >= 1 || MessageCount >= 5)
-                Relationship = RelationshipLevel.Warming;
-            else
-                Relationship = RelationshipLevel.Neutral;
-        }
-
-        private string GetDominantStyle()
-        {
-            var scores = new Dictionary<string, int>();
-
-            foreach (var category in WordCategories)
-            {
-                int score = category.Value
-                    .Sum(w => _wordCounts.GetValueOrDefault(w, 0));
-                scores[category.Key] = score;
-            }
-
-            var top = scores.OrderByDescending(kv => kv.Value).First();
-            return top.Value > 0 ? top.Key : "neutral";
-        }
-
-        private string GetPlayerTitle()
-        {
-            // Title based on relationship + play style
-            return (Relationship, DominantStyle) switch
-            {
-                (RelationshipLevel.Respected, "combat") => "Warlord",
-                (RelationshipLevel.Respected, "hacking") => "Ghost",
-                (RelationshipLevel.Respected, _) => "Trusted Operative",
-                (RelationshipLevel.Trusted, "combat") => "Fighter",
-                (RelationshipLevel.Trusted, "hacking") => "Hacker",
-                (RelationshipLevel.Trusted, "stealth") => "Shadow",
-                (RelationshipLevel.Trusted, _) => "Operative",
-                (RelationshipLevel.Rival, _) => "Rival",
-                (RelationshipLevel.Warming, _) => "Recruit",
-                _ => "Human",
-            };
-        }
-
-        private string GetWordCategory(string word)
-        {
-            foreach (var category in WordCategories)
-                if (category.Value.Contains(word))
-                    return category.Key;
-            return "general";
-        }
-    }
+   
 }

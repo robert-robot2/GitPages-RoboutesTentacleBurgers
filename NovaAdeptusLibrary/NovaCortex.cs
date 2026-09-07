@@ -22,7 +22,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using static System.Collections.Specialized.BitVector32;
 
 namespace NovaAdeptusLibrary
 {
@@ -381,6 +380,7 @@ namespace NovaAdeptusLibrary
                 "menus" => ShowChapterMenu(),
                 "class" => _thalamus.Apply(ReopenCharacterSelect(), Session),
                 "name" => AskName(),
+                "profile" => ShowProfile(),
                 "time" => _thalamus.Apply(
                                 DateTime.Now.ToString("'Time is 'hh:mm tt ⏰"), Session),
                 "date" => _thalamus.Apply(
@@ -2425,6 +2425,53 @@ private string RandomBonus()
     Session.XP += 10;
     return $"Bonus: {bonuses[_rng.Next(bonuses.Length)]} | XP +10 💰";
 }
+        private string ShowProfile()
+        {
+            var profile = new NovaPlayerProfile
+            {
+                OperativeName = Session.UserName ?? "Unknown Operative",
+                XP = Session.XP,
+                MissionsCompleted = Session.MissionsCompleted,
+                EnemiesDefeated = Session.EnemiesDefeated,
+            };
+
+            // Sync skills
+            foreach (var kv in Session.Skills)
+                profile.Skills[kv.Key] = kv.Value;
+
+            // Check achievements
+            profile.TryUnlockAchievements();
+            var unlocked = profile.Achievements
+                .Where(a => a.Unlocked).ToList();
+
+            var lines = new List<string>
+    {
+        $"👤 OPERATIVE PROFILE",
+        $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
+        $"Name:     {profile.OperativeName}",
+        $"Level:    {profile.Level}",
+        $"XP:       {profile.XP}",
+        $"Missions: {profile.MissionsCompleted}",
+        $"Enemies:  {profile.EnemiesDefeated}",
+        $"",
+        $"🎯 SKILLS",
+    };
+
+            foreach (var kv in profile.Skills)
+                lines.Add($"  {kv.Key,-10}: {kv.Value}");
+
+            lines.Add("");
+            lines.Add($"🏆 ACHIEVEMENTS ({unlocked.Count}/{profile.Achievements.Count})");
+
+            if (!unlocked.Any())
+                lines.Add("  None unlocked yet. Get out there. ☠️");
+            else
+                foreach (var a in unlocked)
+                    lines.Add($"  ✅ {a.Title} — {a.Description}");
+
+            return string.Join("\n", lines);
+        }
+
 
         private string ShowStats()
         {
