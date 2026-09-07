@@ -72,11 +72,13 @@ namespace NovaAdeptusLibrary
         public string PlayerTitle { get; set; } = "operative";
         public int MessageCount { get; set; } = 0;
         public int HostileCount { get; set; } = 0;
+ 
 
         // ── HP System ─────────────────────────────────────
         public int MaxHP { get; set; } = 100;
         public int CurrentHP { get; set; } = 100;
         public int Armor { get; set; } = 0;
+        public double AttackSpeedMod { get; set; } = 1.0;
 
         // ── Equipped bonuses (applied from market items) ───────────
         public int CombatBonus { get; set; } = 0;
@@ -177,9 +179,10 @@ namespace NovaAdeptusLibrary
         // ── HP helpers ─────────────────────────────────────
         public int TakeDamage(int incoming)
         {
-            int actual = Math.Max(1, incoming - Armor);
+            int adjusted = (int)Math.Round(incoming * AttackSpeedMod);
+            int actual = Math.Max(1, adjusted - Armor);
             CurrentHP = Math.Max(0, CurrentHP - actual);
-            return actual; // returns actual damage dealt after armor
+            return actual;
         }
 
         public int Heal(int amount)
@@ -208,7 +211,9 @@ namespace NovaAdeptusLibrary
         // FSM runtime — not persisted
         public NovaFSMState FSMState { get; set; } = NovaFSMState.Idle;
         public Dictionary<string, object> FSMContext { get; set; } = new();
-
+        // ── Crew / Companions ──────────────────────────────────────
+        public List<string> ActiveCrew { get; set; } = new();
+        // Format: "Name|Type|combat:N,hacking:N|companion-<name>.png"
         public void UpdateRelationship()
         {
             if (Relationship == "rival") return;
@@ -258,6 +263,11 @@ namespace NovaAdeptusLibrary
         private readonly NovaWernicke _wernicke = new();
         private NovaBroca _broca = default!;
         private readonly IJSRuntime _js;
+        // ── Nova's own combat stats — cosmetic/display ──────────────────
+        public int NovaMaxHP { get; } = 150;
+        public int NovaCurrentHP { get; } = 150;
+        public int NovaArmor { get; } = 8;
+        public int NovaAttack { get; } = 12;
 
         // ── Session state ──────────────────────────────────────
         public NovaSession Session { get; private set; } = new();
@@ -2968,16 +2978,34 @@ private string SideQuest()
     return $"Side quest: {quest.Name} | XP +{quest.Reward} 📜";
 }
 
-private string SummonCompanion()
-{
-    var c = NovaContent.Companions[_rng.Next(NovaContent.Companions.Count)];
-    var skills = string.Join("  ", c.Skills.Select(kv => $"{kv.Key}:{kv.Value}"));
-    return $"🤝 {c.Name} ({c.Type}) joined! {skills}";
-}
+        private string SummonCompanion()
+        {
+            var c = NovaContent.Companions[_rng.Next(NovaContent.Companions.Count)];
+            var skills = string.Join("  ", c.Skills.Select(kv => $"{kv.Key}:{kv.Value}"));
 
-private string DismissCompanion() => "Companion dismissed.";
+            bool already = Session.ActiveCrew.Any(x => x.StartsWith(c.Name + "|"));
+            if (!already)
+            {
+                var skillString = string.Join(",", c.Skills.Select(kv => $"{kv.Key}:{kv.Value}"));
+                Session.ActiveCrew.Add(
+                    $"{c.Name}|{c.Type}|{skillString}|{c.Image}|{c.HP}|{c.Armor}|{c.Attack}");
+            }
 
-private string MissionChain()
+            return $"🤝 {c.Name} ({c.Type}) joined! {skills}" +
+                   (already ? "\n(Already in your crew — re-bonded.)" : "");
+        }
+
+        private string DismissCompanion()
+        {
+            if (!Session.ActiveCrew.Any())
+                return "No companions to dismiss.";
+            var last = Session.ActiveCrew.Last();
+            Session.ActiveCrew.RemoveAt(Session.ActiveCrew.Count - 1);
+            var name = last.Split('|')[0];
+            return $"{name} has been dismissed from active crew.";
+        }
+
+        private string MissionChain()
 {
     int n = _rng.Next(2, 6), total = 0;
     var log = new List<string>();
@@ -3395,6 +3423,7 @@ private string RandomCosmicEvent()
                     Session.PlayerGender = parts[0].Trim();
                     Session.PlayerType = parts[1].Trim();
                     Session.PlayerClass = parts[2].Trim();
+                    ApplyClassCombatProfile(Session.PlayerClass);
                     return BuildClassReactionResponse();
                 }
             }
@@ -3528,6 +3557,8 @@ private string RandomCosmicEvent()
                     chapter2MissionsCompleted = Session.Chapter2MissionsCompleted,
                     chapter1Complete = Session.Chapter1Complete,
                     chapter2Complete = Session.Chapter2Complete,
+                    activeCrew = Session.ActiveCrew,
+                    attackSpeedMod = Session.AttackSpeedMod,
                     // ── New fields ──────────────────────────────────
                     galacticCoins = Session.GalacticCoins,
                     currentHP = Session.CurrentHP,
@@ -3602,30 +3633,49 @@ public async Task LoadSession()
                 Session.PlayerClass = root.TryGetProperty("playerClass", out var pc) ? pc.GetString()! : "civilian";
                 Session.PlayerGender = root.TryGetProperty("playerGender", out var pg) ? pg.GetString()! : "male";
                 Session.PlayerType = root.TryGetProperty("playerType", out var pt) ? pt.GetString()! : "biological";
-
+                if (root.TryGetProperty("activeCrew", out var crew))
+                    Session.ActiveCrew = crew.EnumerateArray().Select(x => x.GetString()!).ToList();
 
                 if (root.TryGetProperty("activeMissions", out var am))
             Session.ActiveMissions = am.EnumerateArray()
                 .Select(x => x.GetString()!)
                 .ToList();
+                Session.AttackSpeedMod = root.TryGetProperty("attackSpeedMod", out var asm) ? asm.GetDouble() : 1.0;
 
-        if (root.TryGetProperty("inventory", out var inv))
+                if (root.TryGetProperty("inventory", out var inv))
             Session.Inventory = inv.EnumerateArray()
                 .Select(x => x.GetString()!)
                 .ToList();
                 // Seed starter gear if inventory is empty (first time)
                 if (Session.Inventory.Count == 0)
-                    SeedStarterInventory();
+                    ApplyClassCombatProfile(Session.PlayerClass);
             }
     catch { /* corrupted save — start fresh */ }
 }
-        private void SeedStarterInventory()
+
+        private void ApplyClassCombatProfile(string classId)
         {
-            // Male Civilian starter kit
-            Session.Inventory.Add("MEDKIT|Nano Medkit|Restores 25 HP|25 HP heal|inventory-medical-medkit.png|consumable");
-            Session.Inventory.Add("WEAPON|Brass Knuckles|Close combat weapon|+2 Combat|inventory-weapon-brassknuckles.png|weapon");
-            Session.Inventory.Add("ARMOR|Synthetic Kevlar|Light ballistic protection|+3 Armor|inventory-armor-malehumanarmor001.png|armor");
+            var key = classId.ToLower();
+            if (!NovaContent.ClassProfiles.TryGetValue(key, out var profile))
+                profile = NovaContent.ClassProfiles["civilian"];
+
+            Session.MaxHP = profile.MaxHP;
+            Session.CurrentHP = profile.MaxHP;
+            Session.Armor = profile.Armor;
+            Session.AttackSpeedMod = profile.AttackSpeedMod;
+
+            Session.CombatBonus = profile.WeaponDamage;
+
+            Session.Inventory.Clear();
+            Session.Inventory.Add(
+                $"WEAPON|{profile.WeaponName}|Starter weapon|+{profile.WeaponDamage} Combat|" +
+                $"inventory-weapon-{profile.WeaponName.ToLower().Replace(" ", "")}.png|weapon");
+            Session.Inventory.Add(
+                $"ITEM|{profile.ItemA}|Class starter gear||inventory-item-{profile.ItemA.ToLower().Replace(" ", "")}.png|misc");
+            Session.Inventory.Add(
+                $"ITEM|{profile.ItemB}|Class starter gear||inventory-item-{profile.ItemB.ToLower().Replace(" ", "")}.png|misc");
         }
+     
         // ==========================================================
         // UI HELPERS
         // ==========================================================

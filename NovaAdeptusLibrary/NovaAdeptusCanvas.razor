@@ -42,7 +42,22 @@
         </div>
         <div class="sidebar-stat">
             <span class="stat-key">HP</span>
-            <span class="stat-val" style="color:#ff6b6b">100 / 100</span>
+            <span class="stat-val" style="color:#ff6b6b">
+                @(_nova?.NovaCurrentHP ?? 150) /
+                @(_nova?.NovaMaxHP ?? 150)
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Armor</span>
+            <span class="stat-val" style="color:#7dd8ff">
+                @(_nova?.NovaArmor ?? 0)
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Attack</span>
+            <span class="stat-val" style="color:#ffd700">
+                +@(_nova?.NovaAttack ?? 0)
+            </span>
         </div>
 
     <div class="sidebar-stat">
@@ -137,6 +152,18 @@
             </span>
         </div>
         <div class="sidebar-stat">
+            <span class="stat-key">Armor</span>
+            <span class="stat-val" style="color:#7dd8ff">
+                @(_nova?.Session.Armor ?? 0)
+            </span>
+        </div>
+        <div class="sidebar-stat">
+            <span class="stat-key">Attack</span>
+            <span class="stat-val" style="color:#ffd700">
+                +@(_nova?.Session.CombatBonus ?? 0)
+            </span>
+        </div>
+        <div class="sidebar-stat">
             <span class="stat-key">Mood</span>
             <span class="stat-val" style="color:#9b59b6">
                 — —
@@ -199,7 +226,44 @@
                 }
             }
         </div>
-      
+        <!-- ── ACTIVE CREW PANEL ────────────────────────────── -->
+        <div class="sidebar-section inv-section">
+            <button class="inv-toggle-btn" @onclick="ToggleCrewPanel">
+                <span>🤝 ACTIVE CREW</span>
+                <span>@(_crewOpen ? "▲" : "▼")</span>
+            </button>
+
+            @if (_crewOpen)
+            {
+                var crew = ParseCrew(_nova?.Session.ActiveCrew ?? new());
+                @if (!crew.Any())
+                {
+                    <div class="crew-empty">No crew recruited. Type 'companion'.</div>
+                }
+                else
+                {
+                    <div class="crew-list">
+                        @foreach (var member in crew)
+                        {
+                            <div class="crew-card">
+                                <img src="/iAssets/@member.Image"
+                                     class="crew-portrait"
+                                     alt="@member.Name"
+                                     onerror="this.src='/iAssets/inventory-default.png'" />
+                                <div class="crew-info">
+                                    <span class="crew-name">@member.Name</span>
+                                    <span class="crew-type">@member.Type</span>
+                                    <span class="crew-skills">@member.SkillLine</span>
+                                    <span class="crew-combat">
+                                        ❤️@member.HP 🛡️@member.Armor ⚔️+@member.Attack
+                                    </span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
     </div>
 
     <div class="sidebar-divider"></div>
@@ -819,6 +883,89 @@
         margin-right: 6px;
         border: 1px solid rgba(57,255,20,0.3);
     }
+
+    .nova-sidebar {
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+        .nova-sidebar::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .nova-sidebar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .nova-sidebar::-webkit-scrollbar-thumb {
+            background: #27b30e;
+            border-radius: 3px;
+        }
+
+            .nova-sidebar::-webkit-scrollbar-thumb:hover {
+                background: #39ff14;
+            }
+
+    .crew-empty {
+        font-size: 10px;
+        color: var(--text-dim);
+        padding: 6px 2px;
+        font-style: italic;
+    }
+
+    .crew-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        margin-top: 8px;
+    }
+
+    .crew-card {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px;
+        background: rgba(0,8,20,0.5);
+        border: 1px solid rgba(57,255,20,0.15);
+    }
+
+    .crew-portrait {
+        width: 32px;
+        height: 32px;
+        image-rendering: pixelated;
+        border: 1px solid var(--panel-edge);
+        flex-shrink: 0;
+    }
+
+    .crew-info {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        min-width: 0;
+    }
+
+    .crew-name {
+        font-size: 10px;
+        color: var(--lime);
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+
+    .crew-type {
+        font-size: 9px;
+        color: var(--text-dim);
+    }
+
+    .crew-skills {
+        font-size: 8px;
+        color: #ffd700;
+    }
+
+    .crew-combat {
+        font-size: 8px;
+        color: var(--text-dim);
+        letter-spacing: 0.5px;
+    }
 </style>
 
 
@@ -863,7 +1010,29 @@
             StateHasChanged();
         }
     }
+    private bool _crewOpen = false;
+    private void ToggleCrewPanel() => _crewOpen = !_crewOpen;
 
+    private record CrewMember(
+        string Name, string Type, string SkillLine, string Image,
+        int HP, int Armor, int Attack);
+
+    private List<CrewMember> ParseCrew(List<string> raw)
+    {
+        var result = new List<CrewMember>();
+        foreach (var entry in raw)
+        {
+            var p = entry.Split('|');
+            if (p.Length >= 7)
+                result.Add(new CrewMember(
+                    p[0], p[1], p[2].Replace(",", "  "), p[3],
+                    int.Parse(p[4]), int.Parse(p[5]), int.Parse(p[6])));
+            else if (p.Length >= 4)
+                // legacy entries from before this patch — fallback values
+                result.Add(new CrewMember(p[0], p[1], p[2].Replace(",", "  "), p[3], 100, 0, 5));
+        }
+        return result;
+    }
     // ── Send message ──────────────────────────────────────────
     private async Task SendMessage()
     {

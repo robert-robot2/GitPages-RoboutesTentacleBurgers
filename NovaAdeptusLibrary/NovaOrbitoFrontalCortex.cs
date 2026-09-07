@@ -210,7 +210,22 @@ namespace NovaAdeptusLibrary
 
 
 
+        public record ClassCombatProfile(
+    string ClassId, int MaxHP, int Armor,
+    string WeaponName, int WeaponDamage,
+    string ItemA, string ItemB,
+    double AttackSpeedMod = 1.0 // 1.0 = normal, >1.0 = slower (Ultramarine penalty)
+);
 
+        public static readonly Dictionary<string, ClassCombatProfile> ClassProfiles = new()
+        {
+            ["civilian"] = new("civilian", 100, 1, "Brass Knuckles", 2, "Nano Medkit", "Pocket Knife"),
+            ["ultramarine"] = new("ultramarine", 140, 6, "Bolter Pistol", 10, "Frag Grenade", "Combat Stims", 1.3),
+            ["doctor"] = new("doctor", 115, 3, "Defibrillator", 2, "Field Defibrillator", "Trauma Kit"),
+            ["mechanic"] = new("mechanic", 110, 4, "Wrench", 4, "Repair Torch", "Spare Parts Kit"),
+            ["hacker"] = new("hacker", 90, 1, "Shock Baton", 3, "Data Spike", "EMP Charge"),
+            ["scientist"] = new("scientist", 90, 2, "Alchemy Bottle", 4, "Alchemy Bottles", "Sample Vial"),
+        };
 
 
 
@@ -290,16 +305,18 @@ namespace NovaAdeptusLibrary
         ("Alien Diplomacy",     3),
     };
 
-        public static readonly List<(string Name, string Type,
-            Dictionary<string, int> Skills)> Companions = new()
-        {
-        ("Zyra",   "AI Drone",
-            new(){ {"combat",3},{"hacking",5} }),
-        ("Korrin", "Space Marine",
-            new(){ {"combat",6},{"stealth",4} }),
-        ("Lyra",   "Alien Ally",
-            new(){ {"combat",4},{"hacking",6} }),
-        };
+        public record CompanionDef(
+            string Name, string Type,
+            Dictionary<string, int> Skills, string Image,
+            int HP, int Armor, int Attack
+        );
+
+        public static readonly List<CompanionDef> Companions = new()
+{
+    new("Zyra",   "AI Drone",     new(){ {"combat",3},{"hacking",5} }, "companion-zyra.png",   70,  2, 6),
+    new("Korrin", "Space Marine", new(){ {"combat",6},{"stealth",4} }, "companion-korrin.png", 120, 5, 9),
+    new("Lyra",   "Alien Ally",   new(){ {"combat",4},{"hacking",6} }, "companion-lyra.png",   90,  3, 7),
+};
 
 
     }
