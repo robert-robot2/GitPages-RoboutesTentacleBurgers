@@ -584,8 +584,7 @@ namespace NovaAdeptusLibrary
                 cleaned.Contains("ship loadout"))
                 return OpenShipScreen();
 
-            if (cleaned.Contains("inventory")) return ShowInventory("player");
-            return ShowInventory();
+            if (cleaned.Contains("inventory")) return ShowInventory("player");        
             if (cleaned.Contains("endgame")) return _thalamus.Apply(EndgameMission(), Session);
             if (cleaned.Contains("cosmic")) return _thalamus.Apply(CosmicEventFinal(), Session);
             if (cleaned.Contains("event")) return _thalamus.Apply(RandomCosmicEvent(), Session);
