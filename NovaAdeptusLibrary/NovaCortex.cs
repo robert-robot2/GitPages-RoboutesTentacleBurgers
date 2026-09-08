@@ -249,6 +249,65 @@ namespace NovaAdeptusLibrary
                     Relationship = "warming";
             }
         }
+
+        // ── Nova & Companion Combat Stats (active in combat) ──────────────
+        public int NovaActiveHP { get; set; } = 150;
+        public int NovaActiveMaxHP { get; set; } = 150;
+        public int NovaActiveArmor { get; set; } = 8;
+        public int NovaActiveAttack { get; set; } = 12;
+
+        public int CompanionHP { get; set; } = 0;
+        public int CompanionMaxHP { get; set; } = 0;
+        public int CompanionArmor { get; set; } = 0;
+        public int CompanionAttack { get; set; } = 0;
+        public string CompanionName { get; set; } = "";
+
+        // ── Helper: sync companion stats from active crew ──────────────────
+        public void SyncCompanionFromCrew()
+        {
+            if (!ActiveCrew.Any()) { CompanionName = ""; CompanionHP = 0; return; }
+            var parts = ActiveCrew.Last().Split('|');
+            if (parts.Length >= 7)
+            {
+                CompanionName = parts[0];
+                CompanionMaxHP = int.TryParse(parts[4], out var h) ? h : 100;
+                CompanionHP = CompanionMaxHP;
+                CompanionArmor = int.TryParse(parts[5], out var a) ? a : 0;
+                CompanionAttack = int.TryParse(parts[6], out var atk) ? atk : 5;
+            }
+        }
+
+        // ── Nova attacks — returns damage dealt ───────────────────────────
+        public int NovaAttackRoll(Random rng)
+        {
+            int roll = rng.Next(8, 18) + NovaActiveAttack;
+            return Math.Max(1, roll - /* enemy armor placeholder */ 0);
+        }
+
+        // ── Companion attacks — returns damage dealt ──────────────────────
+        public int CompanionAttackRoll(Random rng)
+        {
+            if (CompanionHP <= 0 || string.IsNullOrEmpty(CompanionName)) return 0;
+            return Math.Max(1, rng.Next(3, 10) + CompanionAttack);
+        }
+
+        // ── Nova takes damage ─────────────────────────────────────────────
+        public int NovaTakeDamage(int incoming)
+        {
+            int actual = Math.Max(1, incoming - NovaActiveArmor);
+            NovaActiveHP = Math.Max(0, NovaActiveHP - actual);
+            return actual;
+        }
+
+        // ── Companion takes damage ────────────────────────────────────────
+        public int CompanionTakeDamage(int incoming)
+        {
+            if (CompanionHP <= 0) return 0;
+            int actual = Math.Max(1, incoming - CompanionArmor);
+            CompanionHP = Math.Max(0, CompanionHP - actual);
+            return actual;
+        }
+
     }
 
     // ==========================================================
@@ -268,6 +327,26 @@ namespace NovaAdeptusLibrary
         public int NovaCurrentHP { get; } = 150;
         public int NovaArmor { get; } = 8;
         public int NovaAttack { get; } = 12;
+
+        // ── Nova's own economy & reputation ────────────────────────────────
+        public int NovaFunds { get; private set; } = 200;
+        public int NovaGoodRep { get; private set; } = 10;
+        public int NovaBadRep { get; private set; } = 2;
+        public string NovaRepTitle => GetNovaRepTitle();
+
+        private string GetNovaRepTitle()
+        {
+            int net = NovaGoodRep - NovaBadRep;
+            return net switch
+            {
+                >= 30 => "High Order Elite",
+                >= 20 => "Trusted Assassin",
+                >= 10 => "Shadow Operative",
+                >= 0 => "Neutral Agent",
+                >= -5 => "Rogue Element",
+                _ => "Most Dangerous",
+            };
+        }
 
         // ── Session state ──────────────────────────────────────
         public NovaSession Session { get; private set; } = new();
@@ -301,7 +380,25 @@ namespace NovaAdeptusLibrary
             _thalamus = new NovaThalamus();
             _broca = new NovaBroca(_wernicke);
         }
-
+        private string ShowNovaStats()
+        {
+            var hpBar = BuildBar(Session.NovaActiveHP, Session.NovaActiveMaxHP, 10);
+            return $"🤖 NOVA ADEPTUS — SYSTEM STATUS\n" +
+                   $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                   $"❤️  HP:       {hpBar} {Session.NovaActiveHP}/{Session.NovaActiveMaxHP}\n" +
+                   $"🛡️  Armor:    {Session.NovaActiveArmor}\n" +
+                   $"⚔️  Attack:   +{Session.NovaActiveAttack}\n" +
+                   $"💰  Funds:    {NovaFunds} GC\n" +
+                   $"⭐  Rep:      {NovaRepTitle} " +
+                   $"(+{NovaGoodRep} / -{NovaBadRep})\n" +
+                   $"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                   $"Loadout:\n" +
+                   string.Join("\n", NovaInventory.Select(i =>
+                   {
+                       var p = i.Split('|');
+                       return p.Length >= 4 ? $"  • {p[1]} — {p[3]}" : $"  • {i}";
+                   }));
+        }
         // ==========================================================
         // MAIN ENTRY POINT
         // Called by ChatBotAdeptus.razor for every message
@@ -478,6 +575,10 @@ namespace NovaAdeptusLibrary
                 "nova inventory" => ShowInventory("nova"),
                 "market" => _thalamus.Apply(TradeMarket(), Session),
                 "rep" => ShowRep(),
+                "nova stats" => ShowNovaStats(),
+                "nova rep" => ShowNovaStats(),
+                "nova buy" => NovaShop("buy"),
+                "nova sell" => NovaShop("sell"),
                 _ => null,
             };
         }
@@ -732,9 +833,81 @@ namespace NovaAdeptusLibrary
 
             if (cleaned == "priority" || cleaned == "nova priority" || cleaned == "what should we do")
                 return NovaSurvivalAI.AssessPriority(Session, "Kennecott");
+            if (cleaned.StartsWith("nova buy") || cleaned.StartsWith("nova sell"))
+                return NovaShop(cleaned.Contains("sell") ? "sell" : "buy");
             return null;
         }
+        // ==========================================================
+        // NOVA SHOP — Nova buys/sells with player advice
+        // Nova has her own funds, her own inventory, her own opinion.
+        // ==========================================================
+        private static readonly List<(string Id, string Name, string Stat, int Cost, string Category)>
+            NovaMarket = new()
+        {
+    ("nova_blade",   "Void Blade",        "+8 Nova Attack",  80,  "weapon"),
+    ("nova_shield",  "Phase Shield",      "+5 Nova Armor",   60,  "armor"),
+    ("nova_medkit",  "Quantum Medkit",    "+40 Nova HP",     45,  "consumable"),
+    ("nova_cloak",   "Shadow Cloak",      "+6 Stealth Bonus",70,  "upgrade"),
+    ("nova_scanner", "Orbital Scanner",   "+5 Analysis Mod", 50,  "upgrade"),
+        };
 
+        private string NovaShop(string mode)
+        {
+            if (mode == "buy")
+            {
+                var lines = new List<string>
+        {
+            $"🛒 NOVA'S MARKET — Funds: {NovaFunds} GC\n",
+            "Nova is considering a purchase. What do you recommend?\n",
+        };
+
+                for (int i = 0; i < NovaMarket.Count; i++)
+                {
+                    var item = NovaMarket[i];
+                    char letter = (char)('A' + i);
+                    bool canAfford = NovaFunds >= item.Cost;
+                    string affordTag = canAfford ? "" : " [INSUFFICIENT FUNDS]";
+                    lines.Add($"  {letter}. {item.Name} — {item.Cost} GC — {item.Stat}{affordTag}");
+                }
+
+                lines.Add($"\n  E. Nova decides herself (AI auto-buy)");
+                lines.Add($"\nType a letter to advise Nova, or E to let her choose.");
+
+                Session.FSMState = NovaFSMState.AwaitMarketChoice;
+                Session.FSMContext["novaShopMode"] = "buy";
+                Session.FSMContext["marketStock"] = string.Join(",",
+                    NovaMarket.Select(m => m.Id));
+
+                return string.Join("\n", lines);
+            }
+
+            // ── Sell mode ─────────────────────────────────────────────
+            if (!NovaInventory.Any())
+                return "Nova has nothing to sell. Her loadout is empty.";
+
+            var sellLines = new List<string>
+    {
+        $"💱 NOVA SELL — Current Funds: {NovaFunds} GC\n",
+        "Which item should Nova sell?\n",
+    };
+
+            for (int i = 0; i < NovaInventory.Count; i++)
+            {
+                var p = NovaInventory[i].Split('|');
+                char letter = (char)('A' + i);
+                int salePrice = 15; // base sale value — extend later
+                sellLines.Add(p.Length >= 4
+                    ? $"  {letter}. {p[1]} — {p[3]} — Sell for {salePrice} GC"
+                    : $"  {letter}. {NovaInventory[i]} — Sell for {salePrice} GC");
+            }
+
+            sellLines.Add("  E. Cancel");
+            sellLines.Add("\nType a letter to recommend which item Nova sells.");
+
+            Session.FSMState = NovaFSMState.AwaitMarketChoice;
+            Session.FSMContext["novaShopMode"] = "sell";
+            return string.Join("\n", sellLines);
+        }
         // ==========================================================
         // FSM STATE MACHINE
         // ==========================================================
@@ -1128,12 +1301,13 @@ namespace NovaAdeptusLibrary
     if (q.LetterMap == null || !q.LetterMap.ContainsKey(guess))
         return _thalamus.Apply($"Not a valid choice. Answer was: {q.CorrectAnswer} 😏", Session);
 
-    if (q.LetterMap[guess] == q.CorrectAnswer)
-    {
-        Session.XP += 10;
-        return _thalamus.Apply($"Correct! ✅ {q.CorrectAnswer} | XP +10", Session);
-    }
-    return _thalamus.Apply($"Wrong ☠️ Answer was: {q.CorrectAnswer}", Session);
+            if (q.LetterMap[guess] == q.CorrectAnswer)
+            {
+                Session.XP += 10;
+                string lvlMsg = CheckLevelUp();
+                return _thalamus.Apply($"Correct! ✅ {q.CorrectAnswer} | XP +10" + lvlMsg, Session);
+            }
+            return _thalamus.Apply($"Wrong ☠️ Answer was: {q.CorrectAnswer}", Session);
 }
 
 public void InjectTrivia(List<TriviaQuestion> questions)
@@ -1307,12 +1481,13 @@ public void InjectTrivia(List<TriviaQuestion> questions)
             int coins = bonusIntel ? 30 : 20;
             Session.GalacticCoins += coins;
             Session.XP += 10;
+            string lvlMsg = CheckLevelUp();
             string bonus = bonusIntel ? " Bonus intel acquired — sublevel three marked." : "";
             return _thalamus.Apply(
                 $"✅ Civilian rescued and extracted safely.{bonus}\n" +
                 $"+{coins} Galactic Coins | +2 Good Rep | XP +10\n" +
-                $"💰 Coins: {Session.GalacticCoins} | ❤️ HP: {Session.CurrentHP}/{Session.MaxHP}",
-                Session);
+                $"💰 Coins: {Session.GalacticCoins} | ❤️ HP: {Session.CurrentHP}/{Session.MaxHP}" +
+                lvlMsg, Session);
         }
 
         private string ResolveCivilianEliminate(bool tookIntel = false)
@@ -1372,11 +1547,12 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                             Session.GoodRep++;
                             Session.GalacticCoins += 15;
                             Session.XP += 10;
+                            string lvlMsg = CheckLevelUp();
                             return _thalamus.Apply(
                                 "💬 You speak calmly. The alien tilts its head... " +
                                 "and steps aside. Diplomatic success.\n" +
-                                "+15 Galactic Coins | +1 Good Rep | XP +10",
-                                Session);
+                                "+15 Galactic Coins | +1 Good Rep | XP +10" +
+                                lvlMsg, Session);
                         }
                         else
                         {
@@ -1393,20 +1569,89 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                                    $"  E. Flee (-10 coins)\n";
                         }
 
-                    case 'B': // Throw rock
-                        _missionStage = "retaliate";
-                        _missionEnemyHP -= _rng.Next(3, 8);
-                        int rockDmg = Session.TakeDamage(3);
-                        string rockGameOver = CheckGameOver();
-                        if (rockGameOver != "") return rockGameOver;
-                        return $"🪨 You hurl a rock. It bounces off the alien's head.\n" +
-                               $"[Enemy HP: {_missionEnemyHP}]\n" +
-                               $"The alien is NOT happy. Tentacle strike! -{rockDmg} HP\n" +
-                               $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}\n\n" +
-                               $"  A. Dodge and run (+5 coins)\n" +
-                               $"  B. Press the attack ⚔️\n" +
-                               $"  C. Deploy armor and hold ground\n" +
-                               $"  E. Flee (-10 coins)\n";
+                    case 'B': // Fight back — player + Nova + companion all act
+                              // ── Player attacks ────────────────────────────────────────
+                        int fightDmg = _rng.Next(5, 16) + Session.EffectiveCombat;
+                        _missionEnemyHP -= fightDmg;
+
+                        var combatLog = new System.Text.StringBuilder();
+                        combatLog.AppendLine($"⚔️ You strike! [{fightDmg} dmg]");
+
+                        // ── Nova attacks ──────────────────────────────────────────
+                        int novaDmg = Session.NovaAttackRoll(_rng);
+                        _missionEnemyHP -= novaDmg;
+                        combatLog.AppendLine($"🔫 Nova fires! [{novaDmg} dmg] " +
+                                             $"[Enemy HP: {Math.Max(0, _missionEnemyHP)}]");
+
+                        // ── Companion attacks ─────────────────────────────────────
+                        int companionDmg = Session.CompanionAttackRoll(_rng);
+                        if (companionDmg > 0)
+                        {
+                            _missionEnemyHP -= companionDmg;
+                            combatLog.AppendLine($"🤝 {Session.CompanionName} attacks! " +
+                                                 $"[{companionDmg} dmg]");
+                        }
+
+                        if (_missionEnemyHP <= 0)
+                        {
+                            ResetMissionState();
+                            Session.MissionsCompleted++;
+                            if (Session.ActiveChapter == NovaChapter.Chapter1_NovaAdeptus)
+                                Session.Chapter1MissionsCompleted++;
+                            else if (Session.ActiveChapter == NovaChapter.Chapter2_EarthApocalypse)
+                                Session.Chapter2MissionsCompleted++;
+                            Session.CheckChapterCompletion();
+                            Session.EnemiesDefeated++;
+                            Session.Skills["combat"]++;
+                            Session.GalacticCoins += 20;
+                            Session.XP += 15;
+                            CheckLevelUp(); // ← UPDATE 3 hook
+                            return _thalamus.Apply(
+                                combatLog.ToString() +
+                                $"\n💀 Enemy defeated!\n" +
+                                $"+20 Galactic Coins | Combat +1 | XP +15\n" +
+                                $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}  " +
+                                $"Nova HP: {Session.NovaActiveHP}/{Session.NovaActiveMaxHP}",
+                                Session);
+                        }
+
+                        // ── Enemy counter-attacks — targets player, Nova, companion ──
+                        int enemyRoll = _rng.Next(4, 14);
+                        int targetRoll = _rng.Next(3); // 0=player 1=nova 2=companion
+
+                        string hitLine;
+                        if (targetRoll == 1 && Session.NovaActiveHP > 0)
+                        {
+                            int novaDmgTaken = Session.NovaTakeDamage(enemyRoll);
+                            hitLine = $"💥 Enemy hits NOVA! -{novaDmgTaken} HP  " +
+                                      $"[Nova HP: {Session.NovaActiveHP}/{Session.NovaActiveMaxHP}]";
+                        }
+                        else if (targetRoll == 2 && Session.CompanionHP > 0)
+                        {
+                            int compDmgTaken = Session.CompanionTakeDamage(enemyRoll);
+                            hitLine = $"💥 Enemy hits {Session.CompanionName}! " +
+                                      $"-{compDmgTaken} HP  " +
+                                      $"[{Session.CompanionName} HP: {Session.CompanionHP}/{Session.CompanionMaxHP}]";
+                            if (Session.CompanionHP <= 0)
+                                hitLine += $"\n☠️ {Session.CompanionName} is down!";
+                        }
+                        else
+                        {
+                            int playerDmgTaken = Session.TakeDamage(enemyRoll);
+                            hitLine = $"💥 Enemy hits YOU! -{playerDmgTaken} HP";
+                            string go = CheckGameOver();
+                            if (go != "") return go;
+                        }
+
+                        combatLog.AppendLine($"\n{hitLine}");
+                        combatLog.AppendLine($"❤️ {Session.CurrentHP}/{Session.MaxHP}  " +
+                                             $"Nova: {Session.NovaActiveHP}  " +
+                                             (Session.CompanionHP > 0
+                                                 ? $"{Session.CompanionName}: {Session.CompanionHP}"
+                                                 : "Companion: KO"));
+                        combatLog.AppendLine($"\n  A. Keep fighting\n  B. Fall back\n  F. Use Medkit\n");
+
+                        return combatLog.ToString();
 
                     case 'C': // Rush
                         int combatSkill = Session.EffectiveCombat;
@@ -1426,11 +1671,12 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                             Session.EnemiesDefeated++;
                             Session.GalacticCoins += 20;
                             Session.XP += 15;
+                            string lvlMsg = CheckLevelUp();
                             return _thalamus.Apply(
                                 "⚔️ You rush the alien with pure aggression. " +
                                 "Your combat skill carries the day — it goes down hard.\n" +
-                                "+20 Galactic Coins | Combat +1 | XP +15",
-                                Session);
+                                "+20 Galactic Coins | Combat +1 | XP +15" +
+                                lvlMsg, Session);
                         }
                         else
                         {
@@ -1530,6 +1776,42 @@ public void InjectTrivia(List<TriviaQuestion> questions)
             return "Type a valid option, operative.";
         }
 
+        // ==========================================================
+        // LEVEL UP SYSTEM
+        // Called after any XP gain. Returns a level-up message or "".
+        // Thresholds: Level = 1 + XP/10 (already in NovaSession).
+        // We track "last announced level" to avoid spam.
+        // ==========================================================
+        private int _lastAnnouncedLevel = 1;
+
+        private string CheckLevelUp()
+        {
+            int currentLevel = Session.Level;
+            if (currentLevel <= _lastAnnouncedLevel) return "";
+
+            _lastAnnouncedLevel = currentLevel;
+
+            // ── Stat bonuses per level ────────────────────────────────
+            Session.MaxHP += 5;
+            Session.CurrentHP = Math.Min(Session.CurrentHP + 5, Session.MaxHP);
+            Session.GalacticCoins += 10; // small coin bonus per level
+
+            // ── Milestone unlocks ─────────────────────────────────────
+            string milestone = currentLevel switch
+            {
+                5 => "\n🎖️ MILESTONE: Veteran status reached. Nova acknowledges you.",
+                10 => "\n🏆 MILESTONE: Elite Operative. The High Order takes notice.",
+                15 => "\n💀 MILESTONE: Shadow Legend. The void bends for you now.",
+                20 => "\n⚡ MILESTONE: LEVEL 20 — MAX RANK. You are the void. ☠️",
+                _ => "",
+            };
+
+            return $"\n\n⬆️ LEVEL UP! You are now Level {currentLevel}!\n" +
+                   $"+5 Max HP | +10 Galactic Coins\n" +
+                   $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}{milestone}";
+        }
+
+
         private string RandomCombatEvent()
         {
             int roll = _rng.Next(4);
@@ -1598,14 +1880,15 @@ public void InjectTrivia(List<TriviaQuestion> questions)
             var completionSignal = Session.CheckChapterCompletion();
             // (use completionSignal to append a completion message — see Snippet 8)
             Session.EnemiesDefeated++;
-    Session.GalacticCoins += 20;
-    Session.XP += 15;
-    return _thalamus.Apply(
-        $"⚔️ {flavor}\nEnemy defeated!\n" +
-        $"+20 Galactic Coins | XP +15\n" +
-        $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}",
-        Session);
-}
+            Session.GalacticCoins += 20;
+            Session.XP += 15;
+            string lvlMsg = CheckLevelUp();
+            return _thalamus.Apply(
+                $"⚔️ {flavor}\nEnemy defeated!\n" +
+                $"+20 Galactic Coins | XP +15\n" +
+                $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}" +
+                lvlMsg, Session);
+        }
 
 // ==========================================================
 // SCAVENGER MISSION
@@ -1989,10 +2272,11 @@ private string AnswerScavengerMission(string input)
                         Session.Skills["hacking"]++;
                         Session.GalacticCoins += 25;
                         Session.XP += 15;
+                        string lvlMsg = CheckLevelUp();
                         return _thalamus.Apply(
                             "💾 Data ripped. Clean disconnect.\n" +
-                            "+25 Galactic Coins | Hacking +1 | XP +15",
-                            Session);
+                            "+25 Galactic Coins | Hacking +1 | XP +15" +
+                            lvlMsg, Session);
 
                     case 'B': // Go deeper — risk/reward
                         int deepRoll = _rng.Next(1, 11) + Session.EffectiveHacking;
@@ -2003,11 +2287,12 @@ private string AnswerScavengerMission(string input)
                             Session.Skills["hacking"] += 2;
                             Session.GalacticCoins += 50;
                             Session.XP += 25;
+                            string lvlMsg2 = CheckLevelUp();
                             return _thalamus.Apply(
                                 "💎 FULL EXTRACTION. Everything. Enemy comms,\n" +
                                 "coordinates, codes. The High Order will be pleased.\n" +
-                                "+50 Galactic Coins | Hacking +2 | XP +25",
-                                Session);
+                                "+50 Galactic Coins | Hacking +2 | XP +25" +
+                                lvlMsg2, Session);
                         }
                         else
                         {
@@ -2445,12 +2730,13 @@ private string AnswerScavengerMission(string input)
             Session.GalacticCoins += coins;
             Session.XP += xp;
             Session.GoodRep++;
+            string lvlMsg = CheckLevelUp();
             return _thalamus.Apply(
                 $"👤 {flavor}\n" +
                 $"Mission complete!\n" +
                 $"+{coins} Galactic Coins | Stealth +1 | XP +{xp} | +1 Good Rep\n" +
-                $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}",
-                Session);
+                $"❤️ HP: {Session.CurrentHP}/{Session.MaxHP}" +
+                lvlMsg, Session);
         }
 
         // ==========================================================
@@ -2729,23 +3015,25 @@ private string ResetMissions()
     return "All missions reset ✅";
 }
 
-private string RandomReward()
-{
-    var rewards = new[] {
-                "XP Boost +5","Hacking Tool","Combat Enhancement",
-                "Stealth Module","Analysis Scanner" };
-    Session.XP += 5;
-    return $"Reward: {rewards[_rng.Next(rewards.Length)]} | XP +5 🎁";
-}
+        private string RandomReward()
+        {
+            var rewards = new[] {
+        "XP Boost +5","Hacking Tool","Combat Enhancement",
+        "Stealth Module","Analysis Scanner" };
+            Session.XP += 5;
+            string lvlMsg = CheckLevelUp();
+            return $"Reward: {rewards[_rng.Next(rewards.Length)]} | XP +5 🎁" + lvlMsg;
+        }
 
-private string RandomBonus()
-{
-    var bonuses = new[] {
-                "XP +10","Combat Gear","Hacking Upgrade",
-                "Stealth Module","Analysis Scanner" };
-    Session.XP += 10;
-    return $"Bonus: {bonuses[_rng.Next(bonuses.Length)]} | XP +10 💰";
-}
+        private string RandomBonus()
+        {
+            var bonuses = new[] {
+        "XP +10","Combat Gear","Hacking Upgrade",
+        "Stealth Module","Analysis Scanner" };
+            Session.XP += 10;
+            string lvlMsg = CheckLevelUp();
+            return $"Bonus: {bonuses[_rng.Next(bonuses.Length)]} | XP +10 💰" + lvlMsg;
+        }
         private string ShowProfile()
         {
             var profile = new NovaPlayerProfile
@@ -2814,8 +3102,12 @@ private string RandomBonus()
     };
 
             foreach (var kv in Session.Skills)
-                lines.Add($"  {kv.Key,-10} {kv.Value}/20");
 
+                lines.Add($"  {kv.Key,-10} {kv.Value}/20");
+            lines.Add($"🤖  Nova HP:   {Session.NovaActiveHP}/{Session.NovaActiveMaxHP}  " +
+          $"Nova Armor: {Session.NovaActiveArmor}  Nova ATK: +{Session.NovaActiveAttack}");
+            lines.Add($"⭐  Nova Rep:  {NovaRepTitle}  💰 Nova Funds: {NovaFunds} GC");
+            lines.Add($"⬆️  Level:       {Session.Level} (XP to next: {10 - (Session.XP % 10)})");
             lines.Add($"📜  Active missions:    {Session.ActiveMissions.Count}");
             lines.Add($"✅  Completed missions: {Session.MissionsCompleted}");
 
@@ -3054,6 +3346,7 @@ private string SideQuest()
 
         private string SummonCompanion()
         {
+
             var c = NovaContent.Companions[_rng.Next(NovaContent.Companions.Count)];
             var skills = string.Join("  ", c.Skills.Select(kv => $"{kv.Key}:{kv.Value}"));
 
@@ -3064,7 +3357,8 @@ private string SideQuest()
                 Session.ActiveCrew.Add(
                     $"{c.Name}|{c.Type}|{skillString}|{c.Image}|{c.HP}|{c.Armor}|{c.Attack}");
             }
-
+          
+            Session.SyncCompanionFromCrew();
             return $"🤝 {c.Name} ({c.Type}) joined! {skills}" +
                    (already ? "\n(Already in your crew — re-bonded.)" : "");
         }
@@ -3291,7 +3585,67 @@ private string BossBattle()
         private string AnswerMarketChoice(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
+            // ── Nova shop intercept ───────────────────────────────────────
+            if (Session.FSMContext.TryGetValue("novaShopMode", out var shopMode))
+            {
+                Session.FSMContext.Remove("novaShopMode");
+                Session.FSMState = NovaFSMState.Idle;
 
+                if (shopMode.ToString() == "sell")
+                {
+                    if (key == 'E') return "Nova keeps her loadout. Smart.";
+                    int sIdx = key - 'A';
+                    if (sIdx < 0 || sIdx >= NovaInventory.Count)
+                        return "Invalid selection. Nova keeps everything.";
+                    var soldItem = NovaInventory[sIdx].Split('|');
+                    string soldName = soldItem.Length >= 2 ? soldItem[1] : NovaInventory[sIdx];
+                    // Note: NovaInventory is readonly in NovaCortex constructor —
+                    // for now return a flavor message. To allow mutation,
+                    // change List to a mutable field in the constructor.
+                    NovaFunds += 15;
+                    return _thalamus.Apply(
+                        $"💱 Nova considers your advice and sells: {soldName}\n" +
+                        $"+15 GC → Nova Funds: {NovaFunds} GC\n" +
+                        $"Nova: \"You recommended it. I'll hold you responsible.\"",
+                        Session);
+                }
+
+                // ── Buy mode ──────────────────────────────────────────────
+                if (key == 'E') // Nova auto-decides
+                {
+                    var affordable = NovaMarket.Where(m => NovaFunds >= m.Cost).ToList();
+                    if (!affordable.Any())
+                        return _thalamus.Apply(
+                            $"Nova reviews the market.\n" +
+                            $"\"Nothing I can afford at {NovaFunds} GC. " +
+                            $"We need more funds.\"", Session);
+                    var pick = affordable[_rng.Next(affordable.Count)];
+                    NovaFunds -= pick.Cost;
+                    ApplyNovaMarketItem(pick.Id);
+                    return _thalamus.Apply(
+                        $"🛒 Nova auto-selects: {pick.Name}\n" +
+                        $"-{pick.Cost} GC → Nova Funds: {NovaFunds} GC\n" +
+                        $"Nova: \"I know what I need. This will do.\"",
+                        Session);
+                }
+
+                int bIdx = key - 'A';
+                if (bIdx < 0 || bIdx >= NovaMarket.Count)
+                    return "Invalid. Nova ignores your advice this time.";
+                var chosen2 = NovaMarket[bIdx];
+                if (NovaFunds < chosen2.Cost)
+                    return $"Nova can't afford {chosen2.Name} ({chosen2.Cost} GC). " +
+                           $"Funds: {NovaFunds} GC.\n" +
+                           $"Nova: \"Good instinct. Wrong budget. Try again.\"";
+
+                NovaFunds -= chosen2.Cost;
+                ApplyNovaMarketItem(chosen2.Id);
+                return _thalamus.Apply(
+                    $"🛒 Nova purchases {chosen2.Name} on your advice.\n" +
+                    $"-{chosen2.Cost} GC → Nova Funds: {NovaFunds} GC\n" +
+                    $"Nova: \"Your recommendation. I'll give you credit if it works.\"",
+                    Session);
+            }
             if (key == 'E')
             {
                 Session.FSMState = NovaFSMState.Idle;
@@ -3339,7 +3693,21 @@ private string BossBattle()
             // Show updated menu
             return confirm + BuildMarketMenu();
         }
-
+        private void ApplyNovaMarketItem(string id)
+        {
+            switch (id)
+            {
+                case "nova_blade": Session.NovaActiveAttack += 8; break;
+                case "nova_shield": Session.NovaActiveArmor += 5; break;
+                case "nova_medkit":
+                    Session.NovaActiveHP = Math.Min(
+                        Session.NovaActiveMaxHP,
+                        Session.NovaActiveHP + 40);
+                    break;
+                case "nova_scanner": break; // future: analysis bonus
+                case "nova_cloak": break; // future: stealth bonus
+            }
+        }
         private void ApplyMarketItem(NovaContent.MarketItem item)
         {
             switch (item.Id)

@@ -25,41 +25,63 @@
 
     <div class="sidebar-divider"></div>
 
-    <div class="sidebar-section">
-        <!-- ── NOVA IDENTITY PANEL ─────────────────────────── -->
-        <div class="sidebar-label">OPERATIVE IDENTITY</div>
-        <div class="portrait-row">
-            <img src="/iAssets/nova-portrait.png"
-                 class="portrait-img"
-                 alt="Nova Adeptus" />
-            <span class="identity-name">NOVA ADEPTUS</span>
-        </div>
+   
+  <div class="sidebar-section">
+    <!-- ── NOVA IDENTITY PANEL ─────────────────────────── -->
+    <div class="sidebar-label">OPERATIVE IDENTITY</div>
+    <div class="portrait-row">
+        <img src="/iAssets/nova-portrait.png"
+             class="portrait-img"
+             alt="Nova Adeptus" />
+        <span class="identity-name">NOVA ADEPTUS</span>
+    </div>
 
-        <!-- PHASE 3 HOOKUP: Nova RPG stats -->
-        <div class="sidebar-stat">
-            <span class="stat-key">Status</span>
-            <span class="stat-val" style="color:var(--lime)">ONLINE</span>
+    <!-- STATUS ROW -->
+    <div class="sidebar-stat">
+        <span class="stat-key">Status</span>
+        <span class="stat-val" style="color:var(--lime)">
+            ● ONLINE
+        </span>
+    </div>
+
+    <!-- HP WITH MINI BAR -->
+    <div class="sidebar-stat">
+        <span class="stat-key">HP</span>
+        <span class="stat-val" style="color:#ff6b6b">
+            @(_nova?.Session.NovaActiveHP ?? 150)/@(_nova?.Session.NovaActiveMaxHP ?? 150)
+        </span>
+    </div>
+    <div class="nova-mini-bar-wrap">
+        <div class="nova-mini-bar-fill"
+             style="width:@((_nova?.Session.NovaActiveHP ?? 150) * 100 /
+                            Math.Max(1, _nova?.Session.NovaActiveMaxHP ?? 150))%;
+                    background:#ff6b6b;">
         </div>
-        <div class="sidebar-stat">
-            <span class="stat-key">HP</span>
-            <span class="stat-val" style="color:#ff6b6b">
-                @(_nova?.NovaCurrentHP ?? 150) /
-                @(_nova?.NovaMaxHP ?? 150)
-            </span>
-        </div>
-        <div class="sidebar-stat">
-            <span class="stat-key">Armor</span>
+    </div>
+
+    <!-- COMBAT STATS ROW -->
+    <div class="sidebar-stat-row3">
+        <div class="stat3">
+            <span class="stat-key">ARM</span>
             <span class="stat-val" style="color:#7dd8ff">
-                @(_nova?.NovaArmor ?? 0)
+                @(_nova?.Session.NovaActiveArmor ?? 8)
             </span>
         </div>
-        <div class="sidebar-stat">
-            <span class="stat-key">Attack</span>
+        <div class="stat3">
+            <span class="stat-key">ATK</span>
             <span class="stat-val" style="color:#ffd700">
-                +@(_nova?.NovaAttack ?? 0)
+                +@(_nova?.Session.NovaActiveAttack ?? 12)
             </span>
         </div>
+        <div class="stat3">
+            <span class="stat-key">LVL</span>
+            <span class="stat-val" style="color:var(--lime)">
+                ∞
+            </span>
+        </div>
+    </div>
 
+    <!-- MOOD ROW -->
     <div class="sidebar-stat">
         <span class="stat-key">Mood</span>
         <span class="stat-val">
@@ -71,14 +93,22 @@
             @_staticEmotionState
         </span>
     </div>
-           <div class="sidebar-stat">
-            <span class="stat-key">Rep</span>
-            <span class="stat-val" style="color:var(--lime);font-size:10px;">— —</span>
-        </div>
-        <div class="sidebar-stat">
-            <span class="stat-key">Funds</span>
-            <span class="stat-val" style="color:#ffd700">$— —</span>
-        </div>
+
+    <!-- REP WITH COLOR INDICATOR -->
+    <div class="sidebar-stat">
+        <span class="stat-key">Rep</span>
+        <span class="stat-val" style="color:var(--lime);font-size:10px;">
+            @(_nova?.NovaRepTitle ?? "Shadow Operative")
+        </span>
+    </div>
+
+    <!-- FUNDS -->
+    <div class="sidebar-stat">
+        <span class="stat-key">Funds</span>
+        <span class="stat-val" style="color:#ffd700">
+            @(_nova?.NovaFunds ?? 200) <span style="color:#5a8aaa;font-size:9px;">GC</span>
+        </span>
+    </div>
         <!-- ── NOVA INVENTORY PANEL ─────────────────────────── -->
         <div class="sidebar-section inv-section">
             <button class="inv-toggle-btn" @onclick="ToggleNovaInv">
@@ -145,6 +175,15 @@
             </span>
         </div>
         <div class="sidebar-stat">
+            <span class="stat-key">Level</span>
+            <span class="stat-val" style="color:#39ff14">
+                @(_nova?.Session.Level ?? 1)
+                <span style="color:#5a8aaa;font-size:9px;">
+                    (XP @(_nova?.Session.XP ?? 0))
+                </span>
+            </span>
+        </div>
+        <div class="sidebar-stat">
             <span class="stat-key">HP</span>
             <span class="stat-val" style="color:#ff6b6b">
                 @(_nova?.Session.CurrentHP ?? 100) /
@@ -166,7 +205,12 @@
         <div class="sidebar-stat">
             <span class="stat-key">Mood</span>
             <span class="stat-val" style="color:#9b59b6">
-                — —
+                <span style="display:inline-block;width:9px;height:9px;
+                    border-radius:50%;
+                    background:#9b59b6;
+                    margin-right:5px;vertical-align:middle;">
+                </span>
+                @(_humanMoodLabel)
             </span>
         </div>
         <div class="sidebar-stat">
@@ -255,7 +299,14 @@
                                     <span class="crew-type">@member.Type</span>
                                     <span class="crew-skills">@member.SkillLine</span>
                                     <span class="crew-combat">
-                                        ❤️@member.HP 🛡️@member.Armor ⚔️+@member.Attack
+                                        ❤️@(member.Name == _nova?.Session.CompanionName
+                                                ? _nova?.Session.CompanionHP
+                                                : member.HP)
+                                        /@member.HP
+                                        🛡️@member.Armor ⚔️+@member.Attack
+                                        @(member.Name == _nova?.Session.CompanionName
+                                            && (_nova?.Session.CompanionHP ?? 1) <= 0
+                                            ? " ☠️ KO" : "")
                                     </span>
                                 </div>
                             </div>
@@ -966,6 +1017,52 @@
         color: var(--text-dim);
         letter-spacing: 0.5px;
     }
+
+    /* ── Nova mini HP bar ───────────────────────────────────── */
+    .nova-mini-bar-wrap {
+        width: 100%;
+        height: 3px;
+        background: rgba(255,107,107,0.15);
+        border-radius: 2px;
+        margin: -3px 0 7px 0;
+        overflow: hidden;
+    }
+
+    .nova-mini-bar-fill {
+        height: 100%;
+        border-radius: 2px;
+        transition: width 0.4s ease;
+        min-width: 2px;
+    }
+
+    /* ── 3-column stat row ──────────────────────────────────── */
+    .sidebar-stat-row3 {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 7px;
+    }
+
+    .stat3 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 2px;
+        font-size: 10px;
+        flex: 1;
+        padding: 4px 2px;
+        border: 1px solid rgba(57,255,20,0.1);
+        background: rgba(0,8,20,0.3);
+    }
+
+        .stat3 .stat-key {
+            font-size: 8px;
+            letter-spacing: 1px;
+        }
+
+        .stat3 .stat-val {
+            font-size: 11px;
+            font-weight: bold;
+        }
 </style>
 
 
@@ -987,7 +1084,8 @@
     private string _playerPortrait = "male-bio-civilian.png";
     private string _playerClass = "CIVILIAN";
     private bool _showCharSelect = false;
-
+    // ── Human mood — placeholder until NovaMoodScanner is wired ──────
+    private string _humanMoodLabel = "neutral";
 
     // ── Init ──────────────────────────────────────────────────
     protected override void OnInitialized()
@@ -1059,11 +1157,27 @@
         _staticEmotionColor = _nova.GetEmotionalColor();
         _staticEmotionState = _nova.GetEmotionalState();
         _staticEmotionEmoji = _nova.GetEmotionalEmoji();
-
+        // ── Human mood stub — will use NovaMoodScanner when built ────────
+        _humanMoodLabel = DetectSimpleHumanMood(input);
         StateHasChanged();
         await ScrollToBottom();
     }
+    private string DetectSimpleHumanMood(string input)
+    {
+        var cleaned = input.ToLower();
 
+        var aggressive = new[] { "fuck", "shit", "cunt", "kill", "hate", "damn" };
+        var playful = new[] { "lol", "lmao", "haha", "bruh", "wamp", "sheesh", "bet" };
+        var frustrated = new[] { "ugh", "whatever", "broken", "useless", "why", "ugh" };
+        var chill = new[] { "nice", "cool", "ok", "okay", "sure", "fine", "good" };
+
+        if (aggressive.Any(w => cleaned.Contains(w))) return "aggressive";
+        if (playful.Any(w => cleaned.Contains(w))) return "playful";
+        if (frustrated.Any(w => cleaned.Contains(w))) return "frustrated";
+        if (chill.Any(w => cleaned.Contains(w))) return "chill";
+
+        return "neutral";
+    }
     private async Task HandleKeyDown(KeyboardEventArgs e)
     {
         if (e.Key == "Enter") await SendMessage();

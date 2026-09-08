@@ -26,41 +26,50 @@ namespace NovaAdeptusLibrary
         // HELP TEXT
         // ==========================================================
         public static readonly string HelpText =
-     "🌌 NOVA ADEPTUS — OPERATIVE HANDBOOK 🌌\n\n" +
-     "── MISSIONS ──────────────────────────\n" +
-     "⚔️   accept      — choose and start a mission\n" +
-     "📜   list        — active mission log\n" +
-     "🔄   reset       — clear all missions\n\n" +
-     "── CHARACTER ─────────────────────────\n" +
-     "📊   stats       — XP, HP, coins, rep, level\n" +
-     "⭐   rep         — your reputation report\n" +
-     "🎯   skills      — skill levels\n" +
-  "── INVENTORY ─────────────────────────\n" +
-"🎒   my inventory   — your gear and loadout\n" +
-"🗂   nova inventory — Nova's loadout (display only)\n\n" +
-     "💡   name        — set your operative name\n\n" +
-     "── ECONOMY ───────────────────────────\n" +
-     "🏪   market      — buy gear and consumables\n" +
-     "🎁   reward      — random reward drop\n" +
-     "💰   bonus       — XP bonus event\n\n" +
-     "── MINI GAMES ────────────────────────\n" +
-     "🎮   mini        — full mini-game menu\n" +
-     "🌌   trivia      — space quiz challenge\n" +
-     "💻   hack        — hacking mini-game\n" +
-     "🧩   puzzle      — logic challenge\n\n" +
-     "── WORLD ─────────────────────────────\n" +
-     "🌌   event       — random cosmic event\n" +
-     "🚀   ship        — ship AI interaction\n" +
-            "🚀   ship inventory        — view/upgrade your ship\n" +
-     "🕐   time/date   — current time and date\n\n" +
-     "── CHAT ──────────────────────────────\n" +
-     "💬   just talk   — Nova always responds\n" +
-    "💡   name        — set your operative name\n" +
-"👤   profile     — view your operative profile & achievements\n\n" +
-     "── CHAPTERS ──────────────────────────\n" +
-     "📖   chapter     — chapter select menu\n" +
-     "🎭   class       — change operative class\n" +
-     "📋   menu        — main menu overview\n";
+            "🌌 NOVA ADEPTUS — OPERATIVE HANDBOOK 🌌\n\n" +
+            "── MISSIONS ──────────────────────────\n" +
+            "⚔️   accept         — choose and start a mission\n" +
+            "📜   list           — active mission log\n" +
+            "🔄   reset          — clear all missions\n\n" +
+            "── CHARACTER ─────────────────────────\n" +
+            "📊   stats          — XP, HP, coins, rep, level\n" +
+            "⭐   rep            — your reputation report\n" +
+            "🎯   skills         — skill levels\n" +
+            "👤   profile        — operative profile & achievements\n" +
+            "💡   name           — set your operative name\n\n" +
+            "── COMBAT ────────────────────────────\n" +
+            "⚔️   fight / combat — engage an enemy encounter\n" +
+            "👾   enemy          — random enemy encounter\n" +
+            "💀   boss           — boss battle\n" +
+            "🤝   companion      — summon a crew member\n" +
+            "🚫   dismiss        — release last companion\n\n" +
+            "── INVENTORY & ECONOMY ───────────────\n" +
+            "🎒   my inventory   — your gear and loadout\n" +
+            "🗂   nova inventory — Nova's loadout\n" +
+            "🏪   market         — buy gear and consumables\n" +
+            "🎁   reward         — random reward drop\n" +
+            "💰   bonus          — XP bonus event\n" +
+            "💎   loot           — loot drop\n\n" +
+            "── MINI GAMES ────────────────────────\n" +
+            "🎮   mini           — full mini-game menu\n" +
+            "🌌   trivia         — space quiz challenge\n" +
+            "💻   hack           — hacking mini-game\n" +
+            "🧩   puzzle         — logic challenge\n\n" +
+            "── WORLD ─────────────────────────────\n" +
+            "🌌   event          — random cosmic event\n" +
+            "🚀   ship           — ship status\n" +
+            "🚀   ship inventory — view/upgrade your ship\n" +
+            "🕐   time / date    — current time and date\n\n" +
+            "── NOVA ──────────────────────────────\n" +
+            "💬   nova stats     — Nova's HP, funds, rep\n" +
+            "🛒   nova buy       — Nova purchases an item\n" +
+            "💱   nova sell      — Nova sells an item\n\n" +
+            "── CHAPTERS ──────────────────────────\n" +
+            "📖   chapter        — chapter select menu\n" +
+            "🎭   class          — change operative class\n" +
+            "📋   menu           — main menu overview\n\n" +
+            "── CHAT ──────────────────────────────\n" +
+            "💬   just talk      — Nova always responds\n";
 
         // ==========================================================
         // PERSONALITY POOLS
