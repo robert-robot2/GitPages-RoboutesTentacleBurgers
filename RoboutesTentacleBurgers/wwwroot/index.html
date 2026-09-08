@@ -1,9 +1,12 @@
 <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=yes">
+    <base id="baseTag" href="/GitPages-RoboutesTentacleBurgers/" />
     <script>
         var isLocal = window.location.hostname === 'localhost';
+        if (isLocal) {
+            document.getElementById('baseTag').setAttribute('href', '/');
+        }
         var base = isLocal ? '/' : '/GitPages-RoboutesTentacleBurgers/';
-        document.write('<base href="' + base + '">');
     </script>
     <link rel="preload" href="iFonts/Digital7-rg1mL.ttf" as="font" type="font/ttf" crossorigin="anonymous">
     <link rel="stylesheet" href="css/app.css" />
