@@ -104,6 +104,7 @@ namespace NovaAdeptusLibrary
         "A signal is broadcasting from the old radio tower. " +
         "Someone else is alive out there.",
         "stealth",
+        // Add new missions here--->>>
         NovaChapter.Chapter2_EarthApocalypse),
  
 // TODO: Add 3–8 more Chapter 2 missions here

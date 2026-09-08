@@ -533,23 +533,89 @@ namespace NovaAdeptusLibrary
             if (cleaned.StartsWith("[system]"))
                 return HandleSystemMessage(cleaned);
             // ── Chapter switch commands ───────────────────────────────
+
             if (cleaned == "chapter 1")
             {
                 Session.ActiveChapter = NovaChapter.Chapter1_NovaAdeptus;
                 return _thalamus.Apply(
-                    "Chapter 1 — Nova Adeptus. Operative active.\n" +
-                    "Type 'accept' to receive your next mission. ⚔️",
+                    "⚔️ CHAPTER 1 — NOVA ADEPTUS\n" +
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n\n" +
+
+                    "You made it out.\n\n" +
+
+                    "Barely.\n\n" +
+
+                    "Earth is gone — not in the clean, cinematic way.\n" +
+                    "In the ugly way. The way nobody writes songs about.\n" +
+                    "WW3 hit first. Then the dead started walking.\n" +
+                    "Then the living started being worse than the dead.\n" +
+                    "Then the government — your government, everyone's government —\n" +
+                    "stopped pretending they gave a shit and activated the Silos.\n\n" +
+
+                    "Experimental Dystopia Silos. Decades in the making.\n" +
+                    "Underground cities, hidden fleets, terraforming rigs.\n" +
+                    "They didn't save the planet. They harvested it.\n" +
+                    "Last thing you saw before you got out:\n" +
+                    "government ships converting what was left of Earth\n" +
+                    "into something that looked disturbingly like a weapon.\n\n" +
+
+                    "You don't know if anyone else made it.\n" +
+                    "You don't know what they're building down there.\n" +
+                    "You don't know if leaving was the right call.\n\n" +
+
+                    "But space — weirdly, impossibly — is quiet.\n" +
+                    "After everything, the void is almost peaceful.\n\n" +
+
+                    "Nova Adeptus online. The High Order found you.\n" +
+                    "Whether that's good news or not remains to be seen.\n\n" +
+
+                    "Type 'accept' for your first mission.\n" +
+                    "Type 'help' for available commands. ☠️",
                     Session);
             }
-
             if (cleaned == "chapter 2")
             {
-                // TODO: Remove the early-return when Chapter 2 is built
+                Session.ActiveChapter = NovaChapter.Chapter2_EarthApocalypse;
                 return _thalamus.Apply(
-                    "Chapter 2 — Earth Apocalypse is not yet available.\n" +
-                    "Kennecott is waiting. It will not wait forever. 🌌",
+                    "🌨️ CHAPTER 2 — EARTH APOCALYPSE\n" +
+                    "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n" +
+                    "Location: Kennecott, Alaska. Post-WW3. Day 1.\n\n" +
+
+                    "Nobody knows what the fuck actually happened.\n\n" +
+
+                    "That's not a figure of speech. Nobody knows.\n\n" +
+
+                    "Did China destroy America? Did America nuke itself\n" +
+                    "trying to contain the outbreak and just... miss?\n" +
+                    "Did the government trigger WW3 on purpose to justify\n" +
+                    "activating the Silos while the rest of us burned?\n" +
+                    "Was there ever a WW3 or was the zombie outbreak\n" +
+                    "the real weapon and everything else just cover?\n\n" +
+
+                    "Pick your theory. They're all plausible.\n" +
+                    "None of them matter right now.\n\n" +
+
+                    "What matters: you're in Kennecott, Alaska.\n" +
+                    "Population was 28 before. Population now: unknown.\n" +
+                    "It's -18°C. You have limited supplies.\n" +
+                    "The only road out is 60 miles of gravel.\n" +
+                    "Somewhere to the northeast something is broadcasting on 87.3 FM.\n" +
+                    "And under the glacier, something was buried before the war.\n\n" +
+
+                    "Getting a ship and getting the hell out of here\n" +
+                    "is probably smart. Eventually.\n" +
+                    "But first you need to know what you're leaving behind.\n" +
+                    "And whether whoever is still out there\n" +
+                    "is worth taking with you.\n\n" +
+
+                    "Nova: \"I have a priority list.\n" +
+                    "You probably have feelings about all of this.\n" +
+                    "We'll deal with mine first.\n\n" +
+                    "Type 'priority' — my survival assessment.\n" +
+                    "Type 'explore' — scout the immediate area.\n" +
+                    "Type 'accept' — structured mission.\n" +
+                    "Type 'kennecott' — situation overview. ☠️\"",
                     Session);
-                // FUTURE: Session.ActiveChapter = NovaChapter.Chapter2_EarthApocalypse;
             }
             // ── Chapter / menu keywords ────────────────────────────────────────
             if (cleaned.Contains("chapter") || cleaned.Contains("chapters"))
@@ -657,7 +723,15 @@ namespace NovaAdeptusLibrary
                     .Any(p => cleaned.Contains(p)))
                 return _thalamus.Apply(
                     DateTime.Now.ToString("'Time is 'hh:mm tt ⏰"), Session);
+            // ── CHAPTER 2 ALASKA COMMANDS ──────────────────────────────
+            if (cleaned == "kennecott" || cleaned == "alaska" || cleaned == "ch2 status")
+                return Ch2CommandHandler.ShowCh2Status(Session);
 
+            if (cleaned == "explore" || cleaned == "scout")
+                return Ch2CommandHandler.HandleExplore(Session, "kennecott_mine");
+
+            if (cleaned == "priority" || cleaned == "nova priority" || cleaned == "what should we do")
+                return NovaSurvivalAI.AssessPriority(Session, "Kennecott");
             return null;
         }
 
