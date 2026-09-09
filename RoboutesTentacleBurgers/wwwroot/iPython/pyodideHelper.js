@@ -1,5 +1,5 @@
 ﻿
-/*
+
 // Pyodide Helper.js
 
 window.PyodideHelper = {
