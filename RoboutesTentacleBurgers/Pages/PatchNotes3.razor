@@ -50,6 +50,36 @@
 
     },
 },
+
+
+new PatchNoteEntry
+{
+    Title = "RTB VX5.396 Nova Adeptus Updates ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "── PYTHON BRIDGE ARCHITECTURE ────────────────────────",
+        "Established Python/C# modding layer via Pyodide in Blazor WASM.",
+        "Python now owns training data. C# owns all game logic and FSM.",
+        "Bridge proven working — Pyodide loads, Python executes, C# receives.",
+        "",
+        "── NEW FILES ─────────────────────────────────────────",
+        "pyodideHelper.js — minimal Pyodide bridge, single purpose.",
+        "cerebellumDataCore.py — all NovaBrain classifier training examples.",
+        "",
+        "── MODIFIED FILES ────────────────────────────────────",
+        "NovaCerebellum.cs — Examples converted to settable property, strings removed.",
+        "NovaBrain.cs — classifier.Train() removed from constructor, public Train() added.",
+        "NovaCortex.cs — LoadAPIContent() now calls Python bridge, populates Examples, trains classifier.",
+        "",
+        "── ARCHITECTURE NOTES ────────────────────────────────",
+        "Each Python data file exposes one get_X() function returning JSON.",
+        "pyodideHelper.js calls CerebellumBridge.initialize() then getExamples().",
+        "Future mods follow same pattern — one Python file per brain part.",
+        "C# receives JSON, deserializes, trains as normal. No logic in Python.",
+    }
+},
+
+
 new PatchNoteEntry
 {
     Title = "RTB VX5.395 Nova Adeptus Updates ❄️⚔️🩸🐺⚔️❄️ ",

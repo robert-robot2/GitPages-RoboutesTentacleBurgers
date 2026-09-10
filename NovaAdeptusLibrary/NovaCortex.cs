@@ -4137,10 +4137,35 @@ private static string CapFirst(string s) =>
         public async Task LoadAPIContent()
         {
             await _api.LoadAllAsync();
-            // inject trivia into the existing cache
             while (_api.Trivia.TryDequeue(out var q))
                 _triviaCache.Add(q);
+
+            // ── Load training data from Python ─────────────────
+            try
+            {
+                var ok = await _js.InvokeAsync<bool>(
+                    "CerebellumBridge.initialize");
+
+                if (ok)
+                {
+                    var json = await _js.InvokeAsync<string>(
+                        "CerebellumBridge.getExamples");
+
+                    if (!string.IsNullOrEmpty(json))
+                    {
+                        var type = typeof(Dictionary<string, List<string>>);
+                        NovaCerebellum.Examples =
+                            JsonSerializer.Deserialize<Dictionary<string, List<string>>>(json)
+                            ?? new Dictionary<string, List<string>>();
+
+                        _brain.Train();
+                    }
+                }
+            }
+            catch { /* silently fall back — brain stays untrained */ }
         }
+
+      
 
     }
 

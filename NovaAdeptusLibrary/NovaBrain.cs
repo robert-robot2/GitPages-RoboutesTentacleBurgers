@@ -219,10 +219,11 @@ namespace NovaAdeptusLibrary
             _classifier = new NaiveBayesClassifier();
             _emotion = new EmotionalStateObject();
             _context = new ContextWindow();
-
+        }
+        public void Train()
+        {
             _classifier.Train(NovaCerebellum.Examples);
         }
-
         // ==========================================================
         // MAIN PROCESS — called by NovaCortex
         // Returns a response string or null to fall through

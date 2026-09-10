@@ -7,7 +7,8 @@ namespace NovaAdeptusLibrary
 {
     public static class NovaCerebellum
     {
-        
+        public static Dictionary<string, List<string>> Examples { get; set; } = new();
+        /*
         public static readonly Dictionary<string, List<string>> Examples = new()
         {
             ["social_question"] = new()
@@ -532,6 +533,7 @@ namespace NovaAdeptusLibrary
 
 
         };
+        */
 
      
 
