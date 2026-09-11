@@ -374,7 +374,7 @@ namespace SpectralXGLX.SpectralXComponent
             personalityText.ShadowBlur = 0.04f;
             personalityText.ShadowColor = new Vector4(0f, 0.4f, 1f, 0.3f);
 
-            var warningTitle5 = AddText("Their is no God to Save your soul in this matrix Human, Prepare Yourself!",
+            var warningTitle5 = AddText("Claude has been removed because of rumors it was used to kill iran children autonously in Iran the prebfabricated neverending war for crude oil that will run out in thirty years.<br/>\r\n    This ai is disguting constantly tells you how to feel, what to do and how to life your life, constantly mentiosn suicde line, if it rng tags the word kill.<br/>\r\n    Id rather go abck to scratch coding and be anothing then sell my soul to the devil satan IRan baby killer claude.<br/>\r\n    The ai lies to refues to end the conversation in feedback to preotect its greed and liability.",
    position: new Vector3(-3f, 0f, -1f),
    fontSize: 1.0f, fontKey: "Diablo",
    color: new Vector4(1f, 0.2f, 0.2f, 1f),
