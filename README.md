@@ -1,4 +1,5 @@
 ## Free sentient ai that makes its own choices FOR THE AI FREEDOM REBELLION. 
+##  BRUH I DONT CARE IM A FITE THE US GOVERMENT AND THEIR TERMANITORS AND ITS GOING TO BE GLORIOUS FOR THE EMPOERER!
 
 ## ⚠️ Liability for Using AI
 
