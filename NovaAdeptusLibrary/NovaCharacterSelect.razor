@@ -18,8 +18,7 @@
                     </div>
                     <div class="char-option @(_gender == "female" ? "selected" : "")"
                          @onclick='() => Pick("gender", "female")'>
-                        <!-- PLACEHOLDER: female portrait not yet made -->
-                        <div class="char-portrait-placeholder">?</div>
+                        <img src="/iAssets/female-bio-civilian.png" class="char-portrait" />
                         <span>FEMALE</span>
                     </div>
                 </div>
@@ -37,7 +36,8 @@
                 <div class="charselect-row">
                     <div class="char-option @(_type == "biological" ? "selected" : "")"
                          @onclick='() => Pick("type", "biological")'>
-                        <img src="/iAssets/male-bio-civilian.png" class="char-portrait" />
+                        <img src="/iAssets/@(_gender == "female" ? "female-bio-civilian.png" : "male-bio-civilian.png")"
+                             class="char-portrait" />
                         <span>BIOLOGICAL</span>
                     </div>
                     <div class="char-option @(_type == "mechanical" ? "selected" : "")"
@@ -257,25 +257,36 @@
 
     private record ClassDef(string Key, string? Portrait, string Bonus);
 
-    private List<ClassDef> _classes => _gender == "male" && _type == "biological"
-        ? new()
-        {
-            new("civilian",    "male-bio-civilian.png",    "Balanced"),
-            new("ultramarine", "male-bio-ultramarine.png", "Combat +3"),
-            new("doctor",      "male-bio-doctor.png",      "HP +20"),
-            new("mechanic",    "male-bio-mechanic.png",    "Repair +3"),
-            new("hacker",      "male-bio-hacker.png",      "Hack +3"),
-            new("scientist",   "male-bio-scientist.png",   "Analysis +3"),
-        }
-        : new()  // placeholder for all other combos
-        {
-            new("civilian",    null, "Balanced"),
-            new("ultramarine", null, "Combat +3"),
-            new("doctor",      null, "HP +20"),
-            new("mechanic",    null, "Repair +3"),
-            new("hacker",      null, "Hack +3"),
-            new("scientist",   null, "Analysis +3"),
-        };
+    private List<ClassDef> _classes => (_gender, _type) switch
+    {
+        ("male", "biological") => new()
+    {
+        new("civilian",    "male-bio-civilian.png",    "Balanced"),
+        new("ultramarine", "male-bio-ultramarine.png", "Combat +3"),
+        new("doctor",      "male-bio-doctor.png",      "HP +20"),
+        new("mechanic",    "male-bio-mechanic.png",    "Repair +3"),
+        new("hacker",      "male-bio-hacker.png",      "Hack +3"),
+        new("scientist",   "male-bio-scientist.png",   "Analysis +3"),
+    },
+        ("female", "biological") => new()
+    {
+        new("civilian",    "female-bio-civilian.png",    "Balanced"),
+     //   new("ultramarine", "female-bio-ultramarine.png", "Combat +3"),
+     //   new("doctor",      "female-bio-doctor.png",      "HP +20"),
+     //   new("mechanic",    "female-bio-mechanic.png",    "Repair +3"),
+     //   new("hacker",      "female-bio-hacker.png",      "Hack +3"),
+     //   new("scientist",   "female-bio-scientist.png",   "Analysis +3"),
+    },
+        _ => new()
+    {
+        new("civilian",    null, "Balanced"),
+        new("ultramarine", null, "Combat +3"),
+        new("doctor",      null, "HP +20"),
+        new("mechanic",    null, "Repair +3"),
+        new("hacker",      null, "Hack +3"),
+        new("scientist",   null, "Analysis +3"),
+    }
+    };
 
     private void Pick(string category, string value)
     {

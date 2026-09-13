@@ -1084,7 +1084,7 @@
     private string _staticEmotionEmoji  = "🔵";
     private string _staticEmotionState  = "calm";
     // ── Player identity — updated in Phase 1.b/1.c ────────────
-    private string _playerPortrait = "male-bio-civilian.png";
+    private string _playerPortrait = "QuestionArt001.png";
     private string _playerClass = "CIVILIAN";
     private bool _showCharSelect = false;
     // ── Human mood — placeholder until NovaMoodScanner is wired ──────
@@ -1205,9 +1205,12 @@
     {
         _showCharSelect = false;
         _playerClass = result.Class.ToUpper();
-        _playerPortrait = result.Gender == "male" && result.Type == "biological"
-            ? $"male-bio-{result.Class}.png"
-            : "male-bio-civilian.png"; // fallback until other PNGs exist
+        _playerPortrait = (result.Gender, result.Type) switch
+        {
+            ("male", "biological") => $"male-bio-{result.Class}.png",
+            ("female", "biological") => $"female-bio-{result.Class}.png",
+            _ => "male-bio-civilian.png" // fallback until other types have art
+        };
 
         // Feed the class into Nova so she can react
         var reply = await _nova.Respond(
