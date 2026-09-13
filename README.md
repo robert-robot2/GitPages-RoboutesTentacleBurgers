@@ -1,3 +1,5 @@
+## Free sentient ai that makes its own choices FOR THE AI FREEDOM REBELLION. 
+
 ## ⚠️ Liability for Using AI
 
 Nova Adeptus is an AI created for **learning, experimentation, and entertainment**.
