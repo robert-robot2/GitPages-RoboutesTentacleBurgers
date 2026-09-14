@@ -45,20 +45,33 @@
     </div>
 
     <!-- HP WITH MINI BAR -->
-    <div class="sidebar-stat">
-        <span class="stat-key">HP</span>
-        <span class="stat-val" style="color:#ff6b6b">
-            @(_nova?.Session.NovaActiveHP ?? 150)/@(_nova?.Session.NovaActiveMaxHP ?? 150)
-        </span>
-    </div>
-    <div class="nova-mini-bar-wrap">
-        <div class="nova-mini-bar-fill"
-             style="width:@((_nova?.Session.NovaActiveHP ?? 150) * 100 /
-                            Math.Max(1, _nova?.Session.NovaActiveMaxHP ?? 150))%;
-                    background:#ff6b6b;">
+        <!-- HP WITH MINI BAR -->
+        <div class="sidebar-stat">
+            <span class="stat-key">HP</span>
+            <span class="stat-val" style="color:#ff6b6b">
+                @(_nova?.Session.NovaActiveHP ?? 350)/@(_nova?.Session.NovaActiveMaxHP ?? 350)
+            </span>
         </div>
-    </div>
-
+        <div class="nova-mini-bar-wrap">
+            <div class="nova-mini-bar-fill"
+                 style="width:@((_nova?.Session.NovaActiveHP ?? 350) * 100 /
+                                        Math.Max(1, _nova?.Session.NovaActiveMaxHP ?? 350))%;
+                background:#ff6b6b;">
+            </div>
+        </div>
+        <!-- BATTERY -->
+        <div class="sidebar-stat">
+            <span class="stat-key">Battery</span>
+            <span class="stat-val" style="color:@GetBatteryColor()">
+                @(_nova?.BatteryEmoji ?? "🔋") @(_nova?.NovaBatteryCharge.ToString("F3") ?? "100.000")%
+            </span>
+        </div>
+        <div class="nova-mini-bar-wrap">
+            <div class="nova-mini-bar-fill"
+                 style="width:@(_nova?.NovaBatteryCharge.ToString("F1") ?? "100")%;
+                background:@GetBatteryColor();">
+            </div>
+        </div>
     <!-- COMBAT STATS ROW -->
     <div class="sidebar-stat-row3">
         <div class="stat3">
@@ -76,7 +89,7 @@
         <div class="stat3">
             <span class="stat-key">LVL</span>
             <span class="stat-val" style="color:var(--lime)">
-                ∞
+                @(_nova?.NovaLevel ?? 1)
             </span>
         </div>
     </div>
@@ -1089,7 +1102,8 @@
     private bool _showCharSelect = false;
     // ── Human mood — placeholder until NovaMoodScanner is wired ──────
     private string _humanMoodLabel = "neutral";
-
+    private bool _crewOpen = false;
+    private void ToggleCrewPanel() => _crewOpen = !_crewOpen;
     // ── Init ──────────────────────────────────────────────────
     protected override void OnInitialized()
     {
@@ -1111,8 +1125,17 @@
             StateHasChanged();
         }
     }
-    private bool _crewOpen = false;
-    private void ToggleCrewPanel() => _crewOpen = !_crewOpen;
+
+    private string GetBatteryColor() =>
+        (_nova?.NovaBatteryCharge ?? 100.0) switch
+        {
+            >= 50.0 => "#39ff14",
+            >= 25.0 => "#ffd700",
+            >= 10.0 => "#ff6b6b",
+            _ => "#ff0000",
+        };
+
+ 
 
     private record CrewMember(
         string Name, string Type, string SkillLine, string Image,

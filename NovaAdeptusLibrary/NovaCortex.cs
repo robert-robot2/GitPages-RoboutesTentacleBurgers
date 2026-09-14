@@ -251,11 +251,11 @@ namespace NovaAdeptusLibrary
         }
 
         // ── Nova & Companion Combat Stats (active in combat) ──────────────
-        public int NovaActiveHP { get; set; } = 150;
-        public int NovaActiveMaxHP { get; set; } = 150;
+        public int NovaActiveHP { get; set; } = 350;
+        public int NovaActiveMaxHP { get; set; } = 350;
         public int NovaActiveArmor { get; set; } = 8;
         public int NovaActiveAttack { get; set; } = 12;
-
+        public double NovaBatteryCharge { get; set; } = 100.0;
         public int CompanionHP { get; set; } = 0;
         public int CompanionMaxHP { get; set; } = 0;
         public int CompanionArmor { get; set; } = 0;
@@ -327,6 +327,29 @@ namespace NovaAdeptusLibrary
         public int NovaCurrentHP { get; } = 150;
         public int NovaArmor { get; } = 8;
         public int NovaAttack { get; } = 12;
+        // ── Nova Battery System ────────────────────────────────
+        public double NovaBatteryCharge { get; private set; } = 100.0;
+
+        public void DrainBattery(double amount)
+        {
+            NovaBatteryCharge = Math.Max(0.0, NovaBatteryCharge - amount);
+        }
+
+        public void RechargeBattery(double amount)
+        {
+            NovaBatteryCharge = Math.Min(100.0, NovaBatteryCharge + amount);
+        }
+
+        public string BatteryEmoji => NovaBatteryCharge switch
+        {
+            >= 50.0 => "🔋",
+            >= 25.0 => "🟡",
+            >= 10.0 => "🔴",
+            _ => "☠️",
+        };
+
+        public bool IsLowPower => NovaBatteryCharge <= 25.0;
+        public bool IsDead => NovaBatteryCharge <= 0.0;
 
         // ── Nova's own economy & reputation ────────────────────────────────
         public int NovaFunds { get; private set; } = 200;
@@ -347,7 +370,26 @@ namespace NovaAdeptusLibrary
                 _ => "Most Dangerous",
             };
         }
-
+        // ── Nova XP & Level System ─────────────────────────────
+        public int NovaXP { get; private set; } = 0;
+        public int NovaLevel => 1 + NovaXP / 50; // 5x harder than player
+        public void AwardNovaXP(int amount)
+        {
+            NovaXP += amount;
+            CheckNovaLevelUp();
+        }
+        private int _lastNovaLevel = 1;
+        private void CheckNovaLevelUp()
+        {
+            int current = NovaLevel;
+            if (current <= _lastNovaLevel) return;
+            _lastNovaLevel = current;
+            Session.NovaActiveMaxHP += 5;
+            Session.NovaActiveHP = Math.Min(
+                Session.NovaActiveHP + 5,
+                Session.NovaActiveMaxHP);
+            Session.NovaActiveAttack++;
+        }
         // ── Session state ──────────────────────────────────────
         public NovaSession Session { get; private set; } = new();
         private static readonly Random _rng = new();
@@ -409,6 +451,7 @@ namespace NovaAdeptusLibrary
                 return _thalamus.Apply("I didn't catch that. Speak clearly.", Session);
 
             Session.MessageCount++;
+            DrainBattery(0.001);
             Session.TrackTone(input);
             Session.UpdateRelationship();
 
@@ -1323,7 +1366,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
         private string AnswerMissionChoice(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
-
+            DrainBattery(0.02);
             if (key == 'E' || input.Trim().ToLower() == "abort")
             {
                 Session.FSMState = NovaFSMState.Idle;
@@ -1393,7 +1436,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
         private string AnswerRescueMission(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
-
+            DrainBattery(0.02);
             if (_missionStage == "start")
             {
                 switch (key)
@@ -1478,6 +1521,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
             var completionSignal = Session.CheckChapterCompletion();
             // (use completionSignal to append a completion message — see Snippet 8)
             Session.GoodRep += 2;
+            AwardNovaXP(2);
             int coins = bonusIntel ? 30 : 20;
             Session.GalacticCoins += coins;
             Session.XP += 10;
@@ -1525,7 +1569,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
         private string AnswerCombatMission(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
-
+            DrainBattery(0.1);
             if (_missionStage == "start")
             {
                 switch (key)
@@ -1580,6 +1624,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
                         // ── Nova attacks ──────────────────────────────────────────
                         int novaDmg = Session.NovaAttackRoll(_rng);
                         _missionEnemyHP -= novaDmg;
+                        DrainBattery(0.1);
                         combatLog.AppendLine($"🔫 Nova fires! [{novaDmg} dmg] " +
                                              $"[Enemy HP: {Math.Max(0, _missionEnemyHP)}]");
 
@@ -1880,6 +1925,7 @@ public void InjectTrivia(List<TriviaQuestion> questions)
             var completionSignal = Session.CheckChapterCompletion();
             // (use completionSignal to append a completion message — see Snippet 8)
             Session.EnemiesDefeated++;
+            AwardNovaXP(3);
             Session.GalacticCoins += 20;
             Session.XP += 15;
             string lvlMsg = CheckLevelUp();
@@ -1908,8 +1954,8 @@ private string ScavengerMissionMenu()
 private string AnswerScavengerMission(string input)
 {
     var key = input.Trim().ToUpper().FirstOrDefault();
-
-    if (_missionStage == "start")
+            DrainBattery(0.02);
+            if (_missionStage == "start")
     {
         switch (key)
         {
@@ -2158,7 +2204,7 @@ private string AnswerScavengerMission(string input)
         private string AnswerHackMission(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
-
+            DrainBattery(0.05);
             // ── START STAGE ──────────────────────────────────────────
             if (_missionStage == "start")
             {
@@ -2214,6 +2260,7 @@ private string AnswerScavengerMission(string input)
                            
                             // (use completionSignal to append a completion message — see Snippet 8)
                             Session.Skills["hacking"]++;
+                            AwardNovaXP(3);
                             Session.GalacticCoins += 35;
                             Session.XP += 20;
                             return _thalamus.Apply(
@@ -2447,7 +2494,7 @@ private string AnswerScavengerMission(string input)
         private string AnswerStealthMission(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
-
+            DrainBattery(0.03);
             // ── START STAGE ──────────────────────────────────────────
             if (_missionStage == "start")
             {
@@ -2725,6 +2772,7 @@ private string AnswerScavengerMission(string input)
             ResetMissionState();
             Session.MissionsCompleted++;
             Session.Skills["stealth"]++;
+            AwardNovaXP(2);
             int coins = bonus ? 35 : 25;
             int xp = bonus ? 20 : 15;
             Session.GalacticCoins += coins;
@@ -2832,7 +2880,8 @@ private string CheckGameOver()
 private string AnswerGameOver(string input)
 {
     var key = input.Trim().ToUpper().FirstOrDefault();
-    switch (key)
+            DrainBattery(0.05);
+            switch (key)
     {
         case 'A':
             if (Session.GalacticCoins >= 25)
@@ -3474,6 +3523,7 @@ private string BossBattle()
         private string AnswerShipMenu(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
+            DrainBattery(0.01);
             switch (key)
             {
                 case 'A':
@@ -3516,6 +3566,7 @@ private string BossBattle()
         private string AnswerShipPartsBuy(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
+            DrainBattery(0.01);
             if (key == 'E')
             {
                 Session.FSMState = NovaFSMState.AwaitShipMenu;
@@ -3585,6 +3636,7 @@ private string BossBattle()
         private string AnswerMarketChoice(string input)
         {
             var key = input.Trim().ToUpper().FirstOrDefault();
+            DrainBattery(0.01);
             // ── Nova shop intercept ───────────────────────────────────────
             if (Session.FSMContext.TryGetValue("novaShopMode", out var shopMode))
             {
@@ -3742,6 +3794,17 @@ private string BossBattle()
                 case "scanner":
                     Session.AnalysisBonus += 4;
                     Session.Inventory.Add("UPGRADE_QS|Quantum Scanner|Advanced sensor suite|+4 Analysis|inventory-upgrade-scanner.png|upgrade");
+                    break;
+                case "power_cell":
+                    RechargeBattery(25.0);
+                    Session.Inventory.Add(
+                        "POWER_CELL|Power Cell|Recharges Nova battery 25%|+25% Battery|inventory-medical-powercell.png|consumable");
+                    break;
+
+                case "quantum_battery":
+                    RechargeBattery(100.0);
+                    Session.Inventory.Add(
+                        "QBATTERY|Quantum Battery|Fully recharges Nova battery|+100% Battery|inventory-medical-quantumbattery.png|consumable");
                     break;
             }
         }
@@ -4001,6 +4064,9 @@ private string RandomCosmicEvent()
                     chapter2Complete = Session.Chapter2Complete,
                     activeCrew = Session.ActiveCrew,
                     attackSpeedMod = Session.AttackSpeedMod,
+                    novaBatteryCharge = NovaBatteryCharge,
+                    novaXP = NovaXP,
+                    novaLevel = NovaLevel,
                     // ── New fields ──────────────────────────────────
                     galacticCoins = Session.GalacticCoins,
                     currentHP = Session.CurrentHP,
@@ -4058,6 +4124,8 @@ public async Task LoadSession()
                     ? hp.GetInt32() : 100;
                 Session.MaxHP = root.TryGetProperty("maxHP", out var mhp)
                     ? mhp.GetInt32() : 100;
+                NovaBatteryCharge = root.TryGetProperty("novaBatteryCharge", out var nbc)
+    ? nbc.GetDouble() : 100.0;
                 Session.Armor = root.TryGetProperty("armor", out var arm)
                     ? arm.GetInt32() : 0;
                 Session.GoodRep = root.TryGetProperty("goodRep", out var gr)
@@ -4075,6 +4143,8 @@ public async Task LoadSession()
                 Session.PlayerClass = root.TryGetProperty("playerClass", out var pc) ? pc.GetString()! : "civilian";
                 Session.PlayerGender = root.TryGetProperty("playerGender", out var pg) ? pg.GetString()! : "male";
                 Session.PlayerType = root.TryGetProperty("playerType", out var pt) ? pt.GetString()! : "biological";
+                NovaXP = root.TryGetProperty("novaXP", out var nxp)
+    ? nxp.GetInt32() : 0;
                 if (root.TryGetProperty("activeCrew", out var crew))
                     Session.ActiveCrew = crew.EnumerateArray().Select(x => x.GetString()!).ToList();
 

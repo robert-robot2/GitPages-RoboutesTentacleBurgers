@@ -148,6 +148,13 @@ namespace NovaAdeptusLibrary
 
     new("scanner", "Quantum Scanner", "Grants +4 to analysis skill checks.", 40, "upgrade",
         "inventory-upgrade-scanner.png"),
+    new("power_cell", "Power Cell",
+    "Recharges Nova's battery by 25%.", 30, "consumable",
+    "inventory-medical-powercell.png"),
+
+new("quantum_battery", "Quantum Battery",
+    "Fully recharges Nova's battery to 100%.", 75, "consumable",
+    "inventory-medical-quantumbattery.png"),
 };
 
         // ══════════════════════════════════════════════════════════

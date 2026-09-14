@@ -511,6 +511,13 @@ namespace NovaAdeptusLibrary
         public string Apply(string text, NovaSession session)
         {
             if (string.IsNullOrWhiteSpace(text)) return text;
+
+            if (session.NovaBatteryCharge <= 0.0)
+                return "⚠️ NOVA OFFLINE — Battery depleted. Type 'market'.";
+
+            if (session.NovaBatteryCharge <= 25.0)
+                text = $"[LOW POWER] {text}";
+
             return ApplyMood(text);
         }
 

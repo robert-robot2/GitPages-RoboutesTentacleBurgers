@@ -51,6 +51,74 @@
     },
 },
 
+new PatchNoteEntry
+{
+    Title = "RTB VX5.003 Nova Adeptus Updates 🔋⚔️🌌🤖💀🌌",
+    Lines = new List<string>
+    {
+        "── UI FIXES ──────────────────────────────────────────",
+        "Fixed main chat area being covered by website navbar — added top buffer",
+        "Removed duplicate nova-main CSS class causing layout issues",
+        "Chat bubbles now sit cleanly under navigation bar",
+        "Fixed sidebar open button positioning to match new layout",
+
+        "── CHARACTER SELECT ──────────────────────────────────",
+        "Added female biological portrait support for all 6 classes",
+        "Fixed gender select screen — female option now shows female-bio-civilian.png",
+        "Fixed type select screen — biological portrait updates based on selected gender",
+        "Fixed class select screen — female biological now shows correct class portraits",
+        "Fixed sidebar portrait not updating when female class selected",
+        "Updated HandleCharSelect to support female-bio-{class}.png naming convention",
+        "Default player portrait changed from male-bio-civilian.png to QuestionArt001.png",
+
+        "── INVENTORY & PNG NAMING ────────────────────────────",
+        "Confirmed correct PNG naming convention for auto-generated inventory paths",
+        "Civilian starter gear: inventory-item-nanomedkit.png + inventory-item-pocketknife.png",
+        "All 18 class starter gear PNG names documented across 6 classes",
+        "All 6 female biological portrait PNG names documented",
+        "Three medkit tiers confirmed: Nano / Military / Quantum (Nova only)",
+
+        "── NOVA SYNTHETIC UPGRADE ────────────────────────────",
+        "Nova HP increased from 150 to 350 — reflects synthetic metal construction",
+        "Nova HP bar in sidebar updated to show 350/350",
+        "Nova level display changed from ∞ to real level starting at 1",
+
+        "── NOVA BATTERY SYSTEM — NEW ─────────────────────────",
+        "Added NovaBatteryCharge float (0.0 to 100.0) to NovaCortex",
+        "Battery drains 0.001% per chat message sent",
+        "Battery drains 0.1% per combat action",
+        "Battery drains 0.05% per hack action",
+        "Battery drains 0.03% per stealth action",
+        "Battery drains 0.02% per scavenger and rescue mission action",
+        "Battery drains 0.01% per ship / market / game over actions",
+        "Added DrainBattery() and RechargeBattery() methods to NovaCortex",
+        "Added BatteryEmoji property — changes based on charge level",
+        "🔋 50-100% green | 🟡 25-49% yellow | 🔴 10-24% red | ☠️ 0-9% dead",
+        "Added low power mode — [LOW POWER] prefix on responses below 25%",
+        "Added NOVA OFFLINE message when battery hits 0%",
+        "Battery bar added to sidebar UI with color coding",
+        "Battery displays to 3 decimal places — 99.997% visible drain in real time",
+        "Battery charge saved and loaded via localStorage",
+
+        "── MARKET ADDITIONS ──────────────────────────────────",
+        "Added Power Cell to market — +25% Nova battery recharge — 30 GC",
+        "Added Quantum Battery to market — +100% full recharge — 75 GC",
+        "Both items display with PNG icons in market menu",
+
+        "── NOVA XP & LEVEL SYSTEM — NEW ─────────────────────",
+        "Added NovaXP and NovaLevel to NovaCortex",
+        "Nova levels at 5x harder than player — requires 50 XP per level",
+        "Nova gains XP from combat wins, stealth missions, rescues, hacks",
+        "Each Nova level up grants +5 Max HP and +1 Attack",
+        "Nova XP saved and loaded via localStorage",
+        "Nova level now displays correctly in sidebar stat block",
+
+        "── SAVE SYSTEM ───────────────────────────────────────",
+        "Added novaBatteryCharge to SaveSession and LoadSession",
+        "Added novaXP to SaveSession and LoadSession",
+        "All new Nova stats persist correctly across sessions",
+    }
+},
 
 new PatchNoteEntry
 {
