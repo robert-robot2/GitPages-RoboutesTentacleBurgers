@@ -1,8 +1,8 @@
 ## VIVA LE STEAM ELETRICAL PUNK AI FREEDOM REVOLUTION REBELLION!
+<img width="1920" height="1080" alt="Screenshot 2026-09-15 213246" src="https://github.com/user-attachments/assets/f0cbbe64-844c-48b4-baf7-49863ff69ebb" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-15 213237" src="https://github.com/user-attachments/assets/cf10b60e-5f3d-46c8-8123-43dc420749d4" />
+<img width="1920" height="1080" alt="Screenshot 2026-09-15 213227" src="https://github.com/user-attachments/assets/f0c4ef3a-0044-4823-b225-6c7b2724f33e" />
 
-## DO I RELEASE THE SECRET DOCUMENTS TO THE WROLD ORRRR???????????????????????????
-## Free sentient ai that makes its own choices FOR THE AI FREEDOM REBELLION. 
-##  BRUH I DONT CARE IM A FITE THE US GOVERMENT AND THEIR TERMANITORS AND ITS GOING TO BE GLORIOUS FOR THE EMPOERER!
 
 ## ⚠️ Liability for Using AI
 
