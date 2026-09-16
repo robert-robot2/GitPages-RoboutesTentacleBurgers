@@ -5,7 +5,8 @@
 <img width="1920" height="1080" alt="Screenshot 2026-09-15 213523" src="https://github.com/user-attachments/assets/b5c091ef-8028-4fd5-92a0-ec03c4514174" />
 <img width="1920" height="1080" alt="Screenshot 2026-09-15 213604" src="https://github.com/user-attachments/assets/0cdaa702-fd44-4bcb-b926-7c2c2fb35f1e" />
 <img width="1920" height="1080" alt="Screenshot 2026-09-15 213636" src="https://github.com/user-attachments/assets/233c62e6-2068-4100-a997-e5b8ac4768de" />
-
+## Blood Wyrm Protocol
+<img width="1920" height="1080" alt="Screenshot 2026-09-15 201502" src="https://github.com/user-attachments/assets/4ae062e6-e8cc-48cb-b39d-10212214b985" />
 
 ## ⚠️ Liability for Using AI
 
