@@ -1,0 +1,716 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 25 · Lamborghini Enkidu RSR · 1200 HP · Pelton Array Steam Engine</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#000008;
+  --forge:#06060e;
+  --steam:#39ff14;
+  --hydro:#00e5ff;
+  --elec:#ffd700;
+  --mech:#ff8c00;
+  --brake:#ff6ec7;
+  --ctrl:#b388ff;
+  --therm:#ff6b35;
+  --water:#40e0d0;
+  --struct:#c0c8d0;
+  --safe:#ff4500;
+  --text:#e8eef4;
+  --muted:#6080a0;
+  --new:#00ffcc;
+  --aegis:#c0a060;
+  --bowl:#b87333;
+  --inject:#00bfff;
+  --exhaust:#ff6b35;
+  --trap:#9b59b6;
+  --next:#ff00ff;
+  --pelton:#9b59b6;
+  --manifold:#39a84a;
+  --enkidu:#00e5ff;
+  --rsr:#ff003c;
+  --font-d:'Georgia',serif;
+  --font-b:'Segoe UI',system-ui,sans-serif;
+  --font-m:'Courier New',monospace;
+}
+body{font-family:var(--font-b);background:var(--void);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+.banner{position:relative;background:var(--void);border-bottom:2px solid #0d0d20;padding:5rem 2rem 4rem;text-align:center;overflow:hidden;}
+.banner::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 100% 50% at 20% -10%,#00e5ff08,transparent),
+    radial-gradient(ellipse 80% 50% at 80% -10%,#ff003c04,transparent),
+    repeating-linear-gradient(90deg,transparent,transparent 80px,#ffffff01 81px),
+    repeating-linear-gradient(0deg,transparent,transparent 80px,#ffffff01 81px);}
+.phase-pill{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-m);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--enkidu);border:1px solid #00e5ff40;padding:8px 28px;border-radius:2px;margin-bottom:2rem;position:relative;}
+.phase-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--enkidu);box-shadow:0 0 20px var(--enkidu);animation:blink 1.2s ease-in-out infinite;}
+@@keyframes blink{0%,100%{opacity:1}50%{opacity:.05}}
+.banner h1{font-family:var(--font-d);font-size:clamp(2rem,5vw,4rem);font-weight:400;color:#fff;letter-spacing:-.03em;line-height:1.05;margin-bottom:1.5rem;}
+.banner h1 .s{color:var(--enkidu)}.banner h1 .w{color:var(--rsr)}.banner h1 .e{color:var(--pelton)}.banner h1 .a{color:var(--manifold)}
+.banner p{color:var(--muted);font-size:13.5px;max-width:1100px;margin:0 auto;line-height:1.95}
+.banner strong{color:var(--enkidu)}
+.delta-box{display:inline-block;margin-top:1.5rem;background:var(--forge);border:1px solid #00e5ff30;border-left:3px solid var(--enkidu);padding:.8rem 1.4rem;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;color:var(--enkidu);text-align:left;max-width:960px;width:100%;}
+.delta-box span{color:var(--muted);display:block;line-height:1.8}
+
+.tab-nav-wrap{background:var(--forge);border-bottom:2px solid #0d0d20;position:relative;}
+.tab-nav{display:flex;gap:0;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#1a1a30 var(--forge);}
+.tab-nav::-webkit-scrollbar{height:4px}.tab-nav::-webkit-scrollbar-track{background:var(--forge)}.tab-nav::-webkit-scrollbar-thumb{background:#1a1a30;border-radius:2px}
+.scroll-btn{position:absolute;top:0;bottom:0;width:36px;border:none;background:none;cursor:pointer;z-index:10;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:16px;transition:color .2s;}
+.scroll-btn:hover{color:var(--text)}.scroll-btn.left{left:0;background:linear-gradient(90deg,var(--forge) 60%,transparent)}.scroll-btn.right{right:0;background:linear-gradient(270deg,var(--forge) 60%,transparent)}
+.tab{flex:0 0 auto;min-width:160px;padding:1.1rem .9rem;text-align:center;cursor:pointer;font-family:var(--font-m);font-size:9px;letter-spacing:.14em;text-transform:uppercase;border-right:1px solid #0d0d20;transition:all .25s;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;}
+.tab:hover{background:#0a0a18;color:var(--text)}
+.tab.active{background:#040408;}
+
+.panel{display:none;animation:fadein .35s ease}.panel.active{display:block}
+@@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.wrap{max-width:1500px;margin:0 auto;padding:3.5rem 2rem}
+.eyebrow{font-family:var(--font-m);font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:.5rem}
+.section-title{font-family:var(--font-d);font-size:1.7rem;font-weight:400;color:#fff;margin-bottom:.7rem;letter-spacing:-.02em}
+.section-lead{color:var(--muted);font-size:13px;line-height:1.95;max-width:1100px;margin-bottom:2rem}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:#0d0d20;border:1px solid #0d0d20;border-radius:3px;overflow:hidden;margin:2rem 0}
+.metric{background:var(--forge);padding:1.4rem .8rem;text-align:center}
+.metric .val{font-family:var(--font-d);font-size:1.9rem;line-height:1;margin-bottom:.3rem}
+.metric .lbl{font-family:var(--font-m);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.13em}
+
+.schem{background:var(--void);border:1px solid #0d0d20;border-radius:3px;padding:1rem;overflow-x:auto;margin:1.5rem 0}
+
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.4rem;margin:1.5rem 0}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;margin:1.5rem 0}
+.g4{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1.2rem;margin:1.5rem 0}
+
+.card{background:var(--forge);border:1px solid #0d0d20;border-radius:3px;padding:1.6rem}
+.card h3{font-family:var(--font-d);font-size:1rem;font-weight:400;color:#fff;margin-bottom:.7rem}
+.srow{display:flex;justify-content:space-between;font-size:11.5px;padding:.35rem 0;border-bottom:1px solid #0a0a18;color:var(--muted)}
+.srow:last-child{border-bottom:none}.srow .v{font-weight:600}
+
+.badge{display:inline-block;font-family:var(--font-m);font-size:9px;letter-spacing:.13em;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:.7rem;border:1px solid}
+.new-badge{display:inline-block;font-family:var(--font-m);font-size:9px;letter-spacing:.13em;text-transform:uppercase;padding:2px 8px;border-radius:2px;border:1px solid var(--enkidu);color:var(--enkidu);margin-left:.5rem}
+
+.tbl{background:var(--void);border:1px solid #0d0d20;border-radius:3px;overflow-x:auto;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+thead{background:var(--forge)}
+th{font-family:var(--font-m);font-weight:400;text-align:left;padding:.8rem 1rem;text-transform:uppercase;letter-spacing:.1em;font-size:9px;border-bottom:2px solid #0d0d20;color:var(--struct)}
+td{padding:.65rem 1rem;border-bottom:1px solid #0a0a18;color:var(--text);font-size:12px}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--forge)}
+
+.legend{display:flex;flex-wrap:wrap;gap:.6rem 1.4rem;background:var(--forge);border:1px solid #0d0d20;border-radius:3px;padding:1rem 1.2rem;margin:1rem 0;font-size:10.5px;font-family:var(--font-m)}
+.leg-item{display:flex;align-items:center;gap:.5rem;color:var(--muted);text-transform:uppercase;letter-spacing:.1em}
+.leg-dot{width:20px;height:3px;border-radius:2px}
+
+.warn-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--elec);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.warn-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--elec);margin-bottom:1rem}
+.warn-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1rem;position:relative}
+.warn-box li::before{content:'⚠';position:absolute;left:0;color:var(--elec);font-size:10px}
+
+.new-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--enkidu);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.new-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--enkidu);margin-bottom:1rem}
+.new-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1.2rem;position:relative}
+.new-box li::before{content:'▶';position:absolute;left:0;color:var(--enkidu);font-size:9px;top:2px}
+
+.next-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--next);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.next-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--next);margin-bottom:1rem}
+.next-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1.2rem;position:relative}
+.next-box li::before{content:'◆';position:absolute;left:0;color:var(--next);font-size:9px;top:2px}
+
+.pass{color:var(--steam)}.fail{color:var(--safe)}.warn{color:var(--elec)}.isnew{color:var(--enkidu)}.isnext{color:var(--next)}
+
+@@keyframes steamflow{to{stroke-dashoffset:-24}}
+@@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@@keyframes powerpulse{to{stroke-dashoffset:-16}}
+@@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@@keyframes spincw{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@@keyframes glow{0%,100%{opacity:.1}50%{opacity:.4}}
+@@keyframes waterflow{to{stroke-dashoffset:-16}}
+@@keyframes aegisglow{0%,100%{opacity:.15}50%{opacity:.7}}
+@@keyframes drivepulse{to{stroke-dashoffset:-24}}
+@@keyframes mistpulse{0%,100%{opacity:.2}50%{opacity:.9}}
+@@keyframes heatpulse{0%,100%{opacity:.3}50%{opacity:1}}
+@@keyframes exhaustflow{to{stroke-dashoffset:-20}}
+@@keyframes trapglow{0%,100%{opacity:.2}50%{opacity:.8}}
+
+.a-steam{stroke-dasharray:8,4;animation:steamflow 1.8s linear infinite}
+.a-pulse{animation:pulse 1.4s ease-in-out infinite}
+.a-power{stroke-dasharray:6,3;animation:powerpulse 1.4s linear infinite}
+.a-glow{animation:glow 2s ease-in-out infinite}
+.a-water{stroke-dasharray:5,4;animation:waterflow 1s linear infinite}
+.a-aegis{animation:aegisglow 2s ease-in-out infinite}
+.a-drive{stroke-dasharray:10,4;animation:drivepulse 1.2s linear infinite}
+.a-mist{animation:mistpulse .8s ease-in-out infinite}
+.a-heat{animation:heatpulse 1.5s ease-in-out infinite}
+.a-exhaust{stroke-dasharray:6,4;animation:exhaustflow 1.4s linear infinite}
+.a-trap{animation:trapglow 1s ease-in-out infinite}
+
+.footer{background:var(--forge);border-top:1px solid #0d0d20;padding:1.5rem;text-align:center;font-family:var(--font-m);font-size:10px;color:#002040;letter-spacing:.1em}
+@@media(max-width:700px){.wrap{padding:2rem 1rem}.tab{min-width:130px;padding:.7rem .5rem}}
+</style>
+</head>
+<body>
+
+<div class="banner">
+<div class="phase-pill">Phase 25 · Lamborghini Enkidu RSR · Pelton Array Steam Engine · 1,200 HP · 10,000+ RPM</div>
+  <h1><span class="s">Lamborghini</span> <span class="w">Enkidu</span> <span class="e">RSR</span> <span class="a">1200</span></h1>
+  <p>
+    Phase 25 — <strong>Lamborghini Enkidu RSR</strong> — a new vehicle entirely. Mid engine rear layout on a Lamborghini supercar chassis.
+    The <strong>Miasma RSR Pelton Array Engine</strong> sits in the rear engine bay where a Lamborghini V12 would normally live —
+    6 cylinder shafts · 6 Pelton wheels per shaft · 36 total Pelton wheels · 8 inch diameter · Pelton double scoop cup geometry · center ridge ·
+    Two spider ladder manifolds shoot steam straight down onto all 36 wheels simultaneously ·
+    2 × 1 inch steam inlet pipes upgraded from 3/4 inch ·
+    Aegis Boiler Mark 1 fully carried forward — domed cube SS 304 · 14cm outer / 12cm inner / 1cm walls · four outward locomotive domes ·
+    hemispherical copper bowl 10cm diameter · dome rivets · TIG welded curved corner trim · 300 PSI EWI mist injector · check valve · dual standpipe steam outlets · steam trap · piston exhaust PCW valves · expansion buffer · Halloween steam whistle · 10 gallon poly tank · dual stage filtration — all unchanged ·
+    <strong>Transmission — Phase 25 development item</strong> — mid engine rear layout changes the drivetrain geometry entirely from the Miasma Decker — HTD Transmission V1 concept carried as starting point — full specification to be developed this phase ·
+    Target — <strong>1,200 HP at 500 PSI · 10,000+ RPM · 200+ MPH</strong>.
+  </p>
+  <div class="delta-box">
+    PHASE 25 — LAMBORGHINI ENKIDU RSR — KEY DIFFERENCES FROM MIASMA DECKER PHASE 24
+    <span>▶ New vehicle entirely — Lamborghini supercar chassis replaces Chevy Impala — mid engine rear layout replaces front engine</span>
+    <span>▶ Miasma RSR Pelton Array Engine — 36 Pelton wheels — replaces 3 crankshaft piston engine — no reciprocating mass — 10,000+ RPM target</span>
+    <span>▶ Two spider ladder manifolds — drop steam straight down onto all 36 Pelton wheels simultaneously — gravity assisted delivery</span>
+    <span>▶ Steam inlet pipes upgraded 3/4 inch to 1 inch — increased flow for 36 wheel demand vs 2 pistons</span>
+    <span>▶ Transmission — Phase 25 development item — mid engine rear geometry requires new transmission design — HTD V1 concept as starting point</span>
+    <span>▶ Tank Belt Chain Drive — geometry changes for rear engine layout — to be confirmed Phase 25</span>
+    <span>▶ All steam and water systems unchanged — Aegis Boiler Mark 1 · EWI · PCW valves · steam trap · expansion buffer · condenser · Halloween whistle — fully carried forward</span>
+    <span>▶ Electrical system unchanged — 24V · dual 2,500W alternators · LiFePO4 48V/100Ah · PID module — carried forward</span>
+    <span>▶ Power target — 1,200 HP at 500 PSI · 10,000+ RPM · 200+ MPH — vs Miasma Decker torque focused piston output</span>
+  </div>
+</div>
+
+<div class="tab-nav-wrap">
+  <button class="scroll-btn left" onclick="scrollTabs(-200)">&#8592;</button>
+  <div class="tab-nav" id="tabNav">
+    <div class="tab active" style="color:#9b59b6;border-bottom-color:#9b59b6" onclick="showTab('engine',this)">⚡ Pelton Engine<br><small style="font-size:7px">36 Wheels · 6 Shafts · 1200HP</small></div>
+    <div class="tab" style="color:var(--aegis);border-bottom-color:var(--aegis)" onclick="showTab('aegis',this)">🛡 Aegis Boiler<br><small style="font-size:7px">Domed Cube · Bowl · Rivets</small></div>
+    <div class="tab" style="color:var(--bowl);border-bottom-color:var(--bowl)" onclick="showTab('bowl',this)">🥣 Bowl Detail<br><small style="font-size:7px">Hemisphere · Rivets · Gap · TIG</small></div>
+    <div class="tab" style="color:var(--water);border-bottom-color:var(--water)" onclick="showTab('water',this)">💧 Water System<br><small style="font-size:7px">Full Chain · Filter · EWI · Check</small></div>
+    <div class="tab" style="color:var(--exhaust);border-bottom-color:var(--exhaust)" onclick="showTab('exhaust',this)">💨 Exhaust System<br><small style="font-size:7px">Back Pressure · Trap · Buffer</small></div>
+    <div class="tab" style="color:#e8a020;border-bottom-color:#e8a020" onclick="showTab('trans',this)">⚙️ Transmission<br><small style="font-size:7px">Phase 25 Dev · TBD · Rear Layout</small></div>
+    <div class="tab" style="color:var(--elec);border-bottom-color:var(--elec)" onclick="showTab('elec',this)">⚡ Electrical<br><small style="font-size:7px">24V · Heater · EWI · PID</small></div>
+    <div class="tab" style="color:var(--mech);border-bottom-color:var(--mech)" onclick="showTab('side',this)">↔ Side View<br><small style="font-size:7px">Enkidu · Mid Engine · Full Layout</small></div>
+    <div class="tab" style="color:var(--therm);border-bottom-color:var(--therm)" onclick="showTab('temp',this)">🌡 Temperature<br><small style="font-size:7px">Pelton · Manifold · Boiler · Trap</small></div>
+    <div class="tab" style="color:var(--safe);border-bottom-color:var(--safe)" onclick="showTab('stress',this)">💪 Stress Tests<br><small style="font-size:7px">Pelton · Cup · Manifold · Chain</small></div>
+    <div class="tab" style="color:var(--brake);border-bottom-color:var(--brake)" onclick="showTab('safety',this)">🛡 Safety<br><small style="font-size:7px">PRV · Trap · Exhaust · Whistle</small></div>
+    <div class="tab" style="color:var(--struct);border-bottom-color:var(--struct)" onclick="showTab('parts',this)">📋 Parts List<br><small style="font-size:7px">Full Build · Cost · Weight</small></div>
+    <div class="tab" style="color:var(--next);border-bottom-color:var(--next)" onclick="showTab('next',this)">🔮 Phase 26 Prep<br><small style="font-size:7px">Trans Dev · Dimensions · Testing</small></div>
+  </div>
+  <button class="scroll-btn right" onclick="scrollTabs(200)">&#8594;</button>
+</div>
+
+<!-- ============================================================
+     PELTON ARRAY ENGINE TAB
+     ============================================================ -->
+<div class="panel active" id="panel-engine">
+<div class="wrap">
+  <div class="eyebrow" style="color:#9b59b6">Diagram 1 · Miasma RSR Pelton Array Engine — Phase 25</div>
+  <h2 class="section-title">36 Pelton Wheels · 6 Cylinder Shafts · Two Spider Ladder Manifolds · 1,200 HP · 10,000+ RPM · Rear Mid Engine</h2>
+  <p class="section-lead">
+    The <strong style="color:#9b59b6">Miasma RSR Pelton Array Engine</strong> is the heart of the Lamborghini Enkidu RSR.
+    Six cylinder shafts sit transverse in the rear engine bay. Each shaft carries six Pelton wheels — 36 total across the full array.
+    The Pelton wheel is the most efficient hydraulic turbine geometry ever designed — a double scoop cup with a center ridge splits incoming steam, deflects it through nearly 180 degrees, and extracts maximum momentum before exhaust steam clears the cup face.
+    Two <strong style="color:#39a84a">spider ladder manifolds</strong> arch over the array — the top manifold sits above the top row of three cylinder shafts, the middle manifold sits between the rows — both shoot steam <strong style="color:#39a84a">straight down</strong> with gravity assisting delivery and deflected exhaust steam falling away naturally after each cup impact.
+    All six cylinder shaft outputs combine via a <strong style="color:#ff4500">serpentine chain belt</strong> into a single output sprocket.
+    A <strong style="color:#8B6914">bevel gear set turns the output 90 degrees</strong> to align with the rear drivetrain — transmission development is the primary Phase 25 engineering task.
+    No reciprocating mass anywhere. Pure rotation from zero RPM. <strong style="color:#e8a020">10,000+ RPM</strong> ceiling determined by bearing limits and material strength — not piston reversal physics.
+    Steam source unchanged — <strong style="color:var(--aegis)">Aegis Boiler Mark 1</strong> carried forward entirely.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:#9b59b6">36</div><div class="lbl">Total Pelton Wheels</div></div>
+    <div class="metric"><div class="val" style="color:#9b59b6">6</div><div class="lbl">Cylinder Shafts</div></div>
+    <div class="metric"><div class="val" style="color:#9b59b6">6</div><div class="lbl">Wheels Per Shaft</div></div>
+    <div class="metric"><div class="val" style="color:#9b59b6">8"</div><div class="lbl">Wheel Diameter</div></div>
+    <div class="metric"><div class="val" style="color:#9b59b6">~16</div><div class="lbl">Cups Per Wheel</div></div>
+    <div class="metric"><div class="val" style="color:#9b59b6">~576</div><div class="lbl">Total Cups</div></div>
+    <div class="metric"><div class="val" style="color:#39a84a">2</div><div class="lbl">Spider Manifolds</div></div>
+    <div class="metric"><div class="val" style="color:#00bfff">1"</div><div class="lbl">Steam Inlet Pipes</div></div>
+    <div class="metric"><div class="val" style="color:#e8a020">10,000+</div><div class="lbl">RPM Target</div></div>
+    <div class="metric"><div class="val" style="color:#e8a020">~1,200</div><div class="lbl">HP at 500 PSI</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">~20,000</div><div class="lbl">Nm Peak Torque Est.</div></div>
+    <div class="metric"><div class="val" style="color:#ff4500">SERP</div><div class="lbl">Chain Belt Output</div></div>
+  </div>
+
+  <div class="legend">
+    <div class="leg-item"><div class="leg-dot" style="background:#9b59b6"></div>Pelton wheel cylinders — 8 inch dia — 6 per shaft — Inconel 718</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#39a84a"></div>Spider ladder manifolds × 2 — top + middle — steam shoots down</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#00bfff"></div>1 inch steam inlet pipes — upgraded from 3/4 inch</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#ff4500"></div>Serpentine chain belt — combines all 6 shaft outputs</div>
+    <div class="leg-item"><div class="leg-dot" style="background:#8B6914"></div>Bevel gear 90° turn — output to transmission</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--elec)"></div>No reciprocating mass — pure rotation — 10,000+ RPM</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--aegis)"></div>Aegis Boiler Mark 1 — steam source unchanged</div>
+    <div class="leg-item"><div class="leg-dot" style="background:var(--new)"></div>Mid engine rear layout — Lamborghini Enkidu RSR chassis</div>
+  </div>
+
+  <text class="schem"></text>
+  <svg width="100%" viewBox="0 0 1400 820" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="pg1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#9b59b6" stop-opacity=".15"/><stop offset="100%" stop-color="#9b59b6" stop-opacity="0"/></radialGradient>
+    <radialGradient id="mg1" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#39a84a" stop-opacity=".2"/><stop offset="100%" stop-color="#39a84a" stop-opacity="0"/></radialGradient>
+    <filter id="pf1"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="ps1" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#00bfff"/></marker>
+    <marker id="po1" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#ff4500"/></marker>
+    <marker id="pb1" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#8B6914"/></marker>
+    <marker id="pg2" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#39a84a"/></marker>
+  </defs>
+
+  <rect width="1400" height="820" fill="#000008"/>
+  <text x="700" y="22" text-anchor="middle" font-size="12" fill="#9b59b6" font-family="Courier New" font-weight="700" letter-spacing="2">LAMBORGHINI ENKIDU RSR — PELTON ARRAY ENGINE — PHASE 25 — FRONT VIEW</text>
+  <text x="700" y="38" text-anchor="middle" font-size="9" fill="#404060" font-family="Courier New">36 Pelton wheels · 6 shafts · two spider ladder manifolds · serpentine chain · bevel 90° · mid engine rear · 1,200 HP · 10,000+ RPM</text>
+
+  <!-- ENGINE HOUSING -->
+  <rect x="120" y="55" width="980" height="620" rx="16" fill="#04040c" stroke="#9b59b6" stroke-width="2.5" filter="url(#pf1)"/>
+  <ellipse cx="610" cy="365" rx="440" ry="280" fill="url(#pg1)" class="a-glow"/>
+  <text x="610" y="78" text-anchor="middle" font-size="10" fill="#9b59b6" font-family="Courier New" font-weight="700">MIASMA RSR PELTON ARRAY ENGINE — MID ENGINE REAR — TRANSVERSE — 6 SHAFTS × 6 WHEELS = 36 TOTAL</text>
+
+  <!-- STEAM INLET PIPES -->
+  <rect x="460" y="58" width="300" height="28" rx="6" fill="#020a14" stroke="#00bfff" stroke-width="2"/>
+  <text x="610" y="77" text-anchor="middle" font-size="8" fill="#00bfff" font-family="Courier New" font-weight="700">2 × 1 INCH STEAM PIPES — FROM AEGIS BOILER — UPGRADED FROM 3/4"</text>
+  <line x1="540" y1="86" x2="540" y2="96" stroke="#00bfff" stroke-width="2.5" marker-end="url(#ps1)" class="a-steam"/>
+  <line x1="680" y1="86" x2="680" y2="96" stroke="#00bfff" stroke-width="2.5" marker-end="url(#ps1)" class="a-steam" style="animation-delay:.2s"/>
+
+  <!-- TOP SPIDER LADDER MANIFOLD -->
+  <rect x="135" y="96" width="950" height="30" rx="8" fill="#010a02" stroke="#39a84a" stroke-width="2.5"/>
+  <text x="610" y="116" text-anchor="middle" font-size="9" fill="#39a84a" font-family="Courier New" font-weight="700">SPIDER LADDER MANIFOLD — TOP — 6 NOZZLE PORTS — STEAM SHOOTS DOWN ↓ — GRAVITY ASSISTED</text>
+  <!-- Top manifold nozzles -->
+  <line x1="245" y1="126" x2="245" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam"/>
+  <line x1="400" y1="126" x2="400" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.1s"/>
+  <line x1="555" y1="126" x2="555" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.2s"/>
+  <line x1="710" y1="126" x2="710" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.3s"/>
+  <line x1="865" y1="126" x2="865" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.4s"/>
+  <line x1="990" y1="126" x2="990" y2="165" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.5s"/>
+
+  <!-- TOP ROW — 3 PELTON CYLINDERS -->
+  <!-- CYL 1 -->
+  <rect x="150" y="165" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="242" cy="237" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="242" y="222" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 1</text>
+  <text x="242" y="238" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="242" y="254" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="242" y="270" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="185" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:185px 237px"/>
+  <circle cx="242" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:242px 237px;animation-delay:.04s"/>
+  <circle cx="300" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:300px 237px;animation-delay:.08s"/>
+
+  <!-- CYL 2 -->
+  <rect x="370" y="165" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="462" cy="237" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="462" y="222" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 2</text>
+  <text x="462" y="238" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="462" y="254" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="462" y="270" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="405" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:405px 237px"/>
+  <circle cx="462" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:462px 237px;animation-delay:.04s"/>
+  <circle cx="520" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:520px 237px;animation-delay:.08s"/>
+
+  <!-- CYL 3 -->
+  <rect x="590" y="165" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="682" cy="237" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="682" y="222" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 3</text>
+  <text x="682" y="238" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="682" y="254" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="682" y="270" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="625" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:625px 237px"/>
+  <circle cx="682" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:682px 237px;animation-delay:.04s"/>
+  <circle cx="740" cy="237" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:740px 237px;animation-delay:.08s"/>
+
+  <!-- MIDDLE SPIDER LADDER MANIFOLD -->
+  <rect x="135" y="330" width="950" height="30" rx="8" fill="#010a02" stroke="#39a84a" stroke-width="2.5"/>
+  <text x="610" y="350" text-anchor="middle" font-size="9" fill="#39a84a" font-family="Courier New" font-weight="700">SPIDER LADDER MANIFOLD — MIDDLE — 6 NOZZLE PORTS — STEAM SHOOTS DOWN ↓ — BETWEEN ROWS</text>
+  <!-- Middle manifold nozzles -->
+  <line x1="245" y1="360" x2="245" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.15s"/>
+  <line x1="400" y1="360" x2="400" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.25s"/>
+  <line x1="555" y1="360" x2="555" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.35s"/>
+  <line x1="710" y1="360" x2="710" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.45s"/>
+  <line x1="865" y1="360" x2="865" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.55s"/>
+  <line x1="990" y1="360" x2="990" y2="398" stroke="#39a84a" stroke-width="3" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.65s"/>
+
+  <!-- BOTTOM ROW — 3 PELTON CYLINDERS -->
+  <!-- CYL 4 -->
+  <rect x="150" y="398" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="242" cy="470" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="242" y="455" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 4</text>
+  <text x="242" y="471" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="242" y="487" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="242" y="503" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="185" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:185px 470px;animation-delay:.12s"/>
+  <circle cx="242" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:242px 470px;animation-delay:.16s"/>
+  <circle cx="300" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:300px 470px;animation-delay:.2s"/>
+
+  <!-- CYL 5 -->
+  <rect x="370" y="398" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="462" cy="470" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="462" y="455" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 5</text>
+  <text x="462" y="471" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="462" y="487" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="462" y="503" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="405" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:405px 470px;animation-delay:.12s"/>
+  <circle cx="462" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:462px 470px;animation-delay:.16s"/>
+  <circle cx="520" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:520px 470px;animation-delay:.2s"/>
+
+  <!-- CYL 6 -->
+  <rect x="590" y="398" width="185" height="145" rx="12" fill="#0a0010" stroke="#9b59b6" stroke-width="2.5"/>
+  <ellipse cx="682" cy="470" rx="82" ry="62" fill="url(#pg1)" class="a-aegis"/>
+  <text x="682" y="455" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CYL 6</text>
+  <text x="682" y="471" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">6 wheels · 8" dia · ~16 cups ea</text>
+  <text x="682" y="487" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">~200 HP  500 PSI</text>
+  <text x="682" y="503" text-anchor="middle" font-size="6" fill="#4a0060" font-family="Courier New">Inconel 718 · ceramic bearings</text>
+  <circle cx="625" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:625px 470px;animation-delay:.12s"/>
+  <circle cx="682" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:682px 470px;animation-delay:.16s"/>
+  <circle cx="740" cy="470" r="25" fill="none" stroke="#9b59b6" stroke-width="1.5" style="animation:spin .25s linear infinite;transform-origin:740px 470px;animation-delay:.2s"/>
+
+  <!-- SERPENTINE CHAIN BELT -->
+  <rect x="800" y="165" width="130" height="378" rx="10" fill="#1a0000" stroke="#ff4500" stroke-width="2.5"/>
+  <text x="865" y="310" text-anchor="middle" font-size="8" fill="#ff4500" font-family="Courier New" font-weight="700" transform="rotate(-90,865,310)">SERPENTINE CHAIN BELT — ALL 6 SHAFTS → SINGLE OUTPUT SPROCKET</text>
+  <line x1="865" y1="175" x2="865" y2="533" stroke="#ff4500" stroke-width="3" stroke-dasharray="8,4" class="a-drive"/>
+  <!-- Shaft to chain connections -->
+  <line x1="335" y1="237" x2="800" y2="237" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+  <line x1="555" y1="237" x2="800" y2="237" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+  <line x1="775" y1="237" x2="800" y2="237" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+  <line x1="335" y1="470" x2="800" y2="470" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+  <line x1="555" y1="470" x2="800" y2="470" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+  <line x1="775" y1="470" x2="800" y2="470" stroke="#ff4500" stroke-width="1.5" stroke-dasharray="4,3" opacity=".5"/>
+
+  <!-- BEVEL GEAR 90 DEG -->
+  <rect x="940" y="305" width="160" height="90" rx="10" fill="#040200" stroke="#8B6914" stroke-width="2.5"/>
+  <text x="1020" y="333" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">BEVEL GEAR</text>
+  <text x="1020" y="349" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">90° TURN</text>
+  <text x="1020" y="365" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">→ TRANSMISSION</text>
+  <text x="1020" y="381" text-anchor="middle" font-size="6" fill="#3a1800" font-family="Courier New">Phase 25 dev item</text>
+  <line x1="930" y1="350" x2="940" y2="350" stroke="#ff4500" stroke-width="2.5" stroke-dasharray="5,3" class="a-drive" marker-end="url(#po1)"/>
+  <line x1="1100" y1="350" x2="1180" y2="350" stroke="#8B6914" stroke-width="3" stroke-dasharray="8,4" class="a-drive" marker-end="url(#pb1)"/>
+  <text x="1200" y="340" font-size="8" fill="#8B6914" font-family="Courier New">→ TRANS</text>
+  <text x="1200" y="354" font-size="7" fill="#3a1800" font-family="Courier New">PH25 TBD</text>
+  <text x="1200" y="368" font-size="7" fill="#3a1800" font-family="Courier New">→ REAR WHEELS</text>
+
+  <!-- PELTON CUP GEOMETRY DETAIL -->
+  <rect x="940" y="420" width="360" height="200" rx="8" fill="#04040c" stroke="#9b59b6" stroke-width="1.5"/>
+  <text x="1120" y="444" text-anchor="middle" font-size="9" fill="#9b59b6" font-family="Courier New" font-weight="700">PELTON CUP GEOMETRY — DETAIL</text>
+  <text x="1120" y="462" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">Double scoop · center ridge · 180° deflection</text>
+  <!-- Cup cross section sketch -->
+  <path d="M980 530 Q1000 490 1040 490 Q1080 490 1100 530 Q1120 490 1160 490 Q1200 490 1220 530" fill="none" stroke="#9b59b6" stroke-width="2"/>
+  <line x1="1100" y1="490" x2="1100" y2="540" stroke="#9b59b6" stroke-width="1.5" stroke-dasharray="3,2"/>
+  <text x="1100" y="558" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">CENTER RIDGE</text>
+  <!-- Steam arrow in -->
+  <line x1="1100" y1="470" x2="1100" y2="495" stroke="#39a84a" stroke-width="2" marker-end="url(#pg2)" class="a-steam"/>
+  <text x="1100" y="468" text-anchor="middle" font-size="7" fill="#39a84a" font-family="Courier New">STEAM IN ↓</text>
+  <!-- Deflection arrows -->
+  <line x1="1060" y1="510" x2="1020" y2="490" stroke="#ff4500" stroke-width="1.5" marker-end="url(#po1)"/>
+  <line x1="1140" y1="510" x2="1180" y2="490" stroke="#ff4500" stroke-width="1.5" marker-end="url(#po1)"/>
+  <text x="980" y="488" font-size="6" fill="#ff4500" font-family="Courier New">EXHAUST ←</text>
+  <text x="1190" y="488" font-size="6" fill="#ff4500" font-family="Courier New">→ EXHAUST</text>
+  <text x="1120" y="592" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">Steam hits ridge · splits left + right into scoops</text>
+  <text x="1120" y="606" text-anchor="middle" font-size="7" fill="#9b59b6" font-family="Courier New">Deflects ~180° · transfers max momentum to wheel</text>
+  <text x="1120" y="620" text-anchor="middle" font-size="7" fill="#4a0060" font-family="Courier New">Exhaust steam clears sideways — no interference</text>
+
+  <!-- Power summary -->
+  <rect x="135" y="560" width="650" height="100" rx="8" fill="#0a0010" stroke="#9b59b6" stroke-width="1.5"/>
+  <text x="460" y="584" text-anchor="middle" font-size="10" fill="#9b59b6" font-family="Courier New" font-weight="700">ENKIDU RSR POWER SUMMARY</text>
+  <text x="460" y="602" text-anchor="middle" font-size="8" fill="#4a0060" font-family="Courier New">36 wheels × ~33 HP avg  500 PSI = ~1,200 HP total</text>
+  <text x="460" y="618" text-anchor="middle" font-size="8" fill="#9b59b6" font-family="Courier New">Steam velocity at nozzle ~520 m/s · Cup efficiency ~85–90% · Pelton geometry</text>
+  <text x="460" y="634" text-anchor="middle" font-size="8" fill="#4a0060" font-family="Courier New">Peak torque est. ~18,000–22,000 Nm · RPM target 10,000+ · No reciprocating mass</text>
+  <text x="460" y="650" text-anchor="middle" font-size="8" fill="#39ff14" font-family="Courier New">Ceramic hybrid bearings mandatory · Inconel 718 cups · SS 304 manifolds</text>
+
+  <text x="700" y="800" text-anchor="middle" font-size="8" fill="#404060" font-family="Courier New">Phase 25 · Lamborghini Enkidu RSR · Pelton Array Engine · 6 Shafts · 36 Wheels · Two Spider Ladder Manifolds · Serpentine Chain · Bevel 90° · 1,200 HP · 10,000+ RPM</text>
+  </svg>
+  </div>
+
+  <div class="new-box">
+    <h4>▶ PELTON ARRAY ENGINE — KEY DESIGN PRINCIPLES</h4>
+    <ul>
+      <li>36 Pelton wheels total — 6 cylinder shafts × 6 wheels per shaft — each wheel 8 inch diameter with approximately 16 Pelton double scoop cups and 0.5 inch cup depth — 576 total cup impact points firing simultaneously</li>
+      <li>Pelton cup geometry — center ridge splits incoming steam into two scoops simultaneously — steam deflects through approximately 180 degrees — near-total momentum transfer to wheel — most efficient turbine cup geometry ever designed for this application</li>
+      <li>Two spider ladder manifolds — top manifold over top row — middle manifold between rows — both shoot steam straight down — gravity assists steam delivery and deflected exhaust steam falls away naturally after each cup impact — no exhaust steam interference with incoming jets</li>
+      <li>Steam inlet pipes upgraded from 3/4 inch to 1 inch diameter — critical for RSR — feeding 36 Pelton wheels simultaneously requires significantly higher volumetric flow than the 2 pistons of the standard Miasma Decker build</li>
+      <li>All 6 cylinder shaft outputs combine via serpentine chain belt into single output sprocket — bevel gear set turns output 90 degrees to align with rear drivetrain — transmission is the primary Phase 25 development item</li>
+      <li>No reciprocating mass anywhere in this engine — pure rotation from zero RPM — RPM ceiling is determined by bearing specification and material fatigue limits not piston reversal inertia — 10,000 RPM is a conservative target for this geometry</li>
+      <li>Inconel 718 for Pelton cup surfaces — nickel superalloy — maintains strength to 700°C — erosion resistant against high velocity steam droplet impact — same alloy used in jet engine turbine blades for identical erosion conditions</li>
+      <li>Ceramic hybrid bearings mandatory for all 6 cylinder shafts — steel bearings will fail at 10,000+ RPM in this thermal environment — ceramic rolling elements with steel races — standard specification for high RPM industrial turbine applications</li>
+      <li>Mid engine rear layout — engine sits where Lamborghini V12 would normally live — transverse mounted — naturally low center of gravity — weight over rear wheels aids traction — ideal supercar layout for high power rear wheel drive</li>
+    </ul>
+  </div>
+
+  <div class="g3">
+    <div class="card" style="border-left:3px solid #9b59b6">
+      <div class="badge" style="color:#9b59b6;border-color:#9b59b6">Pelton Array Spec</div>
+      <h3>36 Wheels · 6 Shafts · 8 Inch Diameter</h3>
+      <div class="srow"><span>Total Pelton wheels</span><span class="v isnew">36</span></div>
+      <div class="srow"><span>Cylinder shafts</span><span class="v isnew">6 — transverse rear</span></div>
+      <div class="srow"><span>Wheels per shaft</span><span class="v isnew">6</span></div>
+      <div class="srow"><span>Wheel diameter</span><span class="v isnew">8 inches</span></div>
+      <div class="srow"><span>Cups per wheel</span><span class="v isnew">~16 Pelton double scoop</span></div>
+      <div class="srow"><span>Cup depth</span><span class="v isnew">~0.5 inch</span></div>
+      <div class="srow"><span>Total cups</span><span class="v isnew">~576 impact points</span></div>
+      <div class="srow"><span>Cup material</span><span class="v pass">Inconel 718 — erosion resistant</span></div>
+      <div class="srow"><span>Shaft bearings</span><span class="v pass">Ceramic hybrid — mandatory</span></div>
+      <div class="srow"><span>RPM target</span><span class="v" style="color:#e8a020">10,000+ RPM</span></div>
+      <div class="srow"><span>Power at 500 PSI</span><span class="v" style="color:#e8a020">~1,200 HP total</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid #39a84a">
+      <div class="badge" style="color:#39a84a;border-color:#39a84a">Spider Ladder Manifolds</div>
+      <h3>Two Manifolds · Down Spray · Equal Pressure</h3>
+      <div class="srow"><span>Count</span><span class="v isnew">2 — top + middle position</span></div>
+      <div class="srow"><span>Material</span><span class="v pass">SS 304 — 500 PSI rated</span></div>
+      <div class="srow"><span>Spine bore</span><span class="v isnew">2 inch internal diameter</span></div>
+      <div class="srow"><span>Rung diameter</span><span class="v isnew">1 inch</span></div>
+      <div class="srow"><span>Nozzle ports</span><span class="v isnew">6 per manifold — 12 total</span></div>
+      <div class="srow"><span>Steam direction</span><span class="v pass">Straight down — gravity assisted</span></div>
+      <div class="srow"><span>Equal pressure</span><span class="v pass">Equal rung length → equal delivery</span></div>
+      <div class="srow"><span>Inlet pipes</span><span class="v isnew">2 × 1 inch upgraded from 3/4"</span></div>
+      <div class="srow"><span>Pressure rating</span><span class="v pass">500 PSI min — matches boiler max</span></div>
+      <div class="srow"><span>Nozzle angle</span><span class="v" style="color:var(--muted)">TBD Phase 26 — attack angle study</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid #ff4500">
+      <div class="badge" style="color:#ff4500;border-color:#ff4500">Output Drive</div>
+      <h3>Serpentine Chain · Bevel 90° · Transmission TBD</h3>
+      <div class="srow"><span>Combining method</span><span class="v isnew">Serpentine chain belt</span></div>
+      <div class="srow"><span>Chain spec</span><span class="v" style="color:var(--muted)">TBD Phase 26 — rated for RSR RPM</span></div>
+      <div class="srow"><span>Output turn</span><span class="v isnew">Bevel gear 90 degrees</span></div>
+      <div class="srow"><span>Transmission</span><span class="v" style="color:#e8a020">PHASE 25 DEVELOPMENT ITEM</span></div>
+      <div class="srow"><span>Drive layout</span><span class="v isnew">Rear wheel drive — mid engine</span></div>
+      <div class="srow"><span>Differential</span><span class="v" style="color:var(--muted)">TBD — LSD recommended for RSR</span></div>
+      <div class="srow"><span>Oil bath</span><span class="v pass">Enclosed — own compartment</span></div>
+    </div>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ PELTON ENGINE — PHASE 25 CRITICAL OPEN ITEMS</h4>
+    <ul>
+      <li>Pelton wheel exact dimensions must be confirmed in Blender model at correct scale — cup geometry, center ridge profile, shaft diameter all require final dimensioning before any machining</li>
+      <li>Nozzle attack angle study — optimal steam jet angle onto Pelton cup face at 10,000 RPM surface velocity — this single parameter has the largest effect on per-cup efficiency — priority Phase 26 item</li>
+      <li>Serpentine chain belt specification — tooth count, chain type, sprocket diameters — must be rated for 10,000+ RPM operation — significantly different requirements from Phase 24 Miasma Decker low RPM chain</li>
+      <li>Boiler steam supply capacity — RSR feeds 36 Pelton wheels vs 2 pistons in standard build — Aegis Boiler Mark 1 steam volume output must be confirmed sufficient — if not, RSR boiler upgrade required Phase 26</li>
+      <li>Transmission development — primary Phase 25 engineering task — mid engine rear layout geometry completely different from Miasma Decker front engine — new design required — see Transmission tab</li>
+      <li>Ceramic hybrid bearing sourcing — specify bearing grade, inner and outer race diameters, load ratings for 10,000+ RPM before build begins — do not substitute standard steel bearings</li>
+    </ul>
+  </div>
+
+</div>
+
+
+<!-- ============================================================
+     AEGIS BOILER TAB — CARRIED FORWARD FROM PHASE 24
+     ============================================================ -->
+<div class="panel" id="panel-aegis">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--aegis)">Diagram 2 · Aegis Boiler Mark 1 — Carried Forward from Phase 24 — Unchanged</div>
+  <h2 class="section-title">Domed Cube SS 304 · Hemispherical Copper Bowl · Dome Rivets · TIG Corner Trim · 90 PSI Operating</h2>
+  <p class="section-lead">
+    The <strong style="color:var(--aegis)">Aegis Boiler Mark 1</strong> is carried forward to Phase 25 Enkidu RSR completely unchanged. Every specification, component, and design decision from Phase 24 applies identically here.
+    The boiler sits in the rear of the Enkidu RSR chassis — repositioned from the mid-rear position of the Miasma Decker to suit the Lamborghini layout — but the boiler itself is mechanically and structurally identical.
+    The one area under review for Phase 26 is whether the Aegis Boiler Mark 1 steam output volume is sufficient to feed 36 Pelton wheels simultaneously at full pressure — this is flagged as a Phase 26 study item. For Phase 25 the boiler is unchanged and all specifications below apply directly.
+    Named after the Roman curved shield — dome geometry deflects pressure force into surface tension exactly as a curved shield deflects projectile force into lateral deflection.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--aegis)">MARK 1</div><div class="lbl">Aegis Boiler</div></div>
+    <div class="metric"><div class="val" style="color:var(--aegis)">14cm</div><div class="lbl">Cube Outer</div></div>
+    <div class="metric"><div class="val" style="color:var(--aegis)">12cm</div><div class="lbl">Cube Inner</div></div>
+    <div class="metric"><div class="val" style="color:var(--aegis)">1cm</div><div class="lbl">Wall Thickness</div></div>
+    <div class="metric"><div class="val" style="color:var(--bowl)">10cm</div><div class="lbl">Bowl Diameter</div></div>
+    <div class="metric"><div class="val" style="color:var(--bowl)">90°</div><div class="lbl">Bowl Hemisphere</div></div>
+    <div class="metric"><div class="val" style="color:var(--steam)">90</div><div class="lbl">PSI Operating</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">120</div><div class="lbl">PRV Spring PSI</div></div>
+    <div class="metric"><div class="val" style="color:var(--aegis)">400–500</div><div class="lbl">Vessel Rating PSI</div></div>
+    <div class="metric"><div class="val" style="color:var(--inject)">300 PSI</div><div class="lbl">EWI Mist Pressure</div></div>
+    <div class="metric"><div class="val" style="color:var(--aegis)">15–20s</div><div class="lbl">Cold Start Est.</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">UNCHANGED</div><div class="lbl">From Phase 24</div></div>
+  </div>
+
+  <div class="new-box">
+    <h4>▶ AEGIS BOILER MARK 1 — PHASE 25 STATUS</h4>
+    <ul>
+      <li>Fully carried forward from Phase 24 — zero changes to vessel, bowl, rivets, TIG corner trim, PRV, fusible plug, standpipes, EWI, check valve, or heater element</li>
+      <li>Steam outlet pipes upgraded from 3/4 inch to 1 inch diameter for RSR — this is the only physical change to the boiler installation — the boiler body itself is unchanged</li>
+      <li>Boiler repositioned in Enkidu RSR chassis to suit Lamborghini mid engine rear layout — mounting bracket redesign required but boiler specification unchanged</li>
+      <li>Phase 26 study item — confirm steam volume output of Aegis Mark 1 is sufficient to feed 36 Pelton wheels simultaneously at 500 PSI — if volume insufficient, Aegis Mark 2 RSR variant with larger internal volume required</li>
+      <li>All safety systems unchanged — dual PRV at 120 PSI · fusible plug 170°C · EWI PID cutoff at 115 PSI · Halloween steam whistle — all carried forward identically</li>
+      <li>All performance specs unchanged — 15 to 20 second cold start · 90 PSI operating · 400 to 500 PSI vessel rating · counter-flow mist injection · dome rivet Leidenfrost disruption — all identical to Phase 24</li>
+    </ul>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Component</th><th>Spec</th><th>Phase 25 Status</th><th>Notes</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--aegis)">Aegis domed cube vessel</td><td>SS 304 · 14cm outer · 12cm inner · 1cm walls · 4 outward domes</td><td class="pass">✓ UNCHANGED</td><td>Same vessel specification Phase 24</td></tr>
+  <tr><td style="color:var(--bowl)">Hemispherical copper bowl</td><td>10cm diameter · true 90° hemisphere · concave face up</td><td class="pass">✓ UNCHANGED</td><td>Single lathe operation — same spec</td></tr>
+  <tr><td style="color:var(--bowl)">Dome rivets</td><td>5mm dia · 3mm height · 8mm spacing · hexagonal pattern</td><td class="pass">✓ UNCHANGED</td><td>Uniform dome throughout bowl face</td></tr>
+  <tr><td style="color:var(--aegis)">TIG curved corner trim</td><td>SS 308 filler · all 4 interior cube corners · curved fillet</td><td class="pass">✓ UNCHANGED</td><td>Stress concentration elimination</td></tr>
+  <tr><td style="color:var(--bowl)">Heater element</td><td>2000–3000W · beneath bowl · 24V</td><td class="pass">✓ UNCHANGED</td><td>Cold start — 15 to 20 seconds</td></tr>
+  <tr><td style="color:var(--steam)">PRV safety valves</td><td>120 PSI · dual redundant</td><td class="pass">✓ UNCHANGED</td><td>Mandatory safety — both retained</td></tr>
+  <tr><td style="color:var(--steam)">Fusible plug</td><td>170°C melt temperature</td><td class="pass">✓ UNCHANGED</td><td>Low water overheat protection</td></tr>
+  <tr><td style="color:var(--steam)">Steam standpipes</td><td>2 × high position outlets on front face</td><td class="pass">✓ UNCHANGED</td><td>Dry steam guarantee — high position</td></tr>
+  <tr><td style="color:var(--inject)">EWI 300 PSI mist system</td><td>Micro pump · 0.5L accumulator · solenoid · PID controlled</td><td class="pass">✓ UNCHANGED</td><td>Counter-flow mist injection</td></tr>
+  <tr><td style="color:var(--inject)">Check valve — nozzle</td><td>Rated 400 PSI · upstream of atomizing nozzle</td><td class="pass">✓ UNCHANGED</td><td>Blocks boiler back-pressure into EWI</td></tr>
+  <tr><td style="color:var(--steam)">Steam outlet pipes</td><td>Upgraded 3/4 inch → 1 inch diameter for RSR</td><td class="isnew">▶ UPGRADED — RSR ONLY</td><td>Only physical change to boiler install</td></tr>
+  <tr><td style="color:var(--brake)">Halloween steam whistle</td><td>Multi-chime · 3/4" steam valve · pull cord</td><td class="pass">✓ UNCHANGED · MANDATORY</td><td>Driver operated · atmosphere vent</td></tr>
+  </tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- ============================================================
+     BOWL DETAIL TAB — CARRIED FORWARD
+     ============================================================ -->
+<div class="panel" id="panel-bowl">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--bowl)">Diagram 3 · Aegis Bowl Detail — Carried Forward from Phase 24 — Unchanged</div>
+  <h2 class="section-title">10cm Hemisphere · Dome Rivets · 1cm Gap · TIG Corner Trim · Steam Battle Zone</h2>
+  <p class="section-lead">
+    The Aegis Bowl specification is carried forward from Phase 24 completely unchanged. A true 90-degree copper hemisphere 10cm in diameter sitting inside the 12cm inner cavity with exactly 1cm annular gap each side. The 19mm minimum flow rule is met — 10mm per side equals 20mm total annular clearance just above the 19mm minimum spec. Dome rivets uniform throughout the concave interior face in hexagonal pattern. TIG welded curved fillet trim on all four interior corners eliminates stress concentration and turbulent dead zones. The water versus copper warfare dynamic — dome crowns pierce the Leidenfrost vapour cushion on mist impact, water splits around dome sides, all flanks superheated copper, near-total flash conversion efficiency — all unchanged and fully applicable to the Enkidu RSR.
+  </p>
+
+  <div class="g3">
+    <div class="card" style="border-left:3px solid var(--bowl)">
+      <div class="badge" style="color:var(--bowl);border-color:var(--bowl)">Bowl Spec — Unchanged</div>
+      <h3>10cm Hemisphere · Uniform Dome Rivets</h3>
+      <div class="srow"><span>Diameter</span><span class="v" style="color:var(--bowl)">10cm</span></div>
+      <div class="srow"><span>Geometry</span><span class="v pass">True 90° hemisphere</span></div>
+      <div class="srow"><span>Material</span><span class="v" style="color:var(--bowl)">Copper C110</span></div>
+      <div class="srow"><span>Orientation</span><span class="v pass">Concave face UP</span></div>
+      <div class="srow"><span>Rivet type</span><span class="v pass">Dome — uniform throughout</span></div>
+      <div class="srow"><span>Rivet diameter</span><span class="v" style="color:var(--bowl)">5mm</span></div>
+      <div class="srow"><span>Rivet height</span><span class="v" style="color:var(--bowl)">3mm</span></div>
+      <div class="srow"><span>Rivet spacing</span><span class="v pass">8mm center to center</span></div>
+      <div class="srow"><span>Rivet pattern</span><span class="v pass">Hexagonal honeycomb</span></div>
+      <div class="srow"><span>Phase 25 status</span><span class="v isnew">UNCHANGED FROM PHASE 24</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--aegis)">
+      <div class="badge" style="color:var(--aegis);border-color:var(--aegis)">Vessel Spec — Unchanged</div>
+      <h3>14cm Domed Cube · TIG Trim · SS 304</h3>
+      <div class="srow"><span>Outer dimensions</span><span class="v" style="color:var(--aegis)">14 × 14 × 14 cm</span></div>
+      <div class="srow"><span>Inner dimensions</span><span class="v" style="color:var(--aegis)">12 × 12 × 12 cm</span></div>
+      <div class="srow"><span>Wall thickness</span><span class="v pass">1cm all six faces</span></div>
+      <div class="srow"><span>Side faces</span><span class="v pass">4 × outward locomotive dome</span></div>
+      <div class="srow"><span>Interior corners</span><span class="v pass">TIG curved fillet — all 4</span></div>
+      <div class="srow"><span>Material</span><span class="v" style="color:var(--aegis)">Stainless 304</span></div>
+      <div class="srow"><span>Pressure rating est.</span><span class="v pass">400–500 PSI operating</span></div>
+      <div class="srow"><span>Safety margin at 90 PSI</span><span class="v pass">4.5–5.5× safety factor</span></div>
+      <div class="srow"><span>Phase 25 status</span><span class="v isnew">UNCHANGED FROM PHASE 24</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--inject)">
+      <div class="badge" style="color:var(--inject);border-color:var(--inject)">19mm Flow Rule</div>
+      <h3>Bowl Gap · Annular Clearance · Spec Confirmed</h3>
+      <div class="srow"><span>Bowl diameter</span><span class="v" style="color:var(--bowl)">10cm</span></div>
+      <div class="srow"><span>Inner cavity</span><span class="v" style="color:var(--aegis)">12cm</span></div>
+      <div class="srow"><span>Gap each side</span><span class="v pass">1cm = 10mm per side</span></div>
+      <div class="srow"><span>Total annular gap</span><span class="v pass">20mm ≥ 19mm minimum ✓</span></div>
+      <div class="srow"><span>Dome bonus points × 4</span><span class="v pass">+5–10mm at dome positions</span></div>
+      <div class="srow"><span>Effective gap at domes</span><span class="v pass">~25–30mm ✓ above minimum</span></div>
+      <div class="srow"><span>Steam pipe diameter</span><span class="v pass">19mm ID — same minimum spec</span></div>
+      <div class="srow"><span>Phase 25 status</span><span class="v isnew">CONFIRMED CORRECT — UNCHANGED</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ============================================================
+     WATER SYSTEM TAB — CARRIED FORWARD
+     ============================================================ -->
+<div class="panel" id="panel-water">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--water)">Water System — Carried Forward from Phase 24 — Unchanged</div>
+  <h2 class="section-title">10 Gal Poly Tank → Pump → Dual Filter → Check Valve → EWI 300 PSI → Aegis Boiler → Condenser Loop</h2>
+  <p class="section-lead">
+    The complete water supply chain is carried forward from Phase 24 unchanged. The 10 gallon polypropylene tank, 24V diaphragm pump, dual stage filtration, EWI high pressure system, check valve, atomizing nozzle, condenser loop, and all sensors are identical to Phase 24. The only change for the Enkidu RSR is physical routing of the water lines to suit the Lamborghini rear engine layout — the components themselves are all unchanged. Preferred fill remains distilled or deionised water. Condenser loop provides near-zero net water consumption at operating conditions.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--water)">10 Gal</div><div class="lbl">Water Tank</div></div>
+    <div class="metric"><div class="val" style="color:var(--water)">24V</div><div class="lbl">Feed Pump</div></div>
+    <div class="metric"><div class="val" style="color:var(--inject)">50µm</div><div class="lbl">Filter Stage 1</div></div>
+    <div class="metric"><div class="val" style="color:var(--inject)">5µm</div><div class="lbl">Filter Stage 2</div></div>
+    <div class="metric"><div class="val" style="color:var(--inject)">300 PSI</div><div class="lbl">EWI Pressure</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">CHECK</div><div class="lbl">Nozzle Back Valve</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">70%+</div><div class="lbl">Condenser Recovery</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">UNCHANGED</div><div class="lbl">From Phase 24</div></div>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>#</th><th>Component</th><th>Spec</th><th>Phase 25 Status</th><th>Notes</th></tr></thead>
+  <tbody>
+  <tr><td>1</td><td style="color:var(--water)">10 Gal Poly Tank</td><td>Polypropylene · unpressurised · vented cap</td><td class="pass">✓ UNCHANGED</td><td>Routing adjusted for Enkidu rear layout</td></tr>
+  <tr><td>2</td><td style="color:var(--water)">Tank ball valve</td><td>Manual 1/2" shutoff</td><td class="pass">✓ UNCHANGED</td><td>Isolate tank for service</td></tr>
+  <tr><td>3</td><td style="color:var(--water)">24V diaphragm pump</td><td>24V · 15 L/min · low pressure supply</td><td class="pass">✓ UNCHANGED</td><td>Tank to filter to EWI</td></tr>
+  <tr><td>4</td><td style="color:var(--inject)">Filter Stage 1 — 50 micron</td><td>10 inch bowl housing · sediment cartridge</td><td class="pass">✓ UNCHANGED</td><td>Coarse sediment removal</td></tr>
+  <tr><td>5</td><td style="color:var(--inject)">Filter Stage 2 — 5 micron</td><td>10 inch bowl housing · fine cartridge</td><td class="pass">✓ UNCHANGED</td><td>Fine particle — protects nozzle</td></tr>
+  <tr><td>6</td><td style="color:var(--inject)">EWI hi-press micro pump</td><td>100–300 PSI · 24V · ~60W</td><td class="pass">✓ UNCHANGED</td><td>Raises water to injection pressure</td></tr>
+  <tr><td>7</td><td style="color:var(--inject)">Pressure accumulator</td><td>0.5L bladder · rated 400 PSI</td><td class="pass">✓ UNCHANGED</td><td>Smooth injection pressure</td></tr>
+  <tr><td>8</td><td style="color:var(--inject)">Solenoid injector valve</td><td>24V · fuel injector type · 300 PSI</td><td class="pass">✓ UNCHANGED</td><td>Microsecond metering</td></tr>
+  <tr><td>9</td><td style="color:var(--inject)">Check valve — nozzle upstream</td><td>Rated 400 PSI · water service</td><td class="pass">✓ UNCHANGED</td><td>Blocks boiler back-pressure into EWI</td></tr>
+  <tr><td>10</td><td style="color:var(--inject)">Atomising nozzle</td><td>SS/brass · 60–90° cone · rated 400 PSI</td><td class="pass">✓ UNCHANGED</td><td>High velocity mist spray</td></tr>
+  <tr><td>11</td><td style="color:var(--water)">Condenser — air cooled</td><td>Radiator type · 70%+ recovery</td><td class="pass">✓ UNCHANGED</td><td>Exhaust steam → liquid — closed loop</td></tr>
+  <tr><td>12</td><td style="color:var(--water)">Condenser return pump</td><td>12V · low pressure</td><td class="pass">✓ UNCHANGED</td><td>Returns condensate to tank</td></tr>
+  <tr><td>13</td><td style="color:var(--water)">Water level sensor</td><td>Tank — warns at 10% remaining</td><td class="pass">✓ UNCHANGED</td><td>Driver warning system</td></tr>
+  <tr><td>14</td><td style="color:var(--water)">EWI supply pressure sensor</td><td>Between filter and hi-press pump</td><td class="pass">✓ UNCHANGED</td><td>Detects filter clog or pump failure</td></tr>
+  <tr><td>15</td><td style="color:var(--water)">Differential pressure gauge</td><td>Across both filter housings</td><td class="pass">✓ UNCHANGED</td><td>Filter service indicator</td></tr>
+  </tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<!-- ============================================================
+     EXHAUST SYSTEM TAB — CARRIED FORWARD
+     ============================================================ -->
+<div class="panel" id="panel-exhaust">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--exhaust)">Exhaust System — Carried Forward from Phase 24 — Unchanged</div>
+  <h2 class="section-title">PCW Exhaust Valves · Steam Trap · Expansion Buffer · Condenser · Halloween Whistle</h2>
+  <p class="section-lead">
+    The exhaust system is carried forward from Phase 24 unchanged. PCW exhaust valves on each piston exhaust port — PID timed — steam trap downstream — expansion buffer chamber — condenser return loop. For the Enkidu RSR the Pelton array engine does not use pistons and therefore does not have traditional piston exhaust ports. The exhaust system for the RSR Pelton engine requires new design — exhaust steam exits the Pelton cups radially after impact and must be collected and routed to the condenser. This is flagged as a Phase 26 design item. The PCW valves, steam trap, and expansion buffer from Phase 24 are carried forward as the basis for the RSR exhaust design. The Halloween whistle is mandatory and unchanged.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--exhaust)">PCW ×2</div><div class="lbl">Exhaust Valves</div></div>
+    <div class="metric"><div class="val" style="color:var(--trap)">TRAP</div><div class="lbl">Steam Trap</div></div>
+    <div class="metric"><div class="val" style="color:var(--exhaust)">0.5L</div><div class="lbl">Expansion Buffer</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">70%+</div><div class="lbl">Condenser Recovery</div></div>
+    <div class="metric"><div class="val" style="color:var(--brake)">🎃</div><div class="lbl">Halloween Whistle</div></div>
+    <div class="metric"><div class="val" style="color:#e8a020">PH26</div><div class="lbl">RSR Exhaust Design</div></div>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ RSR EXHAUST SYSTEM — PHASE 26 REDESIGN REQUIRED</h4>
+    <ul>
+      <li>Pelton array engine exhaust is fundamentally different from piston exhaust — steam exits radially from Pelton cups after impact rather than through cylinder exhaust ports — collection geometry must be designed around the cylindrical array housing</li>
+      <li>Exhaust steam collection manifold required — housing around each Pelton cylinder shaft captures deflected exhaust steam — routes to common exhaust header — then to steam trap and expansion buffer as per Phase 24 system</li>
+      <li>PCW exhaust valves from Phase 24 may not apply directly — Pelton exhaust is continuous flow not timed stroke exhaust — exhaust management is passive geometry not active valve timing — Phase 26 study item</li>
+      <li>Steam trap and expansion buffer concept unchanged and carried forward — condensate separation and back pressure management still required regardless of engine type</li>
+      <li>Halloween whistle unchanged — tapped from main steam line before engine inlet — driver pull cord — mandatory — non-negotiable Phase 25 carry forward</li>
+      <li>Condenser loop unchanged — exhaust steam still needs condensing and returning to tank — closed loop operation unchanged — condenser sizing may need review for RSR exhaust volume</li>
+    </ul>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Component</th><th>Phase 24 Spec</th><th>Phase 25 RSR Status</th><th>Notes</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--exhaust)">PCW exhaust valves × 2</td><td>24V · PID timed · one per piston</td><td class="warn">⚠ REDESIGN PH26 — Pelton has no piston exhaust ports</td><td>Exhaust geometry study required</td></tr>
+  <tr><td style="color:var(--trap)">Steam trap</td><td>Thermostatic or float type · 3/4" line</td><td class="pass">✓ CARRIED FORWARD — concept unchanged</td><td>Condensate separation still required</td></tr>
+  <tr><td style="color:var(--exhaust)">Expansion buffer</td><td>0.5L SS 304 · rated 200 PSI</td><td class="pass">✓ CARRIED FORWARD — concept unchanged</td><td>Back pressure reduction still required</td></tr>
+  <tr><td style="color:var(--exhaust)">Expansion buffer PRV</td><td>150 PSI safety valve</td><td class="pass">✓ CARRIED FORWARD — unchanged</td><td>Buffer safety — mandatory</td></tr>
+  <tr><td style="color:var(--water)">Condenser loop</td><td>Air cooled · 70%+ recovery · return pump</td><td class="pass">✓ UNCHANGED</td><td>Sizing review for RSR exhaust volume PH26</td></tr>
+  <tr><td style="color:var(--brake)">Halloween whistle</td><td>Multi-chime · 3/4" steam valve · pull cord</td><td class="pass">✓ MANDATORY — UNCHANGED</td><td>Non-negotiable — driver operated</td></tr>
+  <tr><td style="color:var(--exhaust)">RSR exhaust collection manifold</td><td>NOT IN PHASE 24</td><td class="isnew">NEW — PHASE 26 DESIGN ITEM</td><td>Collects radial exhaust from Pelton cups</td></tr>
+  </tbody>
+  </table>
+  </div>
+</div>
+</div>
+
+<script>
+function showTab(id,tab){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  tab.classList.add('active');
+}
+function scrollTabs(amount){document.getElementById('tabNav').scrollBy({left:amount,behavior:'smooth'});}
+</script>
+</body>
+</html>

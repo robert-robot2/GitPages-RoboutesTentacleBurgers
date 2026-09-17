@@ -37,6 +37,7 @@
                            new("phase22", "Phase 22", "Chevy Miasma V6"),
                              new("phase23", "Phase 23", "Chevy Miasma V7"),
                              new ("phase24", "Phase 24", "Chevy Miasma V8"),
+                                new ("phase25", "Phase 25", "Lambo Enkidu 1200 hp"),
     }; 
 
         private string _activeId = "phase1";
