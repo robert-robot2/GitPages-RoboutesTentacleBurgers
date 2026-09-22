@@ -64,14 +64,11 @@ window.CerebellumBridge = {
                 await this.pyodide.runPythonAsync(code);
                 this._parietalLoaded = true;
             }
-
+            // Return raw string — C# will parse it
             const result = await this.pyodide.runPythonAsync(
                 `nova_parietal_respond(${JSON.stringify(userInput)})`
             );
-
-            // ← FIX: Parse the JSON string that Python returns
-            const parsed = typeof result === 'string' ? JSON.parse(result) : result;
-            return parsed;
+            return result;  // ← no JSON.parse here
         } catch (err) {
             console.error('[CerebellumBridge] ParietalLobe failed:', err);
             return null;

@@ -522,7 +522,21 @@ namespace NovaAdeptusLibrary
             }
 
             var cleaned = input.ToLower().Trim();
-         
+            // ── Parietal Lobe — sentiment/noun O(log n) response ──
+            var cleaned_lower = cleaned.ToLower();
+            if (cleaned_lower.StartsWith("i love") ||
+                cleaned_lower.StartsWith("i hate") ||
+                cleaned_lower.StartsWith("i like"))
+            {
+                var json = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.getParietalResponse", input);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var result = JsonDocument.Parse(json).RootElement;
+                    return _thalamus.Apply(
+                        result.GetProperty("response").GetString()!, Session);
+                }
+            }
 
             try
             {
@@ -580,21 +594,7 @@ namespace NovaAdeptusLibrary
         
 
 
-            // ── Parietal Lobe — sentiment/noun O(log n) response ──
-            var cleaned_lower = cleaned.ToLower();
-            if (cleaned_lower.StartsWith("i love") ||
-                cleaned_lower.StartsWith("i hate") ||
-                cleaned_lower.StartsWith("i like"))
-            {
-                var json = await _js.InvokeAsync<string>(
-                    "CerebellumBridge.getParietalResponse", input);
-                if (!string.IsNullOrEmpty(json))
-                {
-                    var result = JsonDocument.Parse(json).RootElement;
-                    return _thalamus.Apply(
-                        result.GetProperty("response").GetString()!, Session);
-                }
-            }
+         
 
           
 
