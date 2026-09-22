@@ -566,6 +566,14 @@ EXAMPLES = {
 
 
 
+"math_request": [
+    "what is 2 + 2", "calculate 10 * 5", "solve 100 / 4",
+    "what is 15 - 7", "3 + 4 * 2", "sqrt 144", "2^10",
+    "what is 100 % 7", "demo indexing", "demo slicing",
+    "demo comprehension", "demo enumerate", "demo zip",
+    "demo dictionary", "demo strings", "demo math",
+],
+
 
 
 

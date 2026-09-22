@@ -456,7 +456,6 @@ namespace NovaAdeptusLibrary
             Session.UpdateRelationship();
 
             // ── 1. FSM check — mid-game states take priority ────
-            // ── 1. FSM check — mid-game states take priority ────
             if (Session.FSMState != NovaFSMState.Idle)
             {
                 // Allow natural item use commands to pass through mid-mission
@@ -523,6 +522,33 @@ namespace NovaAdeptusLibrary
             }
 
             var cleaned = input.ToLower().Trim();
+         
+
+            try
+            {
+                var angularResult = await _js.InvokeAsync<JsonElement?>(
+                    "CerebellumBridge.getAngularGyrusResponse", input);
+
+                if (angularResult.HasValue)
+                {
+                    var type = angularResult.Value
+                        .TryGetProperty("type", out var t) ? t.GetString() : null;
+                    var response3 = angularResult.Value
+                        .TryGetProperty("response", out var r) ? r.GetString() : null;
+
+                    if ((type == "math" || type == "concept")
+                        && !string.IsNullOrEmpty(response3))
+                    {
+                        await SaveSession();
+                        return _thalamus.Apply(response3, Session);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine($"[NovaCortex] Angular Gyrus error: {ex.Message}");
+                // Fall through to normal command dispatch
+            }
 
             // ── 3. Hard command dispatch ────────────────────────
             var commandReply = DispatchCommand(cleaned, input);
@@ -551,8 +577,31 @@ namespace NovaAdeptusLibrary
             // ── 6. Thalamus language generation ─────────────────
             var response = _thalamus.GenerateResponse(input, Session);
             await SaveSession();
+        
+
+
+            // ── Parietal Lobe — sentiment/noun O(log n) response ──
+            var cleaned_lower = cleaned.ToLower();
+            if (cleaned_lower.StartsWith("i love") ||
+                cleaned_lower.StartsWith("i hate") ||
+                cleaned_lower.StartsWith("i like"))
+            {
+                var json = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.getParietalResponse", input);
+                if (!string.IsNullOrEmpty(json))
+                {
+                    var result = JsonDocument.Parse(json).RootElement;
+                    return _thalamus.Apply(
+                        result.GetProperty("response").GetString()!, Session);
+                }
+            }
+
+          
+
             // fire and forget — never await this, never block the response
             _ = _api.RefillIfNeededAsync();
+
+
             return response;
         }
 
@@ -632,6 +681,8 @@ namespace NovaAdeptusLibrary
         // ==========================================================
         private string? DispatchKeyword(string cleaned, string raw)
         {
+            // ── Parietal Lobe — sentiment/noun O(log n) response ──
+           
             var spellTarget = NovaBroca.DetectSpellRequest(raw);
             if (spellTarget != null)
             {
@@ -761,6 +812,7 @@ namespace NovaAdeptusLibrary
                     "Type 'kennecott' — situation overview. ☠️\"",
                     Session);
             }
+
             // ── Chapter / menu keywords ────────────────────────────────────────
             if (cleaned.Contains("chapter") || cleaned.Contains("chapters"))
                 return ShowChapterMenu();
