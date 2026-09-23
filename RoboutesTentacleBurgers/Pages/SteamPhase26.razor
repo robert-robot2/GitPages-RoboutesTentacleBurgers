@@ -1,1 +1,788 @@
-﻿
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 26 · Mack Berserker · Steam Truck</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#000008;--forge:#06060e;--steam:#39ff14;--hydro:#00e5ff;
+  --elec:#ffd700;--mech:#ff8c00;--brake:#ff6ec7;--ctrl:#b388ff;
+  --therm:#ff6b35;--water:#40e0d0;--struct:#c0c8d0;--safe:#ff4500;
+  --text:#e8eef4;--muted:#6080a0;--new:#00ffcc;--aegis:#c0a060;
+  --bowl:#b87333;--inject:#00bfff;--exhaust:#ff6b35;--next:#ff00ff;
+  --shaft:#D85A30;--tank:#8B6914;--gold:#FFD700;--berserker:#cc2200;
+  --big:#ff2200;--boiler:#e8c060;--piston:#FFB300;
+  --font-d:'Georgia',serif;--font-b:'Segoe UI',system-ui,sans-serif;
+  --font-m:'Courier New',monospace;
+}
+body{font-family:var(--font-b);background:var(--void);color:var(--text);line-height:1.6;overflow-x:hidden}
+
+.banner{position:relative;background:var(--void);border-bottom:2px solid #0d0d20;padding:4rem 2rem 3.5rem;text-align:center;overflow:hidden;}
+.banner::before{content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 120% 60% at 50% -20%,#cc220012,transparent),
+    radial-gradient(ellipse 80% 40% at 20% 110%,#FFD70008,transparent),
+    repeating-linear-gradient(90deg,transparent,transparent 80px,#ffffff01 81px),
+    repeating-linear-gradient(0deg,transparent,transparent 80px,#ffffff01 81px);}
+.phase-pill{display:inline-flex;align-items:center;gap:10px;font-family:var(--font-m);font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--berserker);border:1px solid #cc220040;padding:8px 28px;border-radius:2px;margin-bottom:2rem;position:relative;}
+.phase-pill::before{content:'';width:8px;height:8px;border-radius:50%;background:var(--berserker);box-shadow:0 0 20px var(--berserker);animation:blink 1.2s ease-in-out infinite;}
+@@keyframes blink{0%,100%{opacity:1}50%{opacity:.05}}
+.banner h1{font-family:var(--font-d);font-size:clamp(2.2rem,5.5vw,4.5rem);font-weight:400;color:#fff;letter-spacing:-.03em;line-height:1.05;margin-bottom:1.5rem;}
+.banner h1 .b{color:var(--berserker)}.banner h1 .g{color:var(--gold)}.banner h1 .s{color:var(--steam)}
+.banner p{color:var(--muted);font-size:13.5px;max-width:1100px;margin:0 auto;line-height:1.95}
+.banner strong{color:var(--boiler)}
+.delta-box{display:inline-block;margin-top:1.5rem;background:var(--forge);border:1px solid #cc220030;border-left:3px solid var(--berserker);padding:.8rem 1.4rem;font-family:var(--font-m);font-size:10px;letter-spacing:.12em;color:var(--berserker);text-align:left;max-width:980px;width:100%;}
+.delta-box span{color:var(--muted);display:block;line-height:1.8}
+
+.tab-nav-wrap{background:var(--forge);border-bottom:2px solid #0d0d20;position:relative;}
+.tab-nav{display:flex;gap:0;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:thin;scrollbar-color:#1a1a30 var(--forge);}
+.tab-nav::-webkit-scrollbar{height:4px}.tab-nav::-webkit-scrollbar-track{background:var(--forge)}.tab-nav::-webkit-scrollbar-thumb{background:#1a1a30;border-radius:2px}
+.tab{flex:1 1 0;min-width:160px;padding:1.1rem .9rem;text-align:center;cursor:pointer;font-family:var(--font-m);font-size:9px;letter-spacing:.14em;text-transform:uppercase;border-right:1px solid #0d0d20;transition:all .25s;color:var(--muted);border-bottom:3px solid transparent;white-space:nowrap;}
+.tab:hover{background:#0a0a18;color:var(--text)}
+.tab.active{background:#040408;}
+.tab.t-boiler{color:var(--boiler);border-bottom-color:var(--boiler)}
+.tab.t-piston{color:var(--piston);border-bottom-color:var(--piston)}
+.tab.t-trans{color:var(--tank);border-bottom-color:var(--tank)}
+.tab.t-drive{color:var(--new);border-bottom-color:var(--new)}
+.tab.t-power{color:var(--elec);border-bottom-color:var(--elec)}
+.tab.t-next{color:var(--next);border-bottom-color:var(--next)}
+
+.panel{display:none;animation:fadein .35s ease}.panel.active{display:block}
+@@keyframes fadein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.wrap{max-width:1500px;margin:0 auto;padding:3.5rem 2rem}
+.eyebrow{font-family:var(--font-m);font-size:10px;letter-spacing:.22em;text-transform:uppercase;margin-bottom:.5rem}
+.section-title{font-family:var(--font-d);font-size:1.7rem;font-weight:400;color:#fff;margin-bottom:.7rem;letter-spacing:-.02em}
+.section-lead{color:var(--muted);font-size:13px;line-height:1.95;max-width:1100px;margin-bottom:2rem}
+
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:#0d0d20;border:1px solid #0d0d20;border-radius:3px;overflow:hidden;margin:2rem 0}
+.metric{background:var(--forge);padding:1.4rem .8rem;text-align:center}
+.metric .val{font-family:var(--font-d);font-size:1.9rem;line-height:1;margin-bottom:.3rem}
+.metric .lbl{font-family:var(--font-m);font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.13em}
+
+.schem{background:var(--void);border:1px solid #0d0d20;border-radius:3px;padding:1rem;overflow-x:auto;margin:1.5rem 0}
+
+.g2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1.4rem;margin:1.5rem 0}
+.g3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:1.4rem;margin:1.5rem 0}
+
+.card{background:var(--forge);border:1px solid #0d0d20;border-radius:3px;padding:1.6rem}
+.card h3{font-family:var(--font-d);font-size:1rem;font-weight:400;color:#fff;margin-bottom:.7rem}
+.srow{display:flex;justify-content:space-between;font-size:11.5px;padding:.35rem 0;border-bottom:1px solid #0a0a18;color:var(--muted)}
+.srow:last-child{border-bottom:none}.srow .v{font-weight:600}
+
+.badge{display:inline-block;font-family:var(--font-m);font-size:9px;letter-spacing:.13em;text-transform:uppercase;padding:3px 10px;border-radius:2px;margin-bottom:.7rem;border:1px solid}
+
+.tbl{background:var(--void);border:1px solid #0d0d20;border-radius:3px;overflow-x:auto;margin:1.5rem 0}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:600px}
+thead{background:var(--forge)}
+th{font-family:var(--font-m);font-weight:400;text-align:left;padding:.8rem 1rem;text-transform:uppercase;letter-spacing:.1em;font-size:9px;border-bottom:2px solid #0d0d20;color:var(--struct)}
+td{padding:.65rem 1rem;border-bottom:1px solid #0a0a18;color:var(--text);font-size:12px}
+tr:last-child td{border-bottom:none}
+tbody tr:hover{background:var(--forge)}
+
+.warn-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--elec);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.warn-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--elec);margin-bottom:1rem}
+.warn-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1rem;position:relative}
+.warn-box li::before{content:'⚠';position:absolute;left:0;color:var(--elec);font-size:10px}
+
+.new-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--berserker);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.new-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--berserker);margin-bottom:1rem}
+.new-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1.2rem;position:relative}
+.new-box li::before{content:'▶';position:absolute;left:0;color:var(--berserker);font-size:9px;top:2px}
+
+.next-box{background:var(--forge);border:1px solid #0d0d20;border-left:4px solid var(--next);border-radius:3px;padding:1.4rem;margin:1.5rem 0}
+.next-box h4{font-family:var(--font-m);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--next);margin-bottom:1rem}
+.next-box li{font-size:12px;color:var(--muted);margin-bottom:.5rem;list-style:none;padding-left:1.2rem;position:relative}
+.next-box li::before{content:'◆';position:absolute;left:0;color:var(--next);font-size:9px;top:2px}
+
+.pass{color:var(--steam)}.fail{color:var(--safe)}.warn{color:var(--elec)}.isnew{color:var(--new)}.isnext{color:var(--next)}.igold{color:var(--gold)}
+
+@@keyframes steamflow{to{stroke-dashoffset:-24}}
+@@keyframes pulse{0%,100%{opacity:.35}50%{opacity:1}}
+@@keyframes powerpulse{to{stroke-dashoffset:-16}}
+@@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@@keyframes glow{0%,100%{opacity:.1}50%{opacity:.4}}
+@@keyframes waterflow{to{stroke-dashoffset:-16}}
+@@keyframes aegisglow{0%,100%{opacity:.15}50%{opacity:.7}}
+@@keyframes drivepulse{to{stroke-dashoffset:-24}}
+@@keyframes heatpulse{0%,100%{opacity:.3}50%{opacity:1}}
+@@keyframes exhaustflow{to{stroke-dashoffset:-20}}
+@@keyframes berserkerpulse{0%,100%{opacity:.2}50%{opacity:.9}}
+
+.a-steam{stroke-dasharray:8,4;animation:steamflow 1.8s linear infinite}
+.a-pulse{animation:pulse 1.4s ease-in-out infinite}
+.a-power{stroke-dasharray:6,3;animation:powerpulse 1.4s linear infinite}
+.a-glow{animation:glow 2s ease-in-out infinite}
+.a-water{stroke-dasharray:5,4;animation:waterflow 1s linear infinite}
+.a-aegis{animation:aegisglow 2s ease-in-out infinite}
+.a-drive{stroke-dasharray:10,4;animation:drivepulse 1.2s linear infinite}
+.a-heat{animation:heatpulse 1.5s ease-in-out infinite}
+.a-exhaust{stroke-dasharray:6,4;animation:exhaustflow 1.4s linear infinite}
+.a-berserker{animation:berserkerpulse 1s ease-in-out infinite}
+
+.footer{background:var(--forge);border-top:1px solid #0d0d20;padding:1.5rem;text-align:center;font-family:var(--font-m);font-size:10px;color:#2a0800;letter-spacing:.1em}
+@@media(max-width:700px){.wrap{padding:2rem 1rem}.tab{min-width:130px;padding:.7rem .5rem}}
+</style>
+</head>
+<body>
+
+<div class="banner">
+  <div class="phase-pill">Phase 26 · Mack Berserker · Multi-Bowl Flash Boiler · 3 ft Gold Pistons · Dual Tank Belt</div>
+  <h1><span class="b">Mack</span> <span class="g">Berserker</span> <span class="s">Steam Truck</span></h1>
+  <p>
+    Phase 26 — <strong>Mack Berserker</strong> — heavy steam truck built on the Mack cab-over chassis visible in the Blender model.
+    <strong>100 gallon front-mounted multi-bowl flash boiler</strong> — multiple Aegis-derived hemispherical copper bowls in a single large pressure vessel — maximum flash surface area for maximum sustained steam output.
+    <strong>3 ft stroke gold steam pistons</strong> — largest piston stroke in the Miasma series — 3 foot stroke · bore to be confirmed in Phase 27 — gold anodised cylinder barrels — locomotive-scale power output.
+    <strong>Transmission TBD Phase 27</strong> — carrier plate concept under development.
+    <strong>Dual Tank Belt Chain Driveshafts</strong> — two ANSI #160 double strand longitudinal chains running in parallel from transmission output to rear bevel gear set — split torque load across two chains — rated for full Berserker torque range.
+    Estimated torque at 90 PSI idle: <strong>~42,000 Nm</strong> — at 500 PSI maximum: <strong>~234,000 Nm</strong> — estimated peak horsepower: <strong>~3,100 HP at 500 PSI and 900 RPM</strong>.
+    This is a semi truck. It does not need to be subtle.
+  </p>
+  <div class="delta-box">
+    PHASE 26 — NEW VERSUS PHASE 25 (CHEVY MIASMA DECKER)
+    <span>▶ Platform change — Chevy Impala replaced by Mack cab-over truck chassis — Blender model base confirmed as Mack Berserker 002</span>
+    <span>▶ Boiler — 100 gallon multi-bowl flash boiler front-mounted in engine bay — multiple Aegis hemispherical copper bowls — design TBD Phase 27 — capacity scale-up ×10 vs Decker 9000</span>
+    <span>▶ Pistons — 3 ft stroke gold anodised cylinders — largest stroke in the Miasma series — cylinder count and bore TBD Phase 27 — torque scaling confirmed below</span>
+    <span>▶ Transmission — design TBD Phase 27 — carrier plate concept under study — HTD V2 concept from Phase 25 as starting reference — must handle minimum 42,000 Nm at idle</span>
+    <span>▶ Drivetrain — Dual Tank Belt Chain — two ANSI #160 DS chains in parallel — replaces single chain from Decker 9000 — 2× torque capacity — dual bevel gear rear turn</span>
+    <span>▶ Torque — estimated 42,000 Nm at 90 PSI · 116,000 Nm at 250 PSI · 234,000 Nm at 500 PSI — all estimates pending bore confirmation in Phase 27</span>
+    <span>▶ Horsepower — estimated 3,100 HP at 500 PSI and 900 RPM — comparable to four Bugatti Chirons combined — from steam</span>
+    <span>▶ Aegis Boiler Mark 1 concept fully carried forward and scaled — dome rivets · TIG corner trim · standpipe outlets · steam trap · expansion buffer · EWI mist — all Phase 23 learnings applied at 100 gallon scale</span>
+  </div>
+</div>
+
+<div class="tab-nav-wrap">
+  <div class="tab-nav" id="tabNav">
+    <div class="tab t-boiler active" onclick="showTab('boiler',this)">🔥 Multi-Bowl Boiler<br><small style="font-size:7px">100 Gal · Multi-Bowl · Front Mount</small></div>
+    <div class="tab t-piston" onclick="showTab('piston',this)">🟡 Gold Pistons<br><small style="font-size:7px">3 ft Stroke · Torque · HP Calc</small></div>
+    <div class="tab t-trans" onclick="showTab('trans',this)">⛓ Transmission TBD<br><small style="font-size:7px">Carrier Plate · HTD Ref · Ph27</small></div>
+    <div class="tab t-drive" onclick="showTab('drive',this)">🔗 Dual Tank Belt<br><small style="font-size:7px">Twin ANSI #160 · Bevel · Diff</small></div>
+    <div class="tab t-power" onclick="showTab('power',this)">⚡ Power & Torque<br><small style="font-size:7px">Nm · HP · Pressure Table</small></div>
+    <div class="tab t-next" onclick="showTab('next',this)">🔮 Phase 27 Prep<br><small style="font-size:7px">Bore · Trans Design · Dims</small></div>
+  </div>
+</div>
+
+<!-- ===================== BOILER TAB ===================== -->
+<div class="panel active" id="panel-boiler">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--boiler)">Diagram 1 · Multi-Bowl Flash Boiler — Phase 26 Concept</div>
+  <h2 class="section-title">100 Gallon Front-Mounted Pressure Vessel · Multiple Aegis Hemispherical Copper Bowls · Maximum Flash Surface</h2>
+  <p class="section-lead">
+    The Phase 26 boiler is a <strong style="color:var(--boiler)">100 gallon multi-bowl flash boiler</strong> mounted in the front engine bay of the Mack Berserker cab-over chassis. The exact internal layout is not yet designed — Phase 27 will produce the full fabrication drawing — but the core concept is confirmed: <strong style="color:var(--boiler)">multiple Aegis-derived hemispherical copper bowls</strong> arranged inside a single large stainless steel pressure vessel, each with its own heater element beneath it, each with dome rivets throughout its concave face, each generating steam independently and feeding into a common steam collection manifold.
+    All Phase 23 Aegis Boiler learnings are carried forward and scaled. The dome geometry, TIG fillet corner trim, standpipe dry-steam outlets, steam trap, expansion buffer, dual EWI mist injectors, PRV array, and fusible plug array all apply at this scale. The boiler occupies the full front engine bay — roughly the footprint a conventional Mack diesel engine would occupy, but significantly taller.
+    A 100 gallon vessel at 90 PSI operating pressure with multiple bowl flash surfaces is estimated to sustain steam output sufficient to keep both 3 ft gold pistons at continuous maximum stroke rate — this is the design target the Phase 27 bowl count and heater array must validate.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--boiler)">100</div><div class="lbl">Gallon Vessel</div></div>
+    <div class="metric"><div class="val" style="color:var(--boiler)">378L</div><div class="lbl">Vessel Capacity</div></div>
+    <div class="metric"><div class="val" style="color:var(--boiler)">MULTI</div><div class="lbl">Copper Bowls</div></div>
+    <div class="metric"><div class="val" style="color:var(--bowl)">90°</div><div class="lbl">Bowl Hemisphere</div></div>
+    <div class="metric"><div class="val" style="color:var(--steam)">90</div><div class="lbl">PSI Idle</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">500</div><div class="lbl">PSI Maximum</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">600</div><div class="lbl">PSI PRV Spring</div></div>
+    <div class="metric"><div class="val" style="color:var(--boiler)">FRONT</div><div class="lbl">Chassis Position</div></div>
+    <div class="metric"><div class="val" style="color:var(--elec)">TBD</div><div class="lbl">Bowl Count Ph27</div></div>
+    <div class="metric"><div class="val" style="color:var(--elec)">TBD</div><div class="lbl">Heater kW Total</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">DUAL</div><div class="lbl">EWI Injectors</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">SS 316L</div><div class="lbl">Vessel Material</div></div>
+  </div>
+
+  <div class="schem">
+  <svg width="100%" viewBox="0 0 1400 700" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg26" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#e8c060" stop-opacity=".15"/><stop offset="100%" stop-color="#e8c060" stop-opacity="0"/></radialGradient>
+    <radialGradient id="sg26" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#39ff14" stop-opacity=".1"/><stop offset="100%" stop-color="#39ff14" stop-opacity="0"/></radialGradient>
+    <filter id="gf26"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+    <marker id="as26" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#39ff14"/></marker>
+    <marker id="ai26" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#00bfff"/></marker>
+    <marker id="ab26" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#cc2200"/></marker>
+  </defs>
+  <rect width="1400" height="700" fill="#000008"/>
+  <text x="700" y="22" text-anchor="middle" font-size="12" fill="#e8c060" font-family="Courier New" font-weight="700" letter-spacing="2">MACK BERSERKER — MULTI-BOWL FLASH BOILER — PHASE 26 CONCEPT</text>
+  <text x="700" y="38" text-anchor="middle" font-size="9" fill="#404060" font-family="Courier New">100 gallon SS 316L vessel · multiple Aegis copper bowls · front engine bay · design TBD Phase 27</text>
+
+  <!-- Main vessel outline -->
+  <rect x="160" y="60" width="1080" height="560" rx="28" fill="#060200" stroke="#e8c060" stroke-width="3" filter="url(#gf26)"/>
+  <ellipse cx="700" cy="340" rx="480" ry="250" fill="url(#bg26)" class="a-glow"/>
+  <text x="700" y="88" text-anchor="middle" font-size="10" fill="#e8c060" font-family="Courier New" font-weight="700">100 GALLON PRESSURE VESSEL — SS 316L — FRONT MOUNT — MACK BERSERKER ENGINE BAY</text>
+  <text x="700" y="104" text-anchor="middle" font-size="8" fill="#604010" font-family="Courier New">Dome faces all four sides · TIG fillet all interior corners · PRV array top · dual EWI injectors top center · steam manifold front face</text>
+
+  <!-- Steam collection zone top -->
+  <rect x="180" y="116" width="1040" height="80" rx="6" fill="#001808" stroke="#39ff14" stroke-width="1.5" opacity=".9"/>
+  <ellipse cx="700" cy="156" rx="480" ry="35" fill="url(#sg26)" class="a-glow"/>
+  <text x="700" y="148" text-anchor="middle" font-size="10" fill="#39ff14" font-family="Courier New" font-weight="700">STEAM COLLECTION MANIFOLD — DRY STEAM ONLY — FULL WIDTH OF VESSEL</text>
+  <text x="700" y="164" text-anchor="middle" font-size="8" fill="#004020" font-family="Courier New">Counter-flow: mist falls ↓ from dual EWI injectors · steam rises ↑ from all bowls · standpipe bank on front face</text>
+  <text x="700" y="180" text-anchor="middle" font-size="7" fill="#39ff14" font-family="Courier New">Each bowl contributes independently · manifold combines all steam output · single dry steam delivery to pistons</text>
+
+  <!-- PRV bank top -->
+  <rect x="580" y="66" width="240" height="28" rx="4" fill="#1a0000" stroke="#ff4500" stroke-width="2"/>
+  <text x="700" y="84" text-anchor="middle" font-size="8" fill="#ff4500" font-family="Courier New">PRV ARRAY × 6 — 600 PSI SPRING — MANDATORY</text>
+
+  <!-- Bowl 1 -->
+  <ellipse cx="340" cy="380" rx="130" ry="38" fill="#0a0500" stroke="#b87333" stroke-width="2"/>
+  <path d="M210 310 Q340 380 470 310" fill="#0a0300" stroke="#b87333" stroke-width="2.5"/>
+  <text x="340" y="330" text-anchor="middle" font-size="9" fill="#b87333" font-family="Courier New" font-weight="700">BOWL 1</text>
+  <text x="340" y="346" text-anchor="middle" font-size="7" fill="#604010" font-family="Courier New">Aegis hemisphere · dome rivets</text>
+  <text x="340" y="360" text-anchor="middle" font-size="7" fill="#b87333" font-family="Courier New">Heater beneath · concave up</text>
+  <circle cx="300" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="320" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="340" cy="312" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="360" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="380" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <rect x="250" y="388" width="180" height="18" rx="4" fill="#1a0000" stroke="#ff4500" stroke-width="1.5" class="a-heat"/>
+  <text x="340" y="401" text-anchor="middle" font-size="7" fill="#ff4500" font-family="Courier New">HEATER ELEMENT × 1</text>
+  <!-- Steam rise from bowl 1 -->
+  <line x1="340" y1="305" x2="340" y2="200" stroke="#39ff14" stroke-width="1.5" stroke-dasharray="5,3" class="a-steam" marker-end="url(#as26)"/>
+
+  <!-- Bowl 2 -->
+  <ellipse cx="700" cy="380" rx="130" ry="38" fill="#0a0500" stroke="#b87333" stroke-width="2"/>
+  <path d="M570 310 Q700 380 830 310" fill="#0a0300" stroke="#b87333" stroke-width="2.5"/>
+  <text x="700" y="330" text-anchor="middle" font-size="9" fill="#b87333" font-family="Courier New" font-weight="700">BOWL 2</text>
+  <text x="700" y="346" text-anchor="middle" font-size="7" fill="#604010" font-family="Courier New">Aegis hemisphere · dome rivets</text>
+  <text x="700" y="360" text-anchor="middle" font-size="7" fill="#b87333" font-family="Courier New">Heater beneath · concave up</text>
+  <circle cx="660" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="680" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="700" cy="312" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="720" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="740" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <rect x="610" y="388" width="180" height="18" rx="4" fill="#1a0000" stroke="#ff4500" stroke-width="1.5" class="a-heat"/>
+  <text x="700" y="401" text-anchor="middle" font-size="7" fill="#ff4500" font-family="Courier New">HEATER ELEMENT × 1</text>
+  <line x1="700" y1="305" x2="700" y2="200" stroke="#39ff14" stroke-width="1.5" stroke-dasharray="5,3" class="a-steam" style="animation-delay:.3s" marker-end="url(#as26)"/>
+
+  <!-- Bowl 3 -->
+  <ellipse cx="1060" cy="380" rx="130" ry="38" fill="#0a0500" stroke="#b87333" stroke-width="2"/>
+  <path d="M930 310 Q1060 380 1190 310" fill="#0a0300" stroke="#b87333" stroke-width="2.5"/>
+  <text x="1060" y="330" text-anchor="middle" font-size="9" fill="#b87333" font-family="Courier New" font-weight="700">BOWL 3</text>
+  <text x="1060" y="346" text-anchor="middle" font-size="7" fill="#604010" font-family="Courier New">Aegis hemisphere · dome rivets</text>
+  <text x="1060" y="360" text-anchor="middle" font-size="7" fill="#b87333" font-family="Courier New">Heater beneath · concave up</text>
+  <circle cx="1020" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="1040" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="1060" cy="312" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="1080" cy="316" r="5" fill="#c0a060" opacity=".8"/>
+  <circle cx="1100" cy="325" r="5" fill="#c0a060" opacity=".8"/>
+  <rect x="970" y="388" width="180" height="18" rx="4" fill="#1a0000" stroke="#ff4500" stroke-width="1.5" class="a-heat"/>
+  <text x="1060" y="401" text-anchor="middle" font-size="7" fill="#ff4500" font-family="Courier New">HEATER ELEMENT × 1</text>
+  <line x1="1060" y1="305" x2="1060" y2="200" stroke="#39ff14" stroke-width="1.5" stroke-dasharray="5,3" class="a-steam" style="animation-delay:.6s" marker-end="url(#as26)"/>
+
+  <!-- More bowls placeholder row below -->
+  <text x="700" y="460" text-anchor="middle" font-size="9" fill="#604010" font-family="Courier New" font-style="italic">+ additional bowl rows — count TBD Phase 27 based on required steam output volume</text>
+  <text x="700" y="478" text-anchor="middle" font-size="8" fill="#604010" font-family="Courier New">Each row adds ~33% more flash surface area · each bowl operates independently · manifold sums all output</text>
+
+  <!-- Dual EWI injectors top -->
+  <rect x="560" y="60" width="90" height="50" rx="5" fill="#020a14" stroke="#00bfff" stroke-width="2"/>
+  <text x="605" y="80" text-anchor="middle" font-size="7" fill="#00bfff" font-family="Courier New" font-weight="700">EWI #1</text>
+  <text x="605" y="94" text-anchor="middle" font-size="6" fill="#005080" font-family="Courier New">300 PSI mist</text>
+  <text x="605" y="106" text-anchor="middle" font-size="6" fill="#00bfff" font-family="Courier New">PID · check valve</text>
+  <rect x="750" y="60" width="90" height="50" rx="5" fill="#020a14" stroke="#00bfff" stroke-width="2"/>
+  <text x="795" y="80" text-anchor="middle" font-size="7" fill="#00bfff" font-family="Courier New" font-weight="700">EWI #2</text>
+  <text x="795" y="94" text-anchor="middle" font-size="6" fill="#005080" font-family="Courier New">300 PSI mist</text>
+  <text x="795" y="106" text-anchor="middle" font-size="6" fill="#00bfff" font-family="Courier New">PID · check valve</text>
+  <line x1="605" y1="110" x2="605" y2="200" stroke="#00bfff" stroke-width="1.5" stroke-dasharray="4,3" class="a-steam" marker-end="url(#ai26)"/>
+  <line x1="795" y1="110" x2="795" y2="200" stroke="#00bfff" stroke-width="1.5" stroke-dasharray="4,3" class="a-steam" style="animation-delay:.5s" marker-end="url(#ai26)"/>
+
+  <!-- Steam manifold outlet arrow -->
+  <line x1="160" y1="155" x2="80" y2="155" stroke="#39ff14" stroke-width="3" stroke-dasharray="8,4" class="a-steam" marker-end="url(#as26)"/>
+  <text x="55" y="148" text-anchor="middle" font-size="8" fill="#39ff14" font-family="Courier New">→ PISTONS</text>
+  <text x="55" y="162" text-anchor="middle" font-size="7" fill="#004020" font-family="Courier New">3/4"+ pipes</text>
+
+  <!-- TIG corner callouts -->
+  <text x="190" y="135" font-size="7" fill="#c0a060" font-family="Courier New">TIG FILLET</text>
+  <text x="190" y="145" font-size="7" fill="#c0a060" font-family="Courier New">ALL CORNERS</text>
+
+  <!-- Water supply note -->
+  <rect x="180" y="520" width="1040" height="50" rx="6" fill="#020818" stroke="#40e0d0" stroke-width="1.5"/>
+  <text x="700" y="541" text-anchor="middle" font-size="9" fill="#40e0d0" font-family="Courier New" font-weight="700">WATER SUPPLY — LARGE POLY TANK REAR · DUAL DIAPHRAGM PUMPS · DUAL FILTER STACKS · CONDENSER LOOP</text>
+  <text x="700" y="559" text-anchor="middle" font-size="8" fill="#005060" font-family="Courier New">100 gallon poly tank in rear — volume TBD Phase 27 — dual condenser banks — near-zero net consumption at cruise — distilled preferred</text>
+
+  <text x="700" y="688" text-anchor="middle" font-size="8" fill="#404060" font-family="Courier New">Phase 26 · Mack Berserker · Multi-Bowl Flash Boiler · 100 Gal SS 316L · Aegis Bowls × TBD · Dome Rivets · TIG Corners · Dual EWI · PRV × 6 · Steam Manifold → 3 ft Gold Pistons</text>
+  </svg>
+  </div>
+
+  <div class="new-box">
+    <h4>▶ MULTI-BOWL DESIGN PHILOSOPHY — WHY MORE BOWLS</h4>
+    <ul>
+      <li>A single large flat boiler surface has diminishing returns — steam generated at one point has to travel through liquid to the steam space above, losing energy to the water column above it</li>
+      <li>Multiple small hemispherical bowls each flash-convert their own localised water supply independently — the steam rises directly from the bowl surface into the steam space with no water column resistance above it</li>
+      <li>Each bowl is a self-contained flash generator — fail one bowl and the rest continue — redundancy is built into the multi-bowl architecture at no extra cost</li>
+      <li>Adding bowls adds steam output proportionally — the 100 gallon vessel can accommodate significantly more bowl surface area than the 14cm cube Aegis Boiler — exact bowl count to be confirmed in Phase 27 once vessel internal dimensions are confirmed in Blender</li>
+      <li>Dome rivets on every bowl — uniform 5mm dome pattern — all Phase 23 bowl wisdom applied — water still has to flank the dome from the rear on every single rivet on every single bowl in the vessel</li>
+      <li>TIG curved fillet on all interior vessel corners — even more critical at 100 gallon scale — larger vessel means larger corner stress under pressure cycling — fillets eliminate stress concentration at every corner</li>
+    </ul>
+  </div>
+
+  <div class="g3">
+    <div class="card" style="border-left:3px solid var(--boiler)">
+      <div class="badge" style="color:var(--boiler);border-color:var(--boiler)">Vessel Spec — Phase 26</div>
+      <h3>100 Gallon SS 316L · Front Engine Bay</h3>
+      <div class="srow"><span>Volume</span><span class="v igold">100 US gallons / 378 litres</span></div>
+      <div class="srow"><span>Material</span><span class="v isnew">SS 316L — upgraded from 304</span></div>
+      <div class="srow"><span>Operating PSI</span><span class="v" style="color:var(--steam)">90 PSI idle · 500 PSI max</span></div>
+      <div class="srow"><span>PRV spring PSI</span><span class="v" style="color:var(--safe)">600 PSI — array of 6</span></div>
+      <div class="srow"><span>Bowl material</span><span class="v" style="color:var(--bowl)">Copper C110 — all bowls</span></div>
+      <div class="srow"><span>Bowl geometry</span><span class="v isnew">True 90° hemisphere each</span></div>
+      <div class="srow"><span>Vessel position</span><span class="v isnew">Front engine bay — Mack chassis</span></div>
+      <div class="srow"><span>Wall thickness est.</span><span class="v isnew">TBD Phase 27 — min 2cm</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--inject)">
+      <div class="badge" style="color:var(--inject);border-color:var(--inject)">EWI System — Dual</div>
+      <h3>Two Independent EWI Systems · Full Redundancy</h3>
+      <div class="srow"><span>EWI count</span><span class="v isnew">2 × independent systems</span></div>
+      <div class="srow"><span>Injection pressure</span><span class="v isnew">300 PSI each</span></div>
+      <div class="srow"><span>Check valve</span><span class="v pass">One per EWI — nozzle upstream</span></div>
+      <div class="srow"><span>PID control</span><span class="v pass">Separate PID channel each</span></div>
+      <div class="srow"><span>Redundancy</span><span class="v pass">Lose one EWI — other continues</span></div>
+      <div class="srow"><span>Coverage area</span><span class="v isnew">Split vessel length between two</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--safe)">
+      <div class="badge" style="color:var(--safe);border-color:var(--safe)">Safety — Phase 26</div>
+      <h3>PRV × 6 · Fusible Plugs · Multiple Thermocouples</h3>
+      <div class="srow"><span>PRV count</span><span class="v" style="color:var(--safe)">6 × — spring 600 PSI</span></div>
+      <div class="srow"><span>Fusible plugs</span><span class="v isnew">Multiple — one per bowl zone</span></div>
+      <div class="srow"><span>Shell thermocouples</span><span class="v pass">One per vessel face minimum</span></div>
+      <div class="srow"><span>Bowl thermocouples</span><span class="v pass">One per bowl</span></div>
+      <div class="srow"><span>Mandatory pressure test</span><span class="v" style="color:var(--elec)">To 1,000 PSI before first run</span></div>
+      <div class="srow"><span>Halloween whistle</span><span class="v" style="color:var(--brake)">Mandatory — multi-chime</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PISTON TAB ===================== -->
+<div class="panel" id="panel-piston">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--piston)">Diagram 2 · 3 ft Gold Steam Pistons — Phase 26</div>
+  <h2 class="section-title">3 Foot Stroke · Gold Anodised Cylinder Barrels · Locomotive Scale · Bore TBD Phase 27</h2>
+  <p class="section-lead">
+    The Phase 26 pistons are a <strong style="color:var(--piston)">3 foot (914mm) stroke</strong> — the largest stroke in the Miasma series by a factor of approximately 3.7 versus the 250mm stroke in the Decker 9000. The cylinder barrels are <strong style="color:var(--piston)">gold anodised</strong> — structural chromoly 4340 with a hard anodised gold finish on the exterior barrel faces for visual identification and thermal signature.
+    Bore is not yet confirmed — this is the primary Phase 27 calculation item. The torque table below uses bore estimates from 150mm through 250mm to bracket the expected output range. At 200mm bore the numbers are approximately: <strong style="color:var(--safe)">42,000 Nm at 90 PSI idle</strong> and <strong style="color:var(--safe)">234,000 Nm at 500 PSI maximum</strong>. These figures assume a cylinder count of two — same as the Decker 9000 — which may be increased in Phase 27 once the transmission design is confirmed capable of accepting the combined output.
+    The 3 ft stroke piston is fundamentally a locomotive cylinder. Locomotive builders have used strokes in this range since the 1880s — the physics is proven. The engineering challenge is not the piston itself but the crankshaft geometry and the transmission that receives the output.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--piston)">3 ft</div><div class="lbl">Piston Stroke</div></div>
+    <div class="metric"><div class="val" style="color:var(--piston)">914mm</div><div class="lbl">Stroke mm</div></div>
+    <div class="metric"><div class="val" style="color:var(--piston)">GOLD</div><div class="lbl">Barrel Finish</div></div>
+    <div class="metric"><div class="val" style="color:var(--muted)">TBD</div><div class="lbl">Bore Phase 27</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">2+</div><div class="lbl">Cylinder Count</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">42,000</div><div class="lbl">Nm  90 PSI est.</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">234,000</div><div class="lbl">Nm  500 PSI est.</div></div>
+    <div class="metric"><div class="val" style="color:var(--elec)">~3,100</div><div class="lbl">HP est. peak</div></div>
+    <div class="metric"><div class="val" style="color:var(--piston)">4340</div><div class="lbl">Crankshaft Steel</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">90°</div><div class="lbl">Crankshaft Angle</div></div>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Bore</th><th>Area cm²</th><th>Force  90 PSI</th><th>Force  250 PSI</th><th>Force  500 PSI</th><th>Torque  90 PSI</th><th>Torque  500 PSI</th><th>Notes</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--piston)">150mm</td><td>176.7</td><td>109.8 kN</td><td>304.9 kN</td><td>609.9 kN</td><td class="warn">~25,100 Nm × 2 cyl</td><td class="warn">~139,500 Nm × 2 cyl</td><td>Minimum practical bore est.</td></tr>
+  <tr><td style="color:var(--piston)">175mm</td><td>240.5</td><td>149.5 kN</td><td>415.3 kN</td><td>830.6 kN</td><td class="isnew">~34,200 Nm × 2 cyl</td><td class="isnew">~189,900 Nm × 2 cyl</td><td>Mid-range bore option</td></tr>
+  <tr><td style="color:var(--piston) font-weight:700">200mm</td><td>314.2</td><td>195.3 kN</td><td>542.5 kN</td><td>1,085 kN</td><td class="pass">~42,100 Nm × 2 cyl</td><td class="pass">~234,000 Nm × 2 cyl</td><td>Primary design target estimate</td></tr>
+  <tr><td style="color:var(--piston)">225mm</td><td>397.6</td><td>247.2 kN</td><td>686.7 kN</td><td>1,373 kN</td><td class="fail">~56,500 Nm × 2 cyl</td><td class="fail">~314,000 Nm × 2 cyl</td><td>Upper bound — transmission limit</td></tr>
+  <tr><td style="color:var(--piston)">250mm</td><td>490.9</td><td>305.1 kN</td><td>847.5 kN</td><td>1,695 kN</td><td class="fail">~69,700 Nm × 2 cyl</td><td class="fail">~387,400 Nm × 2 cyl</td><td>Possible only with 4+ strand chain</td></tr>
+  </tbody>
+  </table>
+  </div>
+  <p style="font-family:var(--font-m);font-size:9px;color:var(--muted);margin-top:.5rem">Torque formula: Force (N) × stroke/2 (m) × 2 cylinders. Stroke = 914mm. Force = bore area × pressure. All estimates assume 2 cylinders. Crankshaft arm = stroke/2 = 457mm.</p>
+
+  <div class="new-box">
+    <h4>▶ GOLD PISTON ENGINEERING NOTES</h4>
+    <ul>
+      <li>Gold anodised finish is a hard anodise Type III process — 25 micron anodise layer over the external barrel surface — purely cosmetic and thermal signature — does not affect bore tolerances or piston ring seal</li>
+      <li>3 ft stroke means the connecting rod or crosshead guide must be at minimum 3 ft long — locomotive crosshead and slide bar geometry is the reference — the Berserker uses the same locomotive rail-wheel and crankshaft concept as the Decker 9000 scaled up</li>
+      <li>At 900 RPM and 914mm stroke the piston mean speed is approximately 27.4 metres per second — this is above the typical locomotive limit of ~12 m/s but within the range of marine diesel pistons which reach 10–12 m/s — Phase 27 must confirm acceptable piston speed for the liner material and ring design chosen</li>
+      <li>Cylinder barrel material: chromoly 4340 liner with chrome bore — same family as the Decker 9000 but scaled — bore finish to H7 tolerance — same honing spec applies at any diameter</li>
+      <li>Crankshaft at 90 degrees confirmed carried from Decker 9000 — each locomotive wheel pair drives one crankshaft — crankshaft diameter must increase significantly from the 60mm 4340 used in the Decker — Phase 27 to calculate minimum crankshaft diameter at 200mm bore 500 PSI</li>
+    </ul>
+  </div>
+
+  <div class="g3">
+    <div class="card" style="border-left:3px solid var(--piston)">
+      <div class="badge" style="color:var(--piston);border-color:var(--piston)">Piston Spec</div>
+      <h3>3 ft Stroke · Gold Barrel · Crosshead Drive</h3>
+      <div class="srow"><span>Stroke</span><span class="v igold">3 ft / 914mm</span></div>
+      <div class="srow"><span>Bore</span><span class="v warn">TBD Phase 27 — est. 200mm</span></div>
+      <div class="srow"><span>Barrel finish</span><span class="v igold">Gold anodise Type III hard coat</span></div>
+      <div class="srow"><span>Barrel material</span><span class="v isnew">Chromoly 4340 — chrome bore</span></div>
+      <div class="srow"><span>Drive geometry</span><span class="v isnew">Locomotive crosshead + rail</span></div>
+      <div class="srow"><span>Crankshaft angle</span><span class="v pass">90° — carried from Decker 9000</span></div>
+      <div class="srow"><span>Ring spec</span><span class="v isnew">TBD Phase 27 — per bore confirmed</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--steam)">
+      <div class="badge" style="color:var(--steam);border-color:var(--steam)">Steam Supply</div>
+      <h3>Large Bore Steam Lines · Full Manifold Width</h3>
+      <div class="srow"><span>Steam pipe bore</span><span class="v isnew">TBD Phase 27 — min 38mm ID</span></div>
+      <div class="srow"><span>PCW inlet valves</span><span class="v pass">One per cylinder — PID timed</span></div>
+      <div class="srow"><span>PCW exhaust valves</span><span class="v pass">One per cylinder — PID timed</span></div>
+      <div class="srow"><span>Steam trap</span><span class="v pass">Post-exhaust valve each cyl</span></div>
+      <div class="srow"><span>Expansion buffer</span><span class="v pass">2L minimum — larger vessel</span></div>
+      <div class="srow"><span>Insulation</span><span class="v pass">Aerogel wrap — full pipe length</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--berserker)">
+      <div class="badge" style="color:var(--berserker);border-color:var(--berserker)">Comparison</div>
+      <h3>Berserker vs Decker 9000 — Scale Factor</h3>
+      <div class="srow"><span>Stroke — Decker 9000</span><span class="v" style="color:var(--muted)">250mm</span></div>
+      <div class="srow"><span>Stroke — Berserker</span><span class="v igold">914mm — 3.66× larger</span></div>
+      <div class="srow"><span>Bore — Decker 9000</span><span class="v" style="color:var(--muted)">75mm</span></div>
+      <div class="srow"><span>Bore — Berserker est.</span><span class="v igold">200mm est. — 2.67× larger</span></div>
+      <div class="srow"><span>Torque × factor est.</span><span class="v" style="color:var(--safe)">~61× at equivalent pressure</span></div>
+      <div class="srow"><span>Platform</span><span class="v isnew">Mack truck vs Chevy Impala</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== TRANSMISSION TAB ===================== -->
+<div class="panel" id="panel-trans">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--tank)">Diagram 3 · Transmission — TBD Phase 27</div>
+  <h2 class="section-title">Design Not Yet Started · Carrier Plate Concept · HTD V2 as Reference · Must Handle 42,000 Nm Idle Minimum</h2>
+  <p class="section-lead">
+    The Berserker transmission is not yet designed. This tab captures the known constraints, the carrier plate concept under consideration, and the HTD V2 from Phase 25 as a starting reference. Phase 27 will produce the full transmission design. The single firm constraint the Phase 27 design must satisfy is <strong style="color:var(--safe)">minimum rated torque of 42,000 Nm at idle (90 PSI)</strong> — rising to 234,000 Nm at maximum pressure. No conventional automotive or truck transmission can handle these loads. Like the Decker 9000, chain drive is the only viable approach at this torque scale.
+    The <strong style="color:var(--tank)">carrier plate concept</strong> under consideration adapts the HTD telescopic derailleur concept to a much larger chain — multiple parallel chains per gear position, a large diameter carrier plate that holds multiple output sprockets at fixed radii, and a hydraulic actuator that indexes the entire carrier plate to bring successive sprocket rings into alignment with the input chain. This is analogous to an epicyclic gear carrier but using chain sprockets rather than planet gears.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--tank)">TBD</div><div class="lbl">Transmission Design</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">42,000</div><div class="lbl">Min Nm  90 PSI</div></div>
+    <div class="metric"><div class="val" style="color:var(--safe)">234,000</div><div class="lbl">Max Nm  500 PSI</div></div>
+    <div class="metric"><div class="val" style="color:var(--tank)">CHAIN</div><div class="lbl">Drive Type — Required</div></div>
+    <div class="metric"><div class="val" style="color:var(--tank)">CARRIER</div><div class="lbl">Plate Concept</div></div>
+    <div class="metric"><div class="val" style="color:var(--muted)">PH27</div><div class="lbl">Design Phase</div></div>
+  </div>
+
+  <div class="new-box">
+    <h4>▶ CARRIER PLATE CONCEPT — PRELIMINARY DESCRIPTION</h4>
+    <ul>
+      <li>A large diameter steel carrier plate — estimated 600–900mm diameter — is mounted on the transmission output shaft and can rotate freely relative to it until locked</li>
+      <li>The carrier plate holds multiple concentric rings of sprocket teeth at different radii from the centre — each ring corresponds to one gear ratio — the different radii give different mechanical advantage</li>
+      <li>The input chain from the engine crankshafts is always engaged with the currently selected sprocket ring — a hydraulic indexing actuator rotates the carrier plate to bring a new ring into alignment with the input chain</li>
+      <li>When the desired ring is aligned the carrier plate locks to the output shaft via a hydraulic pin or jaw clutch — torque now flows from input chain through the selected ring through the locked carrier plate to the output shaft</li>
+      <li>A clutch flywheel still disengages drive during indexing — same sequence as HTD V2 — the difference is the carrier plate rotates to the new position rather than a telescopic cylinder moving laterally</li>
+      <li>This concept is more compact laterally than the HTD — the carrier plate keeps the chain on a single longitudinal plane — at Berserker scale lateral space in the chassis is limited and a single-plane transmission is preferred</li>
+      <li>Multiple parallel chains per gear ring — to handle Berserker torque each sprocket ring may be driven by two or three parallel chains simultaneously — torque split across chains</li>
+      <li>All details TBD Phase 27 — this is a concept description not a mechanical design — the Phase 27 Blender model will be the first engineering artefact for this system</li>
+    </ul>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Transmission Constraint</th><th>Value</th><th>Source</th><th>Status</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--tank)">Minimum rated torque</td><td class="fail">42,000 Nm</td><td>90 PSI idle · 200mm bore est.</td><td class="warn">Must be confirmed once bore fixed</td></tr>
+  <tr><td style="color:var(--tank)">Maximum rated torque</td><td class="fail">234,000 Nm</td><td>500 PSI max · 200mm bore est.</td><td class="warn">Must be confirmed once bore fixed</td></tr>
+  <tr><td style="color:var(--tank)">Drive type</td><td class="pass">Chain only</td><td>Same reasoning as Decker 9000 — no gear can survive these loads</td><td class="pass">Confirmed — no alternatives</td></tr>
+  <tr><td style="color:var(--tank)">Concept</td><td class="isnew">Carrier plate</td><td>Phase 26 preliminary thinking</td><td class="warn">Not yet designed</td></tr>
+  <tr><td style="color:var(--tank)">Reference</td><td class="isnew">HTD V2 Phase 25</td><td>Telescopic cylinder + derailleur concept</td><td class="pass">Carries forward chain + clutch + Hall effect logic</td></tr>
+  <tr><td style="color:var(--tank)">Oil bath</td><td class="pass">Required — own sealed compartment</td><td>Phase 23/24/25 oil bath spec</td><td class="pass">GL-4 75W-90 or equivalent — volume TBD</td></tr>
+  <tr><td style="color:var(--tank)">Output to</td><td class="isnew">Dual tank belt chains</td><td>Phase 26 drivetrain spec</td><td class="pass">Two chains from single output shaft</td></tr>
+  <tr><td style="color:var(--tank)">Design deliverable</td><td class="fail">Phase 27</td><td>Full Blender model required</td><td class="fail">Not started — Phase 27 primary task</td></tr>
+  </tbody>
+  </table>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ TRANSMISSION PHASE 27 CRITICAL DESIGN REQUIREMENTS</h4>
+    <ul>
+      <li>Bore must be confirmed before transmission gear ratios can be calculated — torque at the input shaft varies significantly across the bore options — design to the highest plausible bore first and work down</li>
+      <li>Carrier plate diameter must fit within the Mack chassis width — confirm available cross-section in Blender before dimensioning the plate</li>
+      <li>Chain width on the carrier plate rings must match the dual tank belt chain spec (ANSI #160 DS) — all chain in the drivetrain should use the same pitch where possible for interchangeability of parts</li>
+      <li>The clutch flywheel for Berserker must be rated for the full idle torque of 42,000 Nm — this is a significant engineering component — source a clutch rated to this level or design a bespoke flywheel clutch as part of the Phase 27 carrier plate design</li>
+      <li>Halloween whistle must be mounted and accessible from the Mack cab — pull cord to driver position confirmed — steam whistle tap from main steam manifold before PCW inlet valves — same as Decker 9000 logic</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ===================== DUAL TANK BELT TAB ===================== -->
+<div class="panel" id="panel-drive">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--new)">Diagram 4 · Dual Tank Belt Chain Drive — Phase 26</div>
+  <h2 class="section-title">Two ANSI #160 DS Chains in Parallel · Dual Bevel Gear Rear Turn · Split Torque · Tandem Output Shafts</h2>
+  <p class="section-lead">
+    The Berserker uses <strong style="color:var(--new)">two Tank Belt chain driveshafts running in parallel</strong> — side by side — from the transmission output to the rear bevel gear set. Each chain is ANSI #160 double strand — one step heavier than the Decker 9000's ANSI #120 DS — for a safe working load of approximately 24,000 lbs per chain (48,000 lbs combined). At the maximum estimated chain pull for the Berserker at 200mm bore 500 PSI, the combined safe load provides a healthy safety factor.
+    The two chains run side by side in a single sealed housing with roller spacers top and bottom for both chains. They share the same oil bath. At the rear a <strong style="color:var(--new)">dual bevel gear assembly</strong> converts both chains' longitudinal rotation 90 degrees into the transverse rear axle direction simultaneously — both chains drive the same bevel gear input pinion shaft via two sprockets on that shaft, combining their torque before the 90 degree turn.
+    Failure mode advantage over single chain: if one chain fails under extreme load the second chain continues to carry full drive — the vehicle does not immediately lose drive, it loses half its maximum torque which at 500 PSI still leaves approximately 117,000 Nm at the wheels — enough to complete the journey and reach a service point.
+  </p>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--new)">DUAL</div><div class="lbl">Chain Count</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">ANSI #160</div><div class="lbl">Chain Spec DS</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">2"</div><div class="lbl">Chain Pitch</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">24,000</div><div class="lbl">lbs SWL Each DS</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">48,000</div><div class="lbl">lbs Combined SWL</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">TOP+BOT</div><div class="lbl">Roller Spacers × 2</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">DUAL</div><div class="lbl">Bevel Gear Rear</div></div>
+    <div class="metric"><div class="val" style="color:var(--new)">OPEN</div><div class="lbl">Rear Diff — Phase 26</div></div>
+    <div class="metric"><div class="val" style="color:var(--steam)">~6–10L</div><div class="lbl">Oil Bath Volume</div></div>
+    <div class="metric"><div class="val" style="color:var(--steam)">5–20 min</div><div class="lbl">Chain Repair Time</div></div>
+  </div>
+
+  <div class="schem">
+  <svg width="100%" viewBox="0 0 1400 500" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <marker id="an26" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#00ffcc"/></marker>
+    <marker id="ab26b" markerWidth="7" markerHeight="7" refX="6" refY="2.5" orient="auto"><polygon points="0 0,7 2.5,0 5" fill="#8B6914"/></marker>
+  </defs>
+  <rect width="1400" height="500" fill="#000008"/>
+  <text x="700" y="22" text-anchor="middle" font-size="12" fill="#00ffcc" font-family="Courier New" font-weight="700" letter-spacing="2">DUAL TANK BELT CHAIN DRIVE — MACK BERSERKER — PHASE 26</text>
+  <text x="700" y="38" text-anchor="middle" font-size="9" fill="#404060" font-family="Courier New">Two ANSI #160 DS chains · parallel run · dual bevel gear · combined 48,000 lbs SWL · one-chain-fail resilience</text>
+
+  <!-- Housing outline -->
+  <rect x="80" y="60" width="1240" height="350" rx="14" fill="#020308" stroke="#00ffcc" stroke-width="2"/>
+  <text x="700" y="84" text-anchor="middle" font-size="9" fill="#00ffcc" font-family="Courier New" font-weight="700">DUAL TANK BELT SEALED HOUSING — OIL BATH ~6–10L CHAIN OIL — ROLLER SPACERS TOP AND BOTTOM BOTH CHAINS</text>
+
+  <!-- Transmission output sprockets (left) -->
+  <rect x="100" y="140" width="140" height="200" rx="10" fill="#040200" stroke="#8B6914" stroke-width="2.5"/>
+  <text x="170" y="180" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">TRANS</text>
+  <text x="170" y="196" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">OUTPUT</text>
+  <text x="170" y="214" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">Dual sprocket</text>
+  <text x="170" y="228" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">stack on shaft</text>
+  <text x="170" y="244" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">Drives both</text>
+  <text x="170" y="258" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">chains from</text>
+  <text x="170" y="272" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">single output</text>
+  <text x="170" y="286" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">shaft</text>
+
+  <!-- Chain 1 (top run) -->
+  <rect x="240" y="150" width="820" height="28" rx="6" fill="#001010" stroke="#00ffcc" stroke-width="2.5"/>
+  <text x="650" y="169" text-anchor="middle" font-size="8" fill="#00ffcc" font-family="Courier New" font-weight="700">CHAIN 1 — ANSI #160 DS — 2" PITCH — 24,000 LBS SWL</text>
+  <!-- Chain 1 return run -->
+  <rect x="240" y="210" width="820" height="20" rx="5" fill="#001010" stroke="#00ffcc" stroke-width="1.5" opacity=".5"/>
+  <text x="650" y="224" text-anchor="middle" font-size="7" fill="#004040" font-family="Courier New">CHAIN 1 RETURN RUN — BOTTOM ROLLERS GUIDE</text>
+
+  <!-- Chain 2 (below) -->
+  <rect x="240" y="280" width="820" height="28" rx="6" fill="#001010" stroke="#00ffcc" stroke-width="2.5"/>
+  <text x="650" y="299" text-anchor="middle" font-size="8" fill="#00ffcc" font-family="Courier New" font-weight="700">CHAIN 2 — ANSI #160 DS — 2" PITCH — 24,000 LBS SWL</text>
+  <!-- Chain 2 return -->
+  <rect x="240" y="340" width="820" height="20" rx="5" fill="#001010" stroke="#00ffcc" stroke-width="1.5" opacity=".5"/>
+  <text x="650" y="354" text-anchor="middle" font-size="7" fill="#004040" font-family="Courier New">CHAIN 2 RETURN RUN — BOTTOM ROLLERS GUIDE</text>
+
+  <!-- Roller spacers chain 1 -->
+  <circle cx="420" cy="164" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="600" cy="164" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="780" cy="164" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="960" cy="164" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="420" cy="220" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+  <circle cx="700" cy="220" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+  <circle cx="960" cy="220" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+
+  <!-- Roller spacers chain 2 -->
+  <circle cx="420" cy="294" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="600" cy="294" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="780" cy="294" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="960" cy="294" r="9" fill="#001020" stroke="#4a9eff" stroke-width="1.5"/>
+  <circle cx="420" cy="352" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+  <circle cx="700" cy="352" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+  <circle cx="960" cy="352" r="8" fill="#001020" stroke="#4a9eff" stroke-width="1"/>
+
+  <!-- Bevel gear assembly right -->
+  <rect x="1060" y="120" width="230" height="260" rx="12" fill="#040200" stroke="#8B6914" stroke-width="2.5"/>
+  <text x="1175" y="160" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">DUAL BEVEL</text>
+  <text x="1175" y="176" text-anchor="middle" font-size="9" fill="#8B6914" font-family="Courier New" font-weight="700">GEAR REAR</text>
+  <text x="1175" y="196" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">Chain 1 → bevel pinion sprocket 1</text>
+  <text x="1175" y="210" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">Chain 2 → bevel pinion sprocket 2</text>
+  <text x="1175" y="226" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">Both sprockets on same pinion shaft</text>
+  <text x="1175" y="242" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">Torque combines before 90° turn</text>
+  <text x="1175" y="262" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">Crown wheel drives</text>
+  <text x="1175" y="276" text-anchor="middle" font-size="7" fill="#8B6914" font-family="Courier New">rear differential</text>
+  <text x="1175" y="296" text-anchor="middle" font-size="7" fill="#3a1800" font-family="Courier New">GL-5 80W-90 oil</text>
+  <text x="1175" y="316" text-anchor="middle" font-size="8" fill="#00ffcc" font-family="Courier New" font-weight="700">→ REAR AXLE</text>
+  <text x="1175" y="332" text-anchor="middle" font-size="7" fill="#004040" font-family="Courier New">LSD upgrade Phase 27</text>
+  <text x="1175" y="348" text-anchor="middle" font-size="7" fill="#004040" font-family="Courier New">twin driven rear axles</text>
+  <text x="1175" y="364" text-anchor="middle" font-size="7" fill="#004040" font-family="Courier New">option for tandem drive</text>
+
+  <!-- Animated flow lines -->
+  <line x1="240" y1="164" x2="1060" y2="164" stroke="#00ffcc" stroke-width="2" stroke-dasharray="10,5" class="a-drive"/>
+  <line x1="240" y1="294" x2="1060" y2="294" stroke="#00ffcc" stroke-width="2" stroke-dasharray="10,5" class="a-drive" style="animation-delay:.4s"/>
+
+  <!-- Labels -->
+  <text x="100" y="420" font-size="8" fill="#4a9eff" font-family="Courier New">● Roller spacers — sealed bearing — matched to #160 DS pitch — top and bottom both chains</text>
+  <text x="100" y="438" font-size="8" fill="#00ffcc" font-family="Courier New">Combined SWL: 48,000 lbs · Max chain pull est. ~17,000 lbs at 200mm bore 500 PSI · Safety factor ~2.8×</text>
+  <text x="100" y="456" font-size="8" fill="#8B6914" font-family="Courier New">One chain failure mode: vehicle retains ~50% torque · drive continues · limp to service point</text>
+
+  <text x="700" y="488" text-anchor="middle" font-size="8" fill="#404060" font-family="Courier New">Phase 26 · Dual Tank Belt Chain Drive · 2× ANSI #160 DS · Dual Bevel Gear · Combined 48,000 lbs SWL · Roller Spacers Both Chains · Oil Bath ~6–10L</text>
+  </svg>
+  </div>
+
+  <div class="g3">
+    <div class="card" style="border-left:3px solid var(--new)">
+      <div class="badge" style="color:var(--new);border-color:var(--new)">Chain Spec</div>
+      <h3>ANSI #160 DS · 2" Pitch · 24,000 lbs Each</h3>
+      <div class="srow"><span>Standard</span><span class="v isnew">ANSI #160 double strand</span></div>
+      <div class="srow"><span>Pitch</span><span class="v isnew">2.0 inch</span></div>
+      <div class="srow"><span>Breaking strength per DS</span><span class="v pass">~54,400 lbs per chain</span></div>
+      <div class="srow"><span>SWL per chain DS</span><span class="v pass">~24,000 lbs</span></div>
+      <div class="srow"><span>Combined SWL dual</span><span class="v pass">~48,000 lbs</span></div>
+      <div class="srow"><span>Estimated max chain pull</span><span class="v isnew">~17,000 lbs at max torque</span></div>
+      <div class="srow"><span>Safety factor combined</span><span class="v pass">~2.8× at 500 PSI max ✓</span></div>
+      <div class="srow"><span>Repair kit</span><span class="v pass">Under 5 kg · under $200 each</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--new)">
+      <div class="badge" style="color:var(--new);border-color:var(--new)">Failure Mode</div>
+      <h3>One Chain Fails — Truck Still Drives</h3>
+      <div class="srow"><span>One chain snap</span><span class="v pass">Second chain takes full load</span></div>
+      <div class="srow"><span>Torque remaining</span><span class="v isnew">~50% — still massive</span></div>
+      <div class="srow"><span>At 90 PSI one chain</span><span class="v isnew">~21,000 Nm — more than most trucks</span></div>
+      <div class="srow"><span>Drive continues</span><span class="v pass">Yes — reduced capacity</span></div>
+      <div class="srow"><span>Second chain safety factor</span><span class="v warn">~1.4× — reduce speed/pressure</span></div>
+      <div class="srow"><span>Repair action</span><span class="v pass">Pull over · replace failed chain · 10–20 min</span></div>
+    </div>
+    <div class="card" style="border-left:3px solid var(--tank)">
+      <div class="badge" style="color:var(--tank);border-color:var(--tank)">Oil System</div>
+      <h3>Three Compartments — Est. 20–28L Total</h3>
+      <div class="srow"><span>Engine / crankshaft box</span><span class="v pass">PAO ISO-68 · est. 15–20L</span></div>
+      <div class="srow"><span>Transmission compartment</span><span class="v pass">GL-4 75W-90 · TBD Phase 27</span></div>
+      <div class="srow"><span>Dual tank belt housing</span><span class="v pass">Chain oil · ~6–10L</span></div>
+      <div class="srow"><span>Rear bevel / diff</span><span class="v pass">GL-5 80W-90 · ~5L</span></div>
+      <div class="srow"><span>Change interval</span><span class="v pass">100k miles or parts failure</span></div>
+      <div class="srow"><span>Level check</span><span class="v pass">All compartments — every 10k miles</span></div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ===================== POWER & TORQUE TAB ===================== -->
+<div class="panel" id="panel-power">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--elec)">Power and Torque Analysis — Phase 26 Estimates</div>
+  <h2 class="section-title">Nm · Horsepower · Pressure Table · Comparison · Electrical System Scale</h2>
+  <p class="section-lead">
+    All figures below are estimates pending bore confirmation in Phase 27. The primary design assumption is <strong style="color:var(--safe)">200mm bore</strong> — two cylinders — 914mm stroke. Torque is calculated as: piston force × stroke arm (457mm) × 2 cylinders. Horsepower is calculated as: torque (ft-lbs) × RPM / 5252. Target operating RPM at cruise is 600–900 RPM. Peak HP is at maximum steam pressure and maximum sustainable RPM simultaneously. These are extraordinary numbers by any measure — the estimated peak of approximately 3,100 HP from two steam pistons fed by a 100 gallon multi-bowl boiler is comparable to four Bugatti Chirons combined and substantially exceeds any production diesel truck ever built.
+  </p>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Pressure (PSI)</th><th>Piston Force × 2 (kN)</th><th>Torque (Nm)</th><th>Torque (ft-lbs)</th><th>HP  600 RPM</th><th>HP  900 RPM</th><th>Condition</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--elec)">90 PSI (idle)</td><td>390.6 kN</td><td class="warn">42,120 Nm</td><td class="warn">31,073 ft-lbs</td><td class="warn">3,549 HP</td><td class="warn">5,325 HP</td><td>Steam idle — low pressure startup</td></tr>
+  <tr><td style="color:var(--elec)">150 PSI</td><td>651.0 kN</td><td class="isnew">70,198 Nm</td><td class="isnew">51,788 ft-lbs</td><td class="isnew">5,916 HP</td><td class="isnew">8,874 HP</td><td>Low-speed operating</td></tr>
+  <tr><td style="color:var(--elec)">250 PSI</td><td>1,085 kN</td><td class="pass">116,997 Nm</td><td class="pass">86,313 ft-lbs</td><td class="pass">9,861 HP</td><td class="pass">14,791 HP</td><td>Mid-range cruise</td></tr>
+  <tr><td style="color:var(--elec)">350 PSI</td><td>1,519 kN</td><td class="fail">163,796 Nm</td><td class="fail">120,838 ft-lbs</td><td class="fail">13,807 HP</td><td class="fail">20,710 HP</td><td>High performance</td></tr>
+  <tr><td style="color:var(--safe)">500 PSI (max)</td><td>2,170 kN</td><td class="fail">234,000 Nm est.</td><td class="fail">172,573 ft-lbs</td><td class="fail">19,723 HP</td><td class="fail">29,584 HP</td><td>Maximum pressure — theoretical</td></tr>
+  </tbody>
+  </table>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ IMPORTANT CONTEXT ON THE HORSEPOWER NUMBERS</h4>
+    <ul>
+      <li>The HP figures above are instantaneous peak figures at full steam pressure — they assume the boiler can sustain steam delivery at that pressure for the duration of the power stroke, which at 100 gallon multi-bowl scale is the design intent to confirm in Phase 27</li>
+      <li>At 900 RPM and 914mm stroke the piston mean speed is ~27.4 m/s — this is higher than traditional locomotive piston speeds and Phase 27 must confirm the liner, rings, and lubrication system can sustain this — if RPM is capped lower the HP figures reduce proportionally</li>
+      <li>Practical target for Phase 26 first build is 90–250 PSI at 600–750 RPM — the 3,100 HP reference in the banner is based on this working range, not the theoretical 500 PSI maximum</li>
+      <li>At 90 PSI idle the torque of 42,000 Nm already exceeds the rated torque of the strongest production diesel trucks (Mack Titan: ~5,900 Nm) by approximately 7× — even at idle this engine is not subtle</li>
+      <li>The transmission must handle the idle torque of 42,000 Nm — this is the design constraint, not the peak — any transmission that survives idle can be protected against peak by the PID pressure limiter</li>
+    </ul>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Reference Vehicle</th><th>Peak Torque</th><th>Peak HP</th><th>Engine Type</th><th>vs Berserker  90 PSI</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--muted)">Mack Titan diesel</td><td>5,898 Nm</td><td>505 HP</td><td>MP10 diesel V8</td><td class="fail">Berserker: 7.1× more torque at idle</td></tr>
+  <tr><td style="color:var(--muted)">Bugatti Chiron</td><td>1,600 Nm</td><td>1,500 HP</td><td>W16 8.0L quad turbo</td><td class="fail">Berserker: 26× more torque at idle</td></tr>
+  <tr><td style="color:var(--muted)">Tesla Semi (est.)</td><td>~15,000 Nm axle</td><td>~1,000 HP</td><td>4× induction motors</td><td class="fail">Berserker: 2.8× more torque at idle</td></tr>
+  <tr><td style="color:var(--muted)">Decker 9000 Phase 24</td><td>3,808 Nm max</td><td>~400 HP est.</td><td>Steam · 75mm bore</td><td class="fail">Berserker: 11× more torque at idle</td></tr>
+  <tr><td style="color:var(--muted)">Stanley Steamer 1906</td><td>~800 Nm est.</td><td>~20 HP</td><td>Steam · small bore</td><td class="fail">Berserker: 52× more torque at idle</td></tr>
+  <tr><td style="color:var(--new)">Berserker 90 PSI</td><td class="pass">42,120 Nm</td><td class="pass">3,549–5,325 HP</td><td class="pass">Steam · 200mm bore est.</td><td class="pass">This vehicle</td></tr>
+  </tbody>
+  </table>
+  </div>
+
+  <div class="new-box">
+    <h4>▶ ELECTRICAL SYSTEM — BERSERKER SCALE</h4>
+    <ul>
+      <li>Alternator chain: multiple alternators required at Berserker scale — the 2× 2,500W dual alternator from the Decker 9000 is insufficient for the heater bank power draw at 100 gallon boiler scale</li>
+      <li>Estimated heater bank for 100 gallon multi-bowl boiler: 20,000–40,000W depending on bowl count and target cold start time — this exceeds the alternator output significantly — large LiFePO4 battery bank required for cold start and low-RPM operations</li>
+      <li>At cruise RPM 750+: alternator chain drives multiple large alternators off the crankshaft — 17.5:1 ratio maintained as starting reference — Phase 27 to calculate how many alternators and what kW rating to sustain the heater load during operation</li>
+      <li>24V system remains the base bus for controls, solenoids, PID, and instrumentation — a dedicated 48V or 96V bus for heater elements is the likely Phase 27 recommendation given the heater power scale</li>
+      <li>PID system upgrades needed: HTD/carrier plate gear position input, dual boiler EWI channels, dual exhaust valve channels per cylinder, dual oil temperature channels for dual tank belt housing — significantly more I/O than the Decker 9000 PID module</li>
+    </ul>
+  </div>
+</div>
+</div>
+
+<!-- ===================== PHASE 27 PREP TAB ===================== -->
+<div class="panel" id="panel-next">
+<div class="wrap">
+  <div class="eyebrow" style="color:var(--next)">Phase 27 Preparation</div>
+  <h2 class="section-title" style="color:var(--next)">Phase 27 · Bore Confirmation · Boiler Bowl Count · Transmission Design · Full Blender Dims · Parts List</h2>
+  <p class="section-lead">
+    Phase 26 establishes the Mack Berserker platform, boiler concept, piston scale, drivetrain configuration, and torque/HP estimates. Phase 27 converts every TBD in this document into a confirmed specification. The three primary Phase 27 tasks are: confirm the piston bore and crankshaft geometry in Blender, design the boiler internal bowl array to sustain steam delivery at the confirmed bore and pressure, and design the carrier plate transmission. Everything else follows from these three.
+  </p>
+
+  <div class="next-box">
+    <h4>◆ PHASE 27 PRIMARY TASKS — IN ORDER</h4>
+    <ul>
+      <li>Task 1 — Confirm piston bore in Blender — the 200mm estimate drives every other calculation — build the cylinder and crankshaft to correct scale in the Mack chassis model and confirm it fits — if bore must change due to chassis geometry all torque and chain spec numbers update accordingly</li>
+      <li>Task 2 — Design boiler internal bowl array — once piston bore is confirmed calculate the steam demand at target operating RPM and pressure — back-calculate required bowl count, heater element wattage per bowl, and total vessel internal layout — produce the boiler fabrication drawing</li>
+      <li>Task 3 — Design the carrier plate transmission — now that torque inputs are confirmed design the carrier plate: plate diameter, sprocket ring tooth counts for each gear, chain count per ring, hydraulic indexing actuator, clutch flywheel rated torque, Hall effect position sensors — produce the transmission Blender model</li>
+      <li>Task 4 — Confirm dual tank belt chain spec — once transmission output torque per chain is confirmed, verify ANSI #160 DS safety factor holds — if not step up to ANSI #200 DS — confirm bevel gear tooth counts and rear differential selection</li>
+      <li>Task 5 — Produce full Phase 27 parts list — every component with quantity, unit cost, total cost, weight — replace all Phase 26 estimates with confirmed specs — update total vehicle weight for Mack chassis</li>
+    </ul>
+  </div>
+
+  <div class="next-box">
+    <h4>◆ PHASE 27 SECONDARY FOCUS — ELECTRICAL AND CONTROLS</h4>
+    <ul>
+      <li>Calculate total heater bank power requirement — bowl count confirmed × watts per heater element — determine alternator count and rating to sustain heater load at cruise RPM</li>
+      <li>Size the LiFePO4 battery bank for Berserker — cold start draws the entire heater bank for 15–30 seconds at multi-bowl scale — battery must supply this without drooping below 80% state of charge</li>
+      <li>Design the dual-bus electrical system — 24V control bus (PID, solenoids, sensors) and high voltage heater bus (48V or 96V) — specify the DC-DC converter between buses</li>
+      <li>PID module upgrade — specify the new I/O count for Berserker — dual EWI, dual exhaust valve pairs, carrier plate gear position, dual tank belt oil temps, dual boiler EWI pressure — minimum 16 channels</li>
+      <li>Halloween whistle routing in Mack cab — pull cord must reach driver seat — steam line tap from main manifold before PCW inlet valves — whistle itself mounts on cab roof or front of vessel — Phase 27 to confirm mounting point in Blender</li>
+    </ul>
+  </div>
+
+  <div class="tbl">
+  <table>
+  <thead><tr><th>Phase 27 Item</th><th>Priority</th><th>Depends On</th><th>Est. Phase 26 Value</th><th>Phase 27 Action</th></tr></thead>
+  <tbody>
+  <tr><td style="color:var(--next)">Piston bore confirmation</td><td class="fail">CRITICAL — first task</td><td>Blender chassis model geometry</td><td>200mm estimate</td><td>Model at correct scale · confirm fits chassis</td></tr>
+  <tr><td style="color:var(--next)">Crankshaft diameter at bore</td><td class="fail">CRITICAL</td><td>Bore confirmed</td><td>TBD — must increase from 60mm</td><td>Calculate min crankshaft dia at 200mm bore 500 PSI</td></tr>
+  <tr><td style="color:var(--next)">Bowl count in 100 gal vessel</td><td class="fail">CRITICAL</td><td>Bore + steam demand calc</td><td>3+ shown in concept</td><td>Calculate steam demand · back-calc bowl count</td></tr>
+  <tr><td style="color:var(--next)">Heater bank total wattage</td><td class="warn">High</td><td>Bowl count confirmed</td><td>20–40 kW estimate</td><td>Confirm per bowl × count · size alternator bank</td></tr>
+  <tr><td style="color:var(--next)">Carrier plate transmission design</td><td class="warn">High</td><td>Torque inputs confirmed from bore</td><td>Concept only</td><td>Full Blender model + fabrication drawing</td></tr>
+  <tr><td style="color:var(--next)">ANSI #160 DS chain validation</td><td class="warn">High</td><td>Max chain pull confirmed from bore</td><td>~2.8× safety factor est.</td><td>Recalculate with confirmed bore · step up if needed</td></tr>
+  <tr><td style="color:var(--next)">Boiler vessel wall thickness</td><td class="warn">High</td><td>Max PSI · vessel diameter in Blender</td><td>Min 2cm estimate</td><td>ASME calculation at 500 PSI · SS 316L yield strength</td></tr>
+  <tr><td style="color:var(--next)">Rear axle configuration</td><td class="na">Medium</td><td>Mack chassis rear axle geometry</td><td>Single rear diff open</td><td>Tandem drive axle option for Mack platform</td></tr>
+  <tr><td style="color:var(--next)">Full parts list Phase 27</td><td class="warn">High</td><td>All specs above confirmed</td><td>Not started</td><td>Every component · qty · cost · weight</td></tr>
+  <tr><td style="color:var(--next)">Halloween whistle mounting</td><td class="isnew">MANDATORY</td><td>Blender model — cab position</td><td>Roof or front of vessel</td><td>Confirm mount point · pull cord routing to driver</td></tr>
+  </tbody>
+  </table>
+  </div>
+
+  <div class="warn-box">
+    <h4>⚠ PHASE 27 CRITICAL PREREQUISITES BEFORE ANY FABRICATION</h4>
+    <ul>
+      <li>Bore must be confirmed and crankshaft geometry modelled at full scale before any machining is specified — every chain, every sprocket, every bearing, and the entire transmission derives from the bore figure</li>
+      <li>Boiler pressure vessel must be designed by or reviewed by a qualified pressure vessel engineer before fabrication at 100 gallon scale at 500 PSI — this is not the 14cm Aegis Boiler Mark 1 — at this scale the regulatory and safety requirements for a pressure vessel of this volume at this pressure are significant</li>
+      <li>Dual tank belt chain pull calculation must be confirmed at the Phase 27 bore — the ANSI #160 DS spec is the current best estimate, but if bore comes in larger than 200mm the chain must step up and the housing must be redesigned to match the larger chain pitch</li>
+      <li>Carrier plate transmission must complete full bench test through all gear positions before installation — jam or mis-index on the Berserker with 42,000 Nm at idle is significantly more destructive than on the Decker 9000 — bench validation is non-negotiable</li>
+      <li>All three oil compartment temperature and level sensors must be installed and verified before the vehicle moves under steam power — Berserker has more oil volume and more heat to manage than any previous Miasma platform</li>
+    </ul>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="val" style="color:var(--next)">PH27</div><div class="lbl">Next Phase</div></div>
+    <div class="metric"><div class="val" style="color:var(--next)">BORE</div><div class="lbl">Primary Confirm</div></div>
+    <div class="metric"><div class="val" style="color:var(--next)">BOWLS</div><div class="lbl">Count Calculation</div></div>
+    <div class="metric"><div class="val" style="color:var(--next)">CARRIER</div><div class="lbl">Plate Design</div></div>
+    <div class="metric"><div class="val" style="color:var(--next)">DIMS</div><div class="lbl">Full Blender</div></div>
+    <div class="metric"><div class="val" style="color:var(--next)">🎃</div><div class="lbl">Whistle — Mandatory</div></div>
+  </div>
+</div>
+</div>
+
+<div class="footer">PHASE 26 · MACK BERSERKER · MULTI-BOWL FLASH BOILER · 3 FT GOLD PISTONS · DUAL TANK BELT · EST. 42,000 NM IDLE · EST. 234,000 NM MAX · PHASE 27 TBD</div>
+
+<script>
+function showTab(id,tab){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('panel-'+id).classList.add('active');
+  tab.classList.add('active');
+}
+</script>
+</body>
+</html>
