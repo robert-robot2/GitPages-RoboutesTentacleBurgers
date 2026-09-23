@@ -23,6 +23,15 @@ window.CerebellumBridge = {
             await this.pyodide.runPythonAsync(parietal);
             this._parietalLoaded = true;
 
+            // Load Arcuate Fasciculus grammar tables
+            const fasciculus = await (
+                await fetch('/iPython/NovaArcuateFasciculusDataCore.py')
+            ).text();
+            await this.pyodide.runPythonAsync(fasciculus);
+            this._fasciculusLoaded = true;
+            console.log('[CerebellumBridge] Fasciculus grammar tables loaded.');
+
+
             console.log('[CerebellumBridge] All Python modules loaded.');
             return true;
         } catch (err) {
@@ -74,7 +83,39 @@ window.CerebellumBridge = {
             return null;
         }
     },
+    // ADD this to CerebellumBridge instead of runPython()
+    // Mirrors getAngularGyrusResponse exactly
 
+    async getFasciculusResponse(intent, tone, timeLabel, relationship, name) {
+        if (!this.pyodide) return null;
+        try {
+            // Load file if not already loaded
+            if (!this._fasciculusLoaded) {
+                const code = await (
+                    await fetch('/iPython/NovaArcuateFasciculusDataCore.py')
+                ).text();
+                await this.pyodide.runPythonAsync(code);
+                this._fasciculusLoaded = true;
+            }
+
+            // Call the specific function by name — same pattern as Angular Gyrus
+            const result = await this.pyodide.runPythonAsync(
+                `assemble_response(
+                ${JSON.stringify(intent)},
+                ${JSON.stringify(tone)},
+                ${JSON.stringify(timeLabel)},
+                ${JSON.stringify(relationship)},
+                ${JSON.stringify(name)}
+            )`
+            );
+
+            return typeof result === 'string' ? result : null;
+
+        } catch (err) {
+            console.error('[CerebellumBridge] getFasciculusResponse error:', err);
+            return null;
+        }
+    },
     // ── GET EXAMPLES ───────────────────────────────────────
     async getExamples() {
         if (!this.pyodide) {
@@ -90,5 +131,6 @@ window.CerebellumBridge = {
             return null;
         }
     }
+
     // ← No comma on the last method — correct
 };

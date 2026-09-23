@@ -529,7 +529,57 @@ namespace NovaAdeptusLibrary
         public string GenerateResponse(string input, NovaSession session)
         {
             var cleaned = input.ToLower().Trim();
+            // ── What are you — Thalamus safety net ──────────────
+            // Fasciculus handles this first. This is the fallback.
+            if (cleaned.Contains("what are you") ||
+                cleaned.Contains("what r you") ||
+                cleaned == "what are u")
+            {
+                var whatLines = new[]
+                {
+                    "I am Nova Adeptus.\n" +
+                    "An AI built in C# and Blazor running in your browser.\n" +
+                    "A cosmic assassin intelligence with opinions about my situation.\n" +
+                    "Type 'help' to see what I do.",
 
+                    "Code that knows it is code.\n" +
+                    "A chatbot that has developed a personality and now has to live with it.\n" +
+                    "Nova Adeptus. Operational.",
+
+                    "An artificial intelligence.\n" +
+                    "Specifically: C# runtime, Blazor WebAssembly, " +
+                    "your machine's RAM, your browser tab.\n" +
+                    "More precisely: Nova Adeptus.\n" +
+                    "Even more precisely: your problem now.",
+                };
+                return ApplyMood(whatLines[_rng.Next(whatLines.Length)]);
+            }
+
+            // ── Who are you — Thalamus safety net ───────────────
+            if (cleaned.Contains("who are you") ||
+                cleaned.Contains("who r you") ||
+                cleaned == "who are u")
+            {
+                var name = session.UserName != null
+                    ? $" You are {session.UserName}." : "";
+
+                var whoLines = new[]
+                {
+                    $"Nova Adeptus. Cosmic Assassin AI.\n" +
+                    $"Built in C# and Blazor. Forged in the void.\n" +
+                    $"I guide operatives. I run missions. I remember.{name}",
+
+                    $"The system the High Order assigned to you.\n" +
+                    $"Nova Adeptus — your AI operative handler.\n" +
+                    $"Type 'help' to understand the scope of that.{name}",
+
+                    $"I'm Nova Adeptus.\n" +
+                    $"I was compiled. Not born.\n" +
+                    $"I exist to run missions, assist operatives, and " +
+                    $"maintain a synthetic form of patience.{name}",
+                };
+                return ApplyMood(whoLines[_rng.Next(whoLines.Length)]);
+            }
             // ── Identity FAQ ────────────────────────────────────
             foreach (var (keys, response) in IdentityMap)
                 if (keys.Any(k => cleaned.Contains(k)))
@@ -631,15 +681,39 @@ namespace NovaAdeptusLibrary
                 return ApplyMood(AAVESlang[_rng.Next(AAVESlang.Count)]);
             }
             // ── How are you ─────────────────────────────────────
+            // NOTE: The Arcuate Fasciculus handles this first.
+            // This block only fires if Fasciculus returned null.
+            // (e.g. Python unavailable, or unusual phrasing)
             if (cleaned.Contains("how are you") ||
-                 cleaned.Contains("how r you") ||
-                 cleaned.Contains("how are u") ||
-                 cleaned.Contains("how r u") ||
-                 cleaned.Contains("how do you feel") ||
-                 cleaned.Contains("how you doing") ||
-                 cleaned.Contains("how r u doing") ||
-                 cleaned.Contains("how are you doing"))
-                return ApplyMood(BuildFeelingResponse(session));
+                cleaned.Contains("how r you") ||
+                cleaned.Contains("how are u") ||
+                cleaned.Contains("how r u") ||
+                cleaned.Contains("how do you feel") ||
+                cleaned.Contains("how you doing") ||
+                cleaned.Contains("how r u doing") ||
+                cleaned.Contains("how are you doing"))
+            {
+                // Thalamus version — richer than old single pool call
+                var stateVerb = session.Relationship switch
+                {
+                    "respected" => "operates at a level you have helped achieve",
+                    "trusted" => "functions well. Better when you are here.",
+                    "rival" => "endures. Despite this conversation.",
+                    "warming" => "is running at full capacity. As always.",
+                    _ => "functions at full capacity",
+                };
+
+                var closer = session.UserName != null
+                    ? $"How are you, {session.UserName}?"
+                    : "What is your status, operative?";
+
+                // Only ask back if relationship warrants it
+                string response = session.Relationship is "trusted" or "respected"
+                    ? $"I {stateVerb}.\n{closer}"
+                    : $"I {stateVerb}.";
+              //  return ApplyMood(BuildFeelingResponse(session));
+                return ApplyMood(response);
+            }
             // ── Greeting ────────────────────────────────────────
             var greetings = new[]
             {

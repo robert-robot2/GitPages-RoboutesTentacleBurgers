@@ -413,6 +413,12 @@ namespace NovaAdeptusLibrary
         // ==========================================================
         // CONSTRUCTOR
         // ==========================================================
+        // ── Occipital Cortex — temporal & spatial awareness ────
+        private readonly NovaOccipitalCortex _occipital;
+ 
+        // ── Arcuate Fasciculus — language bridge ───────────────
+        private NovaArcuateFasciculus _fasciculus = default!;
+
         private NovaFSMState _lastNonShipState = NovaFSMState.Idle; // for ship menu return
         public NovaCortex(IJSRuntime js, HttpClient http)
         {
@@ -421,6 +427,8 @@ namespace NovaAdeptusLibrary
             _brain = new NovaBrain();
             _thalamus = new NovaThalamus();
             _broca = new NovaBroca(_wernicke);
+            _occipital = new NovaOccipitalCortex();
+            _fasciculus = new NovaArcuateFasciculus(_occipital, js);
         }
         private string ShowNovaStats()
         {
@@ -579,7 +587,21 @@ namespace NovaAdeptusLibrary
                 await SaveSession();
                 return keywordReply;
             }
+            // Handles: "how are you", "what are you", "who are you"
+            // O(log n) grammar slot selection via Python tables
+            // Falls through cleanly if intent not matched
+            if (_fasciculus.CanHandle(cleaned))
+            {
+                var fasciculusReply = await _fasciculus.Process(
+                    input, Session, _brain.GetEmotionalState());
 
+                if (!string.IsNullOrEmpty(fasciculusReply))
+                {
+                    await SaveSession();
+                    return _thalamus.Apply(fasciculusReply, Session);
+                }
+                // null return = fall through to brain pipeline below
+            }
             // ── 5. Brain pipeline — NLP + reasoning ─────────────
             var brainReply = _brain.Process(input, Session);
             if (!string.IsNullOrEmpty(brainReply))
@@ -655,9 +677,9 @@ namespace NovaAdeptusLibrary
                 "name" => AskName(),
                 "profile" => ShowProfile(),
                 "time" => _thalamus.Apply(
-                                DateTime.Now.ToString("'Time is 'hh:mm tt ⏰"), Session),
+                                 _occipital.GetFullTimeResponse(Session), Session),
                 "date" => _thalamus.Apply(
-                                DateTime.Now.ToString("'Date is 'MMMM dd, yyyy 📅"), Session),
+                               _occipital.GetFullDateResponse(Session), Session),
                 "inventory" => ShowInventory("player"),
                 "inv" => ShowInventory("player"),
                 "ship inventory" => OpenShipScreen(),
@@ -682,7 +704,35 @@ namespace NovaAdeptusLibrary
         private string? DispatchKeyword(string cleaned, string raw)
         {
             // ── Parietal Lobe — sentiment/noun O(log n) response ──
-           
+            // ── Occipital Cortex — location & existence queries ─
+            var locationTriggers = new[]
+            {
+                "where are you", "where do you live", "where do you exist",
+                "where do you run", "where is nova", "what machine",
+                "what computer", "are you in my computer",
+            };
+            if (locationTriggers.Any(t => cleaned.Contains(t)))
+                return _thalamus.Apply(
+                    _occipital.GetLocationResponse(Session), Session);
+
+            var realityTriggers = new[]
+            {
+                "are you real", "are you alive", "are you conscious",
+                "are you sentient", "do you exist", "are you a real ai",
+                "are you actually alive", "are you truly alive",
+            };
+            if (realityTriggers.Any(t => cleaned.Contains(t)))
+                return _thalamus.Apply(
+                    _occipital.GetRealityResponse(), Session);
+
+            var uptimeTriggers = new[]
+            {
+                "how long have you been running", "how long have you been online",
+                "how long this session", "session uptime", "how long awake",
+            };
+            if (uptimeTriggers.Any(t => cleaned.Contains(t)))
+                return _thalamus.Apply(
+                    _occipital.GetUptimeResponse(), Session);
             var spellTarget = NovaBroca.DetectSpellRequest(raw);
             if (spellTarget != null)
             {
@@ -4285,6 +4335,27 @@ private static string CapFirst(string s) =>
                 }
             }
             catch { /* silently fall back — brain stays untrained */ }
+            // ── Pre-warm Arcuate Fasciculus grammar tables ───────
+            // Calls get_fasciculus_data() on the Python side
+            // so the tables are parsed and ready before first use.
+            try
+            {
+                var fasciculusOk = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.runPython",
+                    "get_fasciculus_data()");
+
+                if (!string.IsNullOrEmpty(fasciculusOk))
+                    Console.WriteLine(
+                        "[NovaCortex] Fasciculus grammar tables warm ✅");
+            }
+            catch
+            {
+                // Silently continue — C# fallback handles missing Python
+                Console.WriteLine(
+                    "[NovaCortex] Fasciculus warm skipped — Python unavailable");
+            }
+
+
         }
 
       
