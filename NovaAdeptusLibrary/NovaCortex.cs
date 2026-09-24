@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using static System.Collections.Specialized.BitVector32;
 
 namespace NovaAdeptusLibrary
 {
@@ -415,7 +416,7 @@ namespace NovaAdeptusLibrary
         // ==========================================================
         // ── Occipital Cortex — temporal & spatial awareness ────
         private readonly NovaOccipitalCortex _occipital;
- 
+      
         // ── Arcuate Fasciculus — language bridge ───────────────
         private NovaArcuateFasciculus _fasciculus = default!;
 
@@ -428,8 +429,13 @@ namespace NovaAdeptusLibrary
             _thalamus = new NovaThalamus();
             _broca = new NovaBroca(_wernicke);
             _occipital = new NovaOccipitalCortex();
-            _fasciculus = new NovaArcuateFasciculus(_occipital, js);
+            _fasciculus = new NovaArcuateFasciculus(
+                  _occipital, js, _api);
+
         }
+
+
+
         private string ShowNovaStats()
         {
             var hpBar = BuildBar(Session.NovaActiveHP, Session.NovaActiveMaxHP, 10);
@@ -733,6 +739,25 @@ namespace NovaAdeptusLibrary
             if (uptimeTriggers.Any(t => cleaned.Contains(t)))
                 return _thalamus.Apply(
                     _occipital.GetUptimeResponse(), Session);
+
+      
+            // ── "define X" explicit command ───────────────────────
+            if (cleaned.StartsWith("define ") && cleaned.Length > 7)
+            {
+                var defineWord = cleaned.Substring(7).Trim();
+                if (!string.IsNullOrEmpty(defineWord))
+                {
+                    var syntheticInput = $"what is {defineWord}";
+                    var defineReply = _fasciculus.Process(
+                        syntheticInput, Session,
+                        _brain.GetEmotionalState()).GetAwaiter().GetResult();
+                    if (!string.IsNullOrEmpty(defineReply))
+                    {
+                        return _thalamus.Apply(defineReply, Session);
+                    }
+                }
+            }
+
             var spellTarget = NovaBroca.DetectSpellRequest(raw);
             if (spellTarget != null)
             {
@@ -4354,7 +4379,27 @@ private static string CapFirst(string s) =>
                 Console.WriteLine(
                     "[NovaCortex] Fasciculus warm skipped — Python unavailable");
             }
+            // ── Pre-warm Wernicke + Broca data tables ────────────
+            try
+            {
+                var wernickeOk = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.runPython",
+                    "get_wernicke_data()");
+                var brocaOk = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.runPython",
+                    "get_broca_data()");
 
+                if (!string.IsNullOrEmpty(wernickeOk) &&
+                    !string.IsNullOrEmpty(brocaOk))
+                    Console.WriteLine(
+                        "[NovaCortex] Wernicke + Broca tables warm ✅");
+            }
+            catch
+            {
+                Console.WriteLine(
+                    "[NovaCortex] Wernicke/Broca warm skipped " +
+                    "— Python unavailable");
+            }
 
         }
 

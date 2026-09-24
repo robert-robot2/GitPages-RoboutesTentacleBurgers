@@ -66,6 +66,55 @@
 
 },
 },
+
+
+new PatchNoteEntry {
+    Title = "RTB VX5.012 Nova Adeptus Updates ❄️⚔️🩸🐺⚔️❄️",
+    Lines = new List<string>
+    {
+        "── NOVA CORTEX ──────────────────────────────────────",
+        "FIXED: CS1503 type conversion errors in DispatchKeyword define block",
+        "FIXED: CS4032 await used in non-async method in DispatchKeyword",
+        "FIXED: CS0103 lowercase 'session' typo corrected to 'Session'",
+        "FIXED: Define block now uses .GetAwaiter().GetResult() for sync context",
+        "REMOVED: Redundant await SaveSession() from DispatchKeyword define path",
+        "",
+        "── NOVA API SERVICE ─────────────────────────────────",
+        "CHANGED: Oxford Dictionary API replaced with Datamuse API",
+        "REASON: Oxford blocked by CORS policy from browser/localhost",
+        "REASON: Free Dictionary API also CORS blocked on localhost",
+        "NEW: ParseDatamuseResponse() parser added for Datamuse JSON format",
+        "NOTE: Oxford constants retained for future ASP.NET backend proxy",
+        "NOTE: Datamuse requires no API key and allows browser requests",
+        "",
+        "── NOVA WERNICKE DATA CORE (Python) ─────────────────",
+        "NEW: parse_datamuse_response() added for Datamuse list format",
+        "CHANGED: parse_oxford_response() now auto-detects list vs dict format",
+        "CHANGED: get_word_data() auto-detects Datamuse vs Oxford response",
+        "NOTE: Oxford parser retained — zero changes needed when backend ready",
+        "NOTE: Domain detection now runs on definition text for Datamuse words",
+        "",
+        "── KNOWN ISSUES ─────────────────────────────────────",
+        "BUG: Wernicke Python enrichment erroring on Datamuse responses",
+        "BUG: AttributeError list object has no attribute get in pipeline",
+        "BUG: Trailing double period on some definition responses",
+        "TODO: Revisit Python/C# enrichment handoff next session",
+        "TODO: ASP.NET backend proxy for Oxford API proper implementation",
+        "",
+        "── INFRASTRUCTURE NOTES ─────────────────────────────",
+        "NOTE: CORS blocks all dictionary APIs on localhost regardless of key",
+        "NOTE: Trivia 429 rate limit hit during heavy testing — self clearing",
+        "NOTE: Fasciculus and Wernicke/Broca warm skipped on init — non fatal",
+        "NOTE: All other pipelines stable — jokes facts trivia missions working",
+        "",
+        "── SESSION SUMMARY ──────────────────────────────────",
+        "Nova Adeptus define pipeline built end to end ✅",
+        "Datamuse working on localhost no CORS ✅",
+        "Full publish test pending for Free Dictionary API ⏳",
+        "ASP.NET backend proxy queued as next major feature ⏳",
+    }
+},
+
 new PatchNoteEntry
 {
     Title = "RTB VX5.010 Nova Adeptus Updates ❄️⚔️🩸🐺⚔️❄️",

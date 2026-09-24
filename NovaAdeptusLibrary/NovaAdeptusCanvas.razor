@@ -1104,6 +1104,8 @@
     private string _humanMoodLabel = "neutral";
     private bool _crewOpen = false;
     private void ToggleCrewPanel() => _crewOpen = !_crewOpen;
+
+    private readonly NovaAPIService _oxford;
     // ── Init ──────────────────────────────────────────────────
     protected override void OnInitialized()
     {

@@ -70,6 +70,9 @@ namespace NovaAdeptusLibrary
         Conjunction,     // and, or, but, so
         Punctuation,     // ? . ! ,
         NameWord,        // proper nouns — detected by context
+        Preposition,     // in, of, for, with, by, from, at
+        DomainMarker,    // c++, python, math, biology etc
+        AuxiliaryVerb,   // does, did, do, will, can, could
     }
 
     // ==========================================================
@@ -121,7 +124,10 @@ namespace NovaAdeptusLibrary
         public string SlotBodyStatus { get; set; } = "";
         public string SlotLocation { get; set; } = "";
         public string SlotCloser { get; set; } = "";
-
+        // ── Dictionary query fields ────────────────────────────
+        public string TargetWord { get; set; } = "";
+        public string SubjectWord { get; set; } = "";
+        public string DomainHint { get; set; } = "";
         // The assembled sentence (filled by Broca)
         public string AssembledSentence { get; set; } = "";
 
@@ -139,6 +145,7 @@ namespace NovaAdeptusLibrary
     {
         // ── Dependencies ───────────────────────────────────────
         private readonly NovaOccipitalCortex _occipital;
+        private readonly NovaAPIService _oxford;
         private readonly IJSRuntime _js;
         private static readonly Random _rng = new();
 
@@ -152,10 +159,12 @@ namespace NovaAdeptusLibrary
         // ==========================================================
         public NovaArcuateFasciculus(
             NovaOccipitalCortex occipital,
-            IJSRuntime js)
+            IJSRuntime js,
+            NovaAPIService oxford)
         {
             _occipital = occipital;
             _js = js;
+            _oxford = oxford;
         }
 
         // ==========================================================
@@ -182,7 +191,20 @@ namespace NovaAdeptusLibrary
                 // ── Step 2: Identify intent ──────────────────────
                 var intent = ClassifyIntent(tokens, rawInput.ToLower().Trim());
                 if (intent == "unknown") return null;
+                // ── Dictionary intents — route to Oxford pipeline ────
+                var dictIntents = new[]
+                {
+                "definition_query",
+                "definition_query_domain",
+                "process_query",
+                };
 
+                if (dictIntents.Contains(intent))
+                {
+                    var dictReply = await ProcessDictionaryIntent(
+                        tokens, intent, session, emotionalTone);
+                    return dictReply; // null = fall through
+                };
                 // ── Step 3: Gather context (OccipitalCortex) ────
                 var (timeLabel, timeFormatted, _, _, _, bodyStatus)
                     = _occipital.GetFasciculusSnapshot();
@@ -302,7 +324,29 @@ namespace NovaAdeptusLibrary
         {
             "and", "or", "but", "so", "because", "if", "then",
         };
+        // ADD these HashSets alongside the existing ones:
 
+        private static readonly HashSet<string> Prepositions = new()
+        {
+            "in", "of", "for", "with", "by", "from", "at",
+            "on", "about", "between", "through", "into",
+        };
+
+        private static readonly HashSet<string> AuxiliaryVerbs = new()
+        {
+            "does", "did", "do", "will", "would", "can",
+            "could", "should", "shall", "may", "might",
+        };
+
+        private static readonly HashSet<string> DomainMarkerWords = new()
+        {
+            "c++", "cpp", "c#", "python", "javascript", "js",
+            "java", "html", "css", "sql", "typescript",
+            "math", "mathematics", "physics", "biology",
+            "chemistry", "zoology", "computing", "programming",
+            "code", "coding", "grammar", "linguistics",
+            "philosophy", "psychology", "medicine", "law",
+        };
         public List<TaggedToken> TagTokens(string input)
         {
             var result = new List<TaggedToken>();
@@ -341,6 +385,10 @@ namespace NovaAdeptusLibrary
                 var w when Adjectives.Contains(w) => TokenTag.Adjective,
                 var w when Articles.Contains(w) => TokenTag.Article,
                 var w when Conjunctions.Contains(w) => TokenTag.Conjunction,
+                // ADD these cases to TagWord() switch BEFORE the _ default:
+                var w when Prepositions.Contains(w) => TokenTag.Preposition,
+                var w when AuxiliaryVerbs.Contains(w) => TokenTag.AuxiliaryVerb,
+                var w when DomainMarkerWords.Contains(w) => TokenTag.DomainMarker,
                 _ => TokenTag.NounGeneral,
             };
 
@@ -407,6 +455,29 @@ namespace NovaAdeptusLibrary
                 !hasSelfPronoun)
                 return "state_query_general";
 
+            // ── "What is X in Y?" — check FIRST (more specific) ──
+            if (firstQuestion == "what" && hasLinkingVerb &&
+                !hasSelfPronoun &&
+                tokens.Any(t => t.Tag == TokenTag.Preposition) &&
+                tokens.Any(t => t.Tag == TokenTag.DomainMarker))
+                return "definition_query_domain";
+
+            // ── "What is X?" — check AFTER domain version ─────────
+            if (firstQuestion == "what" &&
+                hasLinkingVerb && !hasSelfPronoun)
+                return "definition_query";
+            // ── "How does X do Y?" ────────────────────────────────
+            if (firstQuestion == "how" &&
+                tokens.Any(t => t.Tag == TokenTag.AuxiliaryVerb) &&
+                !hasSelfPronoun)
+                return "process_query";
+
+            // ── "Define X" ────────────────────────────────────────
+            if (cleaned.StartsWith("define ") ||
+                cleaned.StartsWith("what does "))
+                return "definition_query";
+
+
             return "unknown";
         }
 
@@ -470,6 +541,127 @@ namespace NovaAdeptusLibrary
 
                 _ => null,
             };
+        }
+        // ==========================================================
+        // DICTIONARY INTENT PIPELINE
+        // Handles definition_query, definition_query_domain,
+        // process_query intents.
+        // C# fetches from Oxford → Python parses + assembles.
+        // ==========================================================
+        private async Task<string?> ProcessDictionaryIntent(
+            List<TaggedToken> tokens,
+            string intent,
+            NovaSession session,
+            string tone)
+        {
+            // ── Extract words from token stream ──────────────────
+            string? targetWord = ExtractTargetWord(tokens);
+            string? subjectWord = intent == "process_query"
+                ? ExtractSubjectWord(tokens) : null;
+            string domainHint = ExtractDomainHint(tokens);
+
+            if (string.IsNullOrEmpty(targetWord))
+                return null; // nothing to look up
+
+            // ── C# fetches from Oxford API ───────────────────────
+            // _oxford is injected via constructor (see Snippet 5)
+            if (_oxford == null) return null;
+
+            var wordData = await _oxford
+                .FetchDefinitionAsync(targetWord, domainHint);
+
+            // For process queries fetch subject too
+            WordDefinition? subjectData = null;
+            if (intent == "process_query" &&
+                !string.IsNullOrEmpty(subjectWord))
+                subjectData = await _oxford
+                    .FetchDefinitionAsync(subjectWord, "");
+
+            // ── Python assembles the sentence ─────────────────────
+            var assembled = await CallPythonBrocaAssembly(
+                intent, tone,
+                session.Relationship,
+                wordData,
+                subjectData,
+                domainHint);
+
+            if (!string.IsNullOrEmpty(assembled))
+                return assembled;
+
+            // ── C# fallback if Python unavailable ────────────────
+            return BuildDictionaryFallback(
+                wordData, subjectData, intent, tone, session);
+        }
+
+        // ==========================================================
+        // CALL PYTHON BROCA ASSEMBLY
+        // Passes enriched WordData to NovaBrocaDataCore.py
+        // via the getBrocaAssembly() JS bridge method.
+        // ==========================================================
+        private async Task<string?> CallPythonBrocaAssembly(
+            string intent,
+            string tone,
+            string relationship,
+            WordDefinition wordData,
+            WordDefinition? subjectData,
+            string domainHint)
+        {
+            try
+            {
+                // Pass raw JSON — Python parser enriches it
+                string wordJson = wordData.RawJson;
+                string subjectJson = subjectData?.RawJson ?? "";
+
+                var result = await _js.InvokeAsync<string>(
+                    "CerebellumBridge.getBrocaAssembly",
+                    intent, tone, relationship,
+                    wordJson, subjectJson, domainHint);
+
+                return string.IsNullOrWhiteSpace(result)
+                    ? null : result;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        // ==========================================================
+        // C# DICTIONARY FALLBACK
+        // When Python is unavailable — assembles a basic but
+        // correct response from the WordDefinition C# record.
+        // Not as rich as Python assembly but never silent.
+        // ==========================================================
+        private string? BuildDictionaryFallback(
+            WordDefinition wordData,
+            WordDefinition? subjectData,
+            string intent,
+            string tone,
+            NovaSession session)
+        {
+            if (!wordData.Found)
+                return $"'{wordData.Word}' — no entry found " +
+                       "in the Oxford lexicon. " +
+                       "Check spelling or try a simpler form.";
+
+            var word = wordData.Word;
+            var cat = wordData.LexicalCategory.ToLower();
+            var def = wordData.Definition;
+            var domain = wordData.Domain;
+
+            if (intent == "definition_query_domain")
+                return $"In {domain}: {word} is a {cat} — " +
+                       $"{def}.";
+
+            if (intent == "process_query" &&
+                subjectData?.Found == true)
+                return $"{subjectData.Word.ToUpperInvariant()[0]}" +
+                       $"{subjectData.Word[1..]}: " +
+                       $"{subjectData.Definition}. " +
+                       $"It {word}s by {def}.";
+
+            return $"{word.ToUpperInvariant()[0]}{word[1..]} " +
+                   $"is a {cat} — {def}.";
         }
 
         private string BuildStateQueryFallback(
@@ -581,6 +773,168 @@ namespace NovaAdeptusLibrary
                    $"Tags:  {tagLine}\n" +
                    $"Intent: {intent}";
         }
+
+        // ==========================================================
+        // EXTRACT TARGET WORD
+        // Finds the word TO BE DEFINED from a tagged token list.
+        // Strategy: first NOUN_GENERAL after ARTICLE or LINKING_VERB
+        //           stops at first CONJUNCTION (Phase 3 will handle
+        //           compound sentences — for now we take first noun)
+        //
+        // e.g. [what, is, a, cat]         → "cat"
+        // e.g. [what, is, a, header, in]  → "header"
+        // e.g. [define, recursion]         → "recursion"
+        // e.g. [how, does, a, cat, jump]  → "jump" (action)
+        // ==========================================================
+        public static string? ExtractTargetWord(
+            List<TaggedToken> tokens)
+        {
+            bool passedTrigger = false;
+
+            foreach (var token in tokens)
+            {
+                // Stop at conjunction — Phase 3 handles splits
+                if (token.Tag == TokenTag.Conjunction)
+                    break;
+
+                // Skip question words, linking verbs, articles
+                if (token.Tag == TokenTag.QuestionWord ||
+                    token.Tag == TokenTag.LinkingVerb ||
+                    token.Tag == TokenTag.Article ||
+                    token.Tag == TokenTag.AuxiliaryVerb ||
+                    token.Tag == TokenTag.Punctuation)
+                {
+                    passedTrigger = true;
+                    continue;
+                }
+
+                // Skip domain markers — they modify, not define
+                if (token.Tag == TokenTag.DomainMarker)
+                    continue;
+
+                // Skip prepositions
+                if (token.Tag == TokenTag.Preposition)
+                    continue;
+
+                // First meaningful noun/verb after trigger words
+                if (passedTrigger &&
+                    (token.Tag == TokenTag.NounGeneral ||
+                     token.Tag == TokenTag.NounAbstract ||
+                     token.Tag == TokenTag.ActionVerb))
+                    return token.Word.ToLower().Trim();
+            }
+
+            return null;
+        }
+
+        // ==========================================================
+        // EXTRACT SUBJECT WORD
+        // For process queries "How does X do Y?"
+        // Returns the SUBJECT (X) — first noun after article
+        // before the action verb.
+        //
+        // e.g. [how, does, a, cat, jump] → "cat" (subject)
+        //       ExtractTargetWord returns "jump" (action)
+        // ==========================================================
+        public static string? ExtractSubjectWord(
+            List<TaggedToken> tokens)
+        {
+            bool pastHow = false;
+            bool pastAux = false;
+
+            foreach (var token in tokens)
+            {
+                if (token.Tag == TokenTag.Conjunction) break;
+
+                if (token.Tag == TokenTag.QuestionWord)
+                { pastHow = true; continue; }
+
+                if (token.Tag == TokenTag.AuxiliaryVerb && pastHow)
+                { pastAux = true; continue; }
+
+                if (token.Tag == TokenTag.Article) continue;
+
+                // First noun after "how does" = subject
+                if (pastAux &&
+                    (token.Tag == TokenTag.NounGeneral ||
+                     token.Tag == TokenTag.NounAbstract))
+                    return token.Word.ToLower().Trim();
+            }
+            return null;
+        }
+
+        // ==========================================================
+        // EXTRACT DOMAIN HINT
+        // Scans tokens for domain marker words.
+        // Returns Oxford domain id string or empty string.
+        //
+        // e.g. [..., "in", "c++"]     → "computing"
+        // e.g. [..., "in", "physics"] → "physics"
+        // e.g. [..., "cat", ...]      → ""
+        // ==========================================================
+        public string ExtractDomainHint(List<TaggedToken> tokens)
+        {
+            // Domain markers are typically after "in" preposition
+            bool afterPrep = false;
+
+            foreach (var token in tokens)
+            {
+                if (token.Tag == TokenTag.Preposition)
+                {
+                    afterPrep = true;
+                    continue;
+                }
+
+                if (afterPrep &&
+                    token.Tag == TokenTag.DomainMarker)
+                {
+                    // Binary search domain markers in Python table
+                    // For now — direct C# map for speed
+                    return token.Word.ToLower() switch
+                    {
+                        "c++" or "cpp" or "c#" or "java" or
+                        "python" or "javascript" or "js" or
+                        "html" or "css" or "sql" or
+                        "typescript" or "code" or "coding" or
+                        "computing" or "programming" => "computing",
+                        "math" or "mathematics" => "mathematics",
+                        "physics" => "physics",
+                        "biology" => "biology",
+                        "chemistry" => "chemistry",
+                        "zoology" => "zoology",
+                        "medicine" => "medicine",
+                        "philosophy" => "philosophy",
+                        "psychology" => "psychology",
+                        "linguistics" or "grammar" => "linguistics",
+                        "law" => "law",
+                        _ => "",
+                    };
+                }
+
+                // Reset if we hit a noun before a domain marker
+                if (afterPrep &&
+                    token.Tag == TokenTag.NounGeneral)
+                    afterPrep = false;
+            }
+
+            // Also check if any token IS a domain marker
+            // even without preposition
+            foreach (var token in tokens)
+                if (token.Tag == TokenTag.DomainMarker)
+                    return ExtractDomainHint(
+                        new List<TaggedToken>
+                        {
+                            new() {
+                                Word = "in",
+                                Tag = TokenTag.Preposition
+                            },
+                            token,
+                        });
+
+            return "";
+        }
+
+
     }
 
     // ==========================================================
