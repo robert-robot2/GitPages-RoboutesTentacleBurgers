@@ -1,0 +1,51 @@
+﻿
+
+<div class="patch-notes-container">
+    @foreach (var note in PatchNoteEntries)
+    {
+        <div class="patch-note-block">
+            <div class="patch-title">@note.Title</div>
+            <div class="patch-body">
+                @foreach (var line in note.Lines)
+                {
+                    <div class="patch-line">@line</div>
+                }
+            </div>
+        </div>
+    }
+</div>
+
+
+
+
+@code {
+    public class PatchNoteEntry
+    {
+        public string Title { get; set; }= default!;
+
+        public List<string> Lines { get; set; }= default!;
+
+    }
+
+    private List<PatchNoteEntry> PatchNoteEntries = new()
+    {
+
+
+                                new PatchNoteEntry
+{
+    Title = "RTB Version Phase 2.0 - Welcome Notes ",
+    Lines = new List<string>
+    {
+
+    "RTB Phase 2 Preparation",
+    " Remaining errors:",
+    " Directional light miscats on foliage in Scene 3",
+    " Point lights not casting on ground in bwp scenes, Remove Point light Drags",
+
+
+
+
+    },
+},
+};
+}
