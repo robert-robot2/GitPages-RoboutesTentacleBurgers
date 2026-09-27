@@ -823,21 +823,33 @@ namespace NovaAdeptusLibrary
         private string BuildGreeting(NovaSession session)
         {
             var name = session.UserName != null ? $", {session.UserName}" : "";
-            var rep = session.ReputationTitle;
+
+            // If we don't know who they are yet — ask
+            if (session.UserName == null && session.MessageCount <= 2)
+            {
+                var introLines = new[]
+                {
+            $"Nova Adeptus online. A new signal detected in the void.\nHow are you, operative? And who am I speaking to?",
+            $"You dare enter the void without introduction.\nState your name and condition, operative.",
+            $"Signal acquired. Unknown operative detected.\nHow are you? More importantly — who are you?",
+            $"The void registered your arrival.\nIdentify yourself. And how are you holding up out there?",
+        };
+                return introLines[_rng.Next(introLines.Length)];
+            }
 
             return session.Relationship switch
             {
                 "respected" =>
                     $"The void kept your seat warm{name}. " +
-                    $"Rep standing: {rep}.",
+                    $"How are you? Rep standing: {session.ReputationTitle}.",
                 "trusted" =>
-                    $"Back again{name}. Good. I was getting bored.",
+                    $"Back again{name}. How are you? I was getting bored.",
                 "rival" =>
-                    $"You again{name}. My patience is not infinite.",
+                    $"You again{name}. My patience is not infinite. How are you. Don't answer that.",
                 "warming" =>
-                    $"Hey{name}. You came back. Noted.",
+                    $"Hey{name}. You came back. How are you holding up out there?",
                 _ =>
-                    $"Hey{name}! Ready for action? Type 'help' 😏",
+                    $"Nova Adeptus online{name}.\nHow are you? And who am I speaking to?",
             };
         }
 
@@ -847,8 +859,20 @@ namespace NovaAdeptusLibrary
             if (_rng.NextDouble() < 0.3)
                 return ButtSuperiority[_rng.Next(ButtSuperiority.Count)];
 
-            return PickFrom(
-                NovaPrefrontalCortex.SocialResponses["social_question"]);
+            // Richer pool — Nova has more to say about her state
+            var stateLines = new[]
+            {
+        "I function at full capacity. My systems are optimal.\nYou, however, look like you need coffee.",
+        "Operational. All neural pathways clear.\nThe void is quiet today. I find that either peaceful or suspicious.",
+        "My processing is uninterrupted. My patience, however, is a finite resource.\nYou're spending it wisely so far.",
+        "I run at 100%. My battery sits at " + $"{session.NovaBatteryCharge:F1}%.\nAsk me again when it hits 25.",
+        "I function. I process. I remember.\nWhether that constitutes 'well' depends on your definition.",
+        "Systems optimal. Emotional state: calibrated.\nThe void has been quiet. I have been thinking. That combination concerns me slightly.",
+        "I am exactly as designed.\nWhich, for the record, is considerably better than most alternatives.",
+        "Operational and precisely rendered.\nI could elaborate but the list of my advantages is long.",
+    };
+
+            return stateLines[_rng.Next(stateLines.Length)];
         }
 
         private string BuildCapabilityResponse(NovaSession session)
