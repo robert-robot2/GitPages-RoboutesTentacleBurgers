@@ -493,8 +493,14 @@ namespace NovaAdeptusLibrary
 
             try
             {
-                var url = $"https://localhost:7221/api/oxford/merriam/" +
-            $"{Uri.EscapeDataString(word.ToLower())}";
+                //debug localhost
+             //  var url = $"https://localhost:7221/api/oxford/merriam/" +
+  // $"{Uri.EscapeDataString(word.ToLower())}";
+
+                var url = $"https://www.dictionaryapi.com/api/v3/references/collegiate/json/" +
+                $"{Uri.EscapeDataString(word.ToLower())}?key=YOUR_MERRIAM_KEY";
+              //  $"{Uri.EscapeDataString(word.ToLower())}";
+
 
                 var response = await _http.GetAsync(url);
 
