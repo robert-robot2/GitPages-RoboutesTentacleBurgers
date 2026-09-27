@@ -48,13 +48,13 @@ namespace NovaAdeptusLibrary
         // ── Oxford Dictionary ──────────────────────────────────
         // Replace YOUR_APP_ID and YOUR_APP_KEY with your credentials
         // from developer.oxforddictionaries.com
-        /*
-        private const string OxfordAppId = "";
-        private const string OxfordAppKey = "";
+        
+        private const string OxfordAppId = "10f1d194";
+        private const string OxfordAppKey = "7be7756f67b5fd43dd08fb9c049bfdf0";
         private const string OxfordBase =
             "https://od-api.oxforddictionaries.com/api/v2";
         private const string OxfordLang = "en-gb";
-        */
+        
 
         // Session cache — one fetch per unique word per session
         // Key: "word:domainhint" (lowercase)
@@ -254,43 +254,37 @@ namespace NovaAdeptusLibrary
         //   e.g. "computing", "zoology", "mathematics"
         //   Empty = use first/best sense returned.
         // ==========================================================
+        // ==========================================================
+        // OXFORD PROXY — FetchDefinitionAsync
+        // Calls RoboutesAspNetCoreBackend which proxies to Oxford.
+        // No CORS — browser never touches Oxford directly.
+        // ==========================================================
         public async Task<WordDefinition> FetchDefinitionAsync(
             string word, string domainHint = "")
         {
             if (string.IsNullOrWhiteSpace(word))
                 return WordDefinition.NotFound(word);
 
-            // ── Cache check ──────────────────────────────────────
+            // ── Cache check ───────────────────────────────────────
             var cacheKey = $"{word.ToLower().Trim()}:" +
                            $"{domainHint.ToLower().Trim()}";
-            if (_definitionCache.TryGetValue(
-                    cacheKey, out var cached))
+            if (_definitionCache.TryGetValue(cacheKey, out var cached))
                 return cached;
 
-            // ── API fetch ────────────────────────────────────────
             try
             {
-                var url = $"{OxfordBase}/entries/{OxfordLang}/" +
+              
+                // ── Call our backend proxy ────────────────────────────────
+                var url = $"https://localhost:7221/api/oxford/define/" +
                           $"{Uri.EscapeDataString(word.ToLower())}";
 
-                // Add domain filter if hint provided
                 if (!string.IsNullOrEmpty(domainHint))
-                    url += $"?fields=definitions,examples," +
-                           $"pronunciations,domains";
-                else
-                    url += "?fields=definitions,examples," +
-                           "pronunciations,domains";
+                    url += $"?domain={Uri.EscapeDataString(domainHint)}";
 
-                using var request = new HttpRequestMessage(
-                    HttpMethod.Get, url);
-                request.Headers.Add("app_id", OxfordAppId);
-                request.Headers.Add("app_key", OxfordAppKey);
-
-                var response = await _http.SendAsync(request);
+                var response = await _http.GetAsync(url);
 
                 if (!response.IsSuccessStatusCode)
                 {
-                    // 404 = word not found (valid, not an error)
                     if (response.StatusCode ==
                         System.Net.HttpStatusCode.NotFound)
                     {
@@ -305,11 +299,10 @@ namespace NovaAdeptusLibrary
                 var rawJson = await response.Content
                     .ReadAsStringAsync();
 
-                // ── Parse raw JSON ───────────────────────────────
+                // ── Reuse existing Oxford parser ──────────────────
                 var definition = ParseOxfordResponse(
                     word, rawJson, domainHint);
 
-                // Cache and return
                 _definitionCache[cacheKey] = definition;
                 OxfordOnline = true;
                 return definition;
@@ -320,7 +313,7 @@ namespace NovaAdeptusLibrary
                 return WordDefinition.NotFound(word);
             }
         }
-
+        
         // ==========================================================
         // OXFORD RESPONSE PARSER
         // Parses raw Oxford JSON → WordDefinition record.
@@ -478,14 +471,15 @@ namespace NovaAdeptusLibrary
             "Oxford lexicon offline. " +
             "The void keeps its definitions today. " +
             "Try again later. 🌌";
-        */
-        /*
+     */
+
+
         // ==========================================================
         // FREE DICTIONARY API — FetchDefinitionAsync
         // No key, no CORS, works directly from Blazor WASM.
         // https://api.dictionaryapi.dev/api/v2/entries/en/{word}
         // ==========================================================
-
+        
         public async Task<WordDefinition> FetchDefinitionAsync(
             string word, string domainHint = "")
         {
@@ -499,8 +493,8 @@ namespace NovaAdeptusLibrary
 
             try
             {
-                var url = $"https://api.dictionaryapi.dev/api/v2/entries/en/" +
-                          $"{Uri.EscapeDataString(word.ToLower())}";
+                var url = $"https://localhost:7221/api/oxford/merriam/" +
+            $"{Uri.EscapeDataString(word.ToLower())}";
 
                 var response = await _http.GetAsync(url);
 
@@ -512,7 +506,7 @@ namespace NovaAdeptusLibrary
                 }
 
                 var rawJson = await response.Content.ReadAsStringAsync();
-                var definition = ParseFreeDictionaryResponse(word, rawJson);
+                var definition = ParseMerriamResponse(word, rawJson);
 
                 _definitionCache[cacheKey] = definition;
                 OxfordOnline = true;
@@ -546,6 +540,116 @@ namespace NovaAdeptusLibrary
         //   }
         // ]
         // ==========================================================
+        private static WordDefinition ParseMerriamResponse(
+    string word, string rawJson)
+        {
+            try
+            {
+                using var doc = JsonDocument.Parse(rawJson);
+                var root = doc.RootElement;
+
+                if (root.ValueKind != JsonValueKind.Array)
+                    return WordDefinition.NotFound(word);
+
+                var entries = root.EnumerateArray().ToList();
+                if (!entries.Any())
+                    return WordDefinition.NotFound(word);
+
+                // If first entry is a string, word not found
+                // Merriam returns suggestions as strings
+                if (entries[0].ValueKind == JsonValueKind.String)
+                    return WordDefinition.NotFound(word);
+
+                var entry = entries[0];
+
+                // Part of speech
+                string lexCategory = "";
+                if (entry.TryGetProperty("fl", out var fl))
+                    lexCategory = fl.GetString() ?? "";
+
+                // Pronunciation
+                string pronunciation = "";
+                if (entry.TryGetProperty("hwi", out var hwi) &&
+                    hwi.TryGetProperty("prs", out var prs))
+                {
+                    var prsList = prs.EnumerateArray().ToList();
+                    if (prsList.Any() &&
+                        prsList[0].TryGetProperty("mw", out var mw))
+                        pronunciation = mw.GetString() ?? "";
+                }
+
+                // Definition
+                string definition = "";
+                string example = "";
+
+                if (entry.TryGetProperty("def", out var defs))
+                {
+                    foreach (var def in defs.EnumerateArray())
+                    {
+                        if (!def.TryGetProperty("sseq", out var sseq))
+                            continue;
+
+                        foreach (var senseSeq in sseq.EnumerateArray())
+                        {
+                            foreach (var senseItem in senseSeq.EnumerateArray())
+                            {
+                                if (senseItem.ValueKind != JsonValueKind.Array)
+                                    continue;
+
+                                var items = senseItem.EnumerateArray().ToList();
+                                if (items.Count < 2) continue;
+                                if (items[0].GetString() != "sense") continue;
+
+                                var senseObj = items[1];
+                                if (!senseObj.TryGetProperty("dt", out var dt))
+                                    continue;
+
+                                foreach (var dtItem in dt.EnumerateArray())
+                                {
+                                    var dtArr = dtItem.EnumerateArray().ToList();
+                                    if (dtArr.Count < 2) continue;
+                                    if (dtArr[0].GetString() != "text") continue;
+
+                                    var text = dtArr[1].GetString() ?? "";
+                                    // Strip Merriam markup {bc}, {sx|...||}
+                                    text = System.Text.RegularExpressions
+                                        .Regex.Replace(text, @"\{[^}]+\}", "")
+                                        .Replace(":", "").Trim();
+
+                                    if (!string.IsNullOrEmpty(text))
+                                    {
+                                        definition = text;
+                                        break;
+                                    }
+                                }
+                                if (!string.IsNullOrEmpty(definition)) break;
+                            }
+                            if (!string.IsNullOrEmpty(definition)) break;
+                        }
+                        if (!string.IsNullOrEmpty(definition)) break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(definition))
+                    return WordDefinition.NotFound(word);
+
+                return new WordDefinition(
+                    word,
+                    lexCategory,
+                    definition,
+                    "General",
+                    "general",
+                    example,
+                    pronunciation,
+                    rawJson,
+                    true);
+            }
+            catch
+            {
+                return WordDefinition.NotFound(word);
+            }
+        }
+        /*
         private static WordDefinition ParseFreeDictionaryResponse(
             string word, string rawJson)
         {
@@ -628,8 +732,13 @@ namespace NovaAdeptusLibrary
                 return WordDefinition.NotFound(word);
             }
         }
-        */
+       */
+        /*
+        // ==========================================================
+        // DataMuse API Fetch
+        // ==========================================================
 
+        
         public async Task<WordDefinition> FetchDefinitionAsync(
     string word, string domainHint = "")
         {
@@ -734,9 +843,11 @@ namespace NovaAdeptusLibrary
                 return WordDefinition.NotFound(word);
             }
         }
+        */
+
 
     }
-
+        
     // ==========================================================
     // JSON RESPONSE MODELS
     // ==========================================================

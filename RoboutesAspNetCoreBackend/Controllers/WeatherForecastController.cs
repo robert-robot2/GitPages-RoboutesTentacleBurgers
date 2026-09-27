@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace NovaAdeptusAPILibrary.Controllers
+namespace RoboutesAspNetCoreBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]

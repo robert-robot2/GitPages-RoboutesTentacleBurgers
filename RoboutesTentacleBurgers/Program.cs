@@ -23,8 +23,23 @@ namespace RoboutesTentacleBurgers
             builder.RootComponents.Add<App>("#app");
             builder.RootComponents.Add<HeadOutlet>("head::after");
 
-            // HTTP Client
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+
+            // ── HTTP Clients ───────────────────────────────────────────────
+
+            // Default client — Blazor app itself
+            builder.Services.AddScoped(sp =>
+                new HttpClient
+                {
+                    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+                });
+
+            // Nova backend client
+            builder.Services.AddHttpClient<NovaAdeptusLibrary.NovaAPIService>(
+                client =>
+                {
+                    client.BaseAddress = new Uri("https://localhost:7221");
+                });
+
 
             // Auth (Optional)
             builder.Services.AddOidcAuthentication(options =>

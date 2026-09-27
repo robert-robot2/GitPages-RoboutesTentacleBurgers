@@ -1,4 +1,4 @@
-namespace NovaAdeptusAPILibrary
+namespace RoboutesAspNetCoreBackend
 {
     public class WeatherForecast
     {

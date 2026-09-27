@@ -47,5 +47,33 @@
 
     },
 },
+
+
+new PatchNoteEntry
+{
+    Title = "RTB Phase 2.0 - Nova API & Backend Architecture",
+    Lines = new List<string>
+    {
+        "Added RoboutesAspNetCoreBackend — new ASP.NET Core Web API project to the solution",
+        "Configured CORS policy on backend to allow requests from Blazor WASM (localhost:7177)",
+        "Created OxfordController.cs — dictionary proxy controller, browser never touches external APIs directly",
+        "Added IHttpClientFactory to backend for server-side HTTP calls",
+        "Wired NovaAPIService to use typed HttpClient pointing at backend (localhost:7221)",
+        "Added Microsoft.Extensions.Http package to RoboutesTentacleBurgers",
+        "Diagnosed and resolved CORS block — external APIs cannot be called directly from Blazor WASM",
+        "Diagnosed Oxford Sandbox plan limitation — sandbox restricted to words starting with A only",
+        "Switched from Oxford to Merriam-Webster Collegiate Dictionary API — free, reliable, no restrictions",
+        "Added freedict and merriam proxy endpoints to OxfordController",
+        "Added Merriam-Webster API key to appsettings.json",
+        "Updated NovaAPIService FetchDefinitionAsync to route through backend proxy",
+        "Updated ParseMerriamResponse parser for Merriam-Webster JSON structure",
+        "Nova dictionary lookups now fully server-side — no CORS issues in dev or production",
+        "Added Microsoft.ML and Microsfot.SemanticKernel to AspNetCore"
+    },
+},
+
+
+
+
 };
 }

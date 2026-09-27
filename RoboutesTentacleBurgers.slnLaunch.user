@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "RoboutesTentacleBurgers\\RoboutesTentacleBurgers.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "RoboutesAspNetCoreBackend\\RoboutesAspNetCoreBackend.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
