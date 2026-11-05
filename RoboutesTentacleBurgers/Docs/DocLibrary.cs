@@ -1197,10 +1197,12 @@ SOFTWARE.
             D("44", "Ghost Engine docs on Roboutes Git Pages"),
             D("35", "Hidden objective"),
             D("20.P", "Roles and Behaviour Reorder Patch"),
+            D("20.Q", "Collision Check"),
+            D("20.G", "Polish for levels"),
+            D("41", "Timed elevators/Animations: Mario/Luigi flag slide down, death, transform, shell stompp, shell hurt"),
         ]),
         new("Active Core", "🔥",
-        [
-            T("20.G", "Collision check, polish for levels"),    
+        [       
             T("20.N", "Play packaged exe (Instruction Set 3)"),
             T("43", "Base demo gameplay package to download on site without installer"),
        
@@ -1208,8 +1210,7 @@ SOFTWARE.
         new("Active Replicant Core", "🧪",
         [
             T("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),
-            T("40", "Transition audio effects"),
-            T("41", "Timed elevators/Animations: Mario/Luigi flag slide down, death, transform"),        
+            T("40", "Transition audio effects"),             
             T("42", "Thicc editor upgrade part Quattro: resolutions"),
               
         ]),
