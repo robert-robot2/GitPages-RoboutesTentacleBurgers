@@ -1196,11 +1196,11 @@ SOFTWARE.
             D("37", "Gamepad zoom (R2 L2), gamepad/keyboard recenter orbit camera (R1 Z)"),
             D("44", "Ghost Engine docs on Roboutes Git Pages"),
             D("35", "Hidden objective"),
+            D("20.P", "Roles and Behaviour Reorder Patch"),
         ]),
         new("Active Core", "🔥",
         [
-            T("20.G", "Collision check, polish for levels"),
-            T("20.P", "Roles and Behaviour Restructure"),
+            T("20.G", "Collision check, polish for levels"),    
             T("20.N", "Play packaged exe (Instruction Set 3)"),
             T("43", "Base demo gameplay package to download on site without installer"),
        
@@ -1209,14 +1209,13 @@ SOFTWARE.
         [
             T("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),
             T("40", "Transition audio effects"),
-            T("41", "Timed elevators"),
-            T("28", "Animations: Mario/Luigi flag slide down, death, transform"),
+            T("41", "Timed elevators/Animations: Mario/Luigi flag slide down, death, transform"),        
             T("42", "Thicc editor upgrade part Quattro: resolutions"),
-            T("-", "Base engine for use without package installer for download"),
-      
+              
         ]),
         new("Active SubCore", "🛰️",
-        [    
+        [       
+            T("-", "Base engine for use without package installer for download"),
             T("-", "Install Shield Wizard / packaged install for download"),
             T("-", "Install wizard setup for standalone game"),
             T("-", "Program launcher"),
