@@ -48,5 +48,8 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Always</CopyToPublishDirectory>
 		</Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <Folder Include="Docs\" />
 	</ItemGroup>	
 </Project>

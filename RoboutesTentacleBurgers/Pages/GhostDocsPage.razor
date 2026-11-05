@@ -1,0 +1,609 @@
+﻿@page "/GhostDocsPage"
+@page "/ghostdocs/{SectionId}"
+@using GhostDocs
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<PageTitle>@Current.Title · GhostX Docs</PageTitle>
+
+<div class="gd">
+    <div class="gd-progress" aria-hidden="true"></div>
+
+    @* ═══════════════ SIDEBAR ═══════════════ *@
+    <button class="gd-burger" @onclick="() => _sideOpen = !_sideOpen" aria-label="Toggle docs navigation">
+        <span></span><span></span><span></span>
+    </button>
+    <div class="gd-scrim @(_sideOpen ? "open" : "")" @onclick="() => _sideOpen = false"></div>
+
+    <aside class="gd-side @(_sideOpen ? "open" : "")">
+        <div class="gd-brand">
+            <div class="gd-logo">👻</div>
+            <div>
+                <div class="gd-brand-name">GHOSTX <b>DOCS</b></div>
+                <div class="gd-brand-sub"><i class="gd-dot"></i> Engine library · v X</div>
+            </div>
+        </div>
+
+        <label class="gd-version">
+            <span>Version</span>
+            <select @bind="_version">
+                <option value="x">GhostX Version X (current)</option>
+                <option value="next">Next · Active Core</option>
+                <option value="legacy">Legacy · Phase 1–12</option>
+            </select>
+        </label>
+
+        <div class="gd-filter">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5h18l-7 8v6l-4-2v-4z" /></svg>
+            <input type="text" placeholder="Filter by title…" @bind="_filter" @bind:event="oninput" />
+            @if (_filter.Length > 0)
+            {
+                <button class="gd-clear" @onclick="() => _filter = string.Empty" aria-label="Clear filter">✕</button>
+            }
+        </div>
+
+        <nav class="gd-nav" aria-label="Documentation sections">
+            @if (Filtering)
+            {
+                @if (!Matches.Any())
+                {
+                    <div class="gd-empty">No sections match “@_filter”.</div>
+                }
+                @foreach (var s in Matches)
+                {
+                    <a class="gd-link @(s.Id == Current.Id ? "on" : "")" href="ghostdocs/@s.Id">
+                        <span class="gd-ico">@s.Icon</span><span class="gd-lt">@s.Title</span>
+                        <em>@CategoryOf(s).Title</em>
+                    </a>
+                }
+            }
+            else
+            {
+                @foreach (var cat in DocLibrary.Categories)
+                {
+                    var secs = DocLibrary.Sections.Where(s => s.Category == cat.Id).ToArray();
+                    var open = !_collapsed.Contains(cat.Id) || secs.Any(s => s.Id == Current.Id);
+                    <div class="gd-cat @(open ? "open" : "")">
+                        <button class="gd-cat-head" @onclick="() => ToggleCat(cat.Id)">
+                            <span class="gd-chev">▸</span>
+                            <span class="gd-ico">@cat.Icon</span>
+                            <span class="gd-lt">@cat.Title</span>
+                            <small>@secs.Length</small>
+                        </button>
+                        @if (open)
+                        {
+                            <div class="gd-cat-body">
+                                @foreach (var s in secs)
+                                {
+                                    <a class="gd-link @(s.Id == Current.Id ? "on" : "")" href="ghostdocs/@s.Id">
+                                        <span class="gd-lt">@s.Title</span>
+                                        @if (s.Placeholder)
+                                        {
+                                            <i class="gd-ph" title="Placeholder content">ph</i>
+                                        }
+                                    </a>
+                                }
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </nav>
+
+        <div class="gd-side-foot">
+            <div class="gd-ring" style="--p:@DocLibrary.RoadmapPercent">
+                <span>@DocLibrary.RoadmapPercent<small>%</small></span>
+            </div>
+            <div>
+                <div class="gd-foot-title">Roadmap progress</div>
+                <div class="gd-foot-sub">@DocLibrary.RoadmapDone of @DocLibrary.RoadmapTotal phases shipped</div>
+            </div>
+        </div>
+    </aside>
+
+    @* ═══════════════ MAIN ═══════════════ *@
+    <main class="gd-main">
+        <nav class="gd-crumbs" aria-label="Breadcrumb">
+            <a href="ghostdocs/introduction">GhostX</a><i>/</i>
+            <a href="ghostdocs/introduction">Documentation</a><i>/</i>
+            <span>@CategoryOf(Current).Title</span><i>/</i>
+            <b>@Current.Title</b>
+        </nav>
+
+        <header class="gd-head">
+            <div class="gd-kicker">@CategoryOf(Current).Icon @CategoryOf(Current).Title.ToUpperInvariant()</div>
+            <h1 class="gd-title"><span class="gd-title-ico">@Current.Icon</span> @Current.Title</h1>
+            <p class="gd-lead">@Current.Summary</p>
+            <div class="gd-meta">
+                <span class="gd-chip">⏱ @Current.ReadMinutes min read</span>
+                @if (Current.Placeholder)
+                {
+                    <span class="gd-chip ph">🧪 placeholder</span>
+                }
+                @foreach (var t in Current.Tags.Take(4))
+                {
+                    <span class="gd-chip tag">#@t</span>
+                }
+            </div>
+        </header>
+
+        <article class="gd-article">
+            @for (int i = 0; i < Current.Blocks.Length; i++)
+            {
+                var b = Current.Blocks[i];
+                var key = $"{Current.Id}:{i}";
+
+                @if (b.Kind == BlockKind.Hero)
+                {
+                    <section class="gd-hero">
+                        <div class="gd-hero-glow"></div>
+                        <div class="gd-hero-tag">👻 DirectX 12 RHI · WinForms · Blazor WASM</div>
+                        <h2>Build worlds.<br /><span>Haunt the GPU.</span></h2>
+                        <p>A futuristic game engine with a native C++ DirectX 12 core, a docking editor you already know how to use and a UI layer that runs in the browser.</p>
+                        <div class="gd-hero-cta">
+                            <a class="gd-btn primary" href="ghostdocs/install-build">Quick start →</a>
+                            <a class="gd-btn" href="ghostdocs/build-level-1">Build Level 1</a>
+                            <a class="gd-btn" href="ghostdocs/roadmap">View roadmap</a>
+                        </div>
+                        <div class="gd-badges">
+                            @foreach (var badge in new[] { ".NET 10", "C++", "C#", "Java tools", "HLSL", "Blazor WASM", "DirectX 12", "MIT" })
+                            {
+                                <span>@badge</span>
+                            }
+                        </div>
+                    </section>
+                }
+                else if (b.Kind == BlockKind.H2)
+                {
+                    <h2 id="@b.Id" class="gd-h2"><span>@b.Text</span></h2>
+                }
+                else if (b.Kind == BlockKind.H3)
+                {
+                    <h3 class="gd-h3">@b.Text</h3>
+                }
+                else if (b.Kind == BlockKind.P)
+                {
+                    <p class="gd-p">@Md.Inline(b.Text)</p>
+                }
+                else if (b.Kind == BlockKind.List)
+                {
+                    <ul class="gd-list">
+                        @foreach (var item in b.Items)
+                        {
+                            <li>@Md.Inline(item)</li>
+                        }
+                    </ul>
+                }
+                else if (b.Kind == BlockKind.Callout)
+                {
+                    <aside class="gd-callout @b.Tone">
+                        <div class="gd-callout-ico">@ToneIcon(b.Tone)</div>
+                        <div>
+                            <div class="gd-callout-title">@b.Id</div>
+                            <div class="gd-callout-body">@Md.Inline(b.Text)</div>
+                        </div>
+                    </aside>
+                }
+                else if (b.Kind == BlockKind.Stats)
+                {
+                    <div class="gd-stats">
+                        @foreach (var raw in b.Items)
+                        {
+                            var parts = raw.Split('|');
+                            var val = parts[0] switch
+                            {
+                                "__PHASES_DONE__" => DocLibrary.RoadmapDone.ToString("N0"),
+                                "__PHASES_TOTAL__" => DocLibrary.RoadmapTotal.ToString("N0"),
+                                var v => v
+                            };
+                            <div class="gd-stat">
+                                <div class="gd-stat-val">@val</div>
+                                <div class="gd-stat-lbl">@parts[1]</div>
+                            </div>
+                        }
+                    </div>
+                }
+                else if (b.Kind == BlockKind.Cards)
+                {
+                    <div class="gd-cards">
+                        @foreach (var c in b.Cards)
+                        {
+                            @if (c.Link is not null)
+                            {
+                                <a class="gd-card link" href="ghostdocs/@c.Link">
+                                    <div class="gd-card-ico">@c.Icon</div>
+                                    <div class="gd-card-title">@c.Title <span>→</span></div>
+                                    <div class="gd-card-body">@c.Body</div>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="gd-card">
+                                    <div class="gd-card-ico">@c.Icon</div>
+                                    <div class="gd-card-title">@c.Title</div>
+                                    <div class="gd-card-body">@c.Body</div>
+                                </div>
+                            }
+                        }
+                    </div>
+                }
+                else if (b.Kind == BlockKind.Steps)
+                {
+                    <ol class="gd-steps">
+                        @foreach (var raw in b.Items)
+                        {
+                            var sp = raw.Split('|', 2);
+                            <li>
+                                <div class="gd-step-title">@sp[0]</div>
+                                @if (sp.Length > 1)
+                                {
+                                    <div class="gd-step-body">@Md.Inline(sp[1])</div>
+                                }
+                            </li>
+                        }
+                    </ol>
+                }
+                else if (b.Kind == BlockKind.Checklist)
+                {
+                    var total = b.Items.Length;
+                    var done = Enumerable.Range(0, total).Count(n => IsChecked($"{key}:{n}", b.Items[n]));
+                    <div class="gd-check">
+                        <div class="gd-check-head">
+                            <span>Checklist</span>
+                            <div class="gd-bar"><i style="width:@(total == 0 ? 0 : done * 100 / total)%"></i></div>
+                            <b>@done / @total</b>
+                        </div>
+                        @for (int n = 0; n < total; n++)
+                        {
+                            var ck = $"{key}:{n}";
+                            var on = IsChecked(ck, b.Items[n]);
+                            var label = b.Items[n].Split('|', 2)[1];
+                            <button class="gd-check-row @(on ? "on" : "")" @onclick="() => ToggleCheck(ck, b.Items[n])">
+                                <span class="gd-box">@(on ? "✓" : "")</span>
+                                <span>@label</span>
+                            </button>
+                        }
+                    </div>
+                }
+                else if (b.Kind == BlockKind.Table)
+                {
+                    var q = _tableFilter.GetValueOrDefault(key, "");
+                    var rows = string.IsNullOrWhiteSpace(q)
+                        ? b.Rows
+                        : b.Rows.Where(r => r.Any(c => c.Contains(q, StringComparison.OrdinalIgnoreCase))).ToArray();
+                    <div class="gd-table-wrap">
+                        @if (b.Filter)
+                        {
+                            <div class="gd-table-tools">
+                                <input type="text" placeholder="Filter this table…" value="@q" @oninput="e => SetTableFilter(key, e.Value?.ToString())" />
+                                <span>@rows.Length / @b.Rows.Length rows</span>
+                            </div>
+                        }
+                        <div class="gd-table-scroll">
+                            <table class="gd-table">
+                                <thead><tr>@foreach (var h in b.Headers) {
+                                    <th>@h</th>
+                                }
+                            </tr></thead>
+                            <tbody>
+                                @foreach (var r in rows)
+                                {
+                                    <tr>
+                                        @for (int c = 0; c < r.Length; c++)
+                                        {
+                                            <td class="@(c == 0 && b.Keys ? "keys" : "")">@Md.Inline(r[c], kbd: c == 0 && b.Keys)</td>
+                                        }
+                                    </tr>
+                                }
+                                @if (rows.Length == 0)
+                                {
+                                    <tr><td colspan="@b.Headers.Length" class="gd-none">Nothing matches.</td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            }
+                else if (b.Kind == BlockKind.Code)
+            {
+                var at = ActiveTab(key, b.Tabs.Length);
+                var tab = b.Tabs[at];
+                <div class="gd-code">
+                    <div class="gd-code-bar">
+                        <div class="gd-code-dots"><i></i><i></i><i></i></div>
+                        <div class="gd-tabs" role="tablist">
+                            @for (int t = 0; t < b.Tabs.Length; t++)
+                            {
+                                var ti = t;
+                                <button role="tab" class="@(at == ti ? "on" : "")" @onclick="() => SetTab(key, ti)">
+                                    <em>@LangBadge(b.Tabs[t].Lang)</em>@b.Tabs[t].Label
+                                </button>
+                            }
+                        </div>
+                        <button class="gd-copy @(_copied == key ? "ok" : "")" @onclick="() => CopyAsync(key, tab.Code)">
+                            @(_copied == key ? "✓ Copied" : "⧉ Copy")
+                        </button>
+                    </div>
+                    <pre><code>@CodeHighlighter.Highlight(tab.Code, tab.Lang)</code></pre>
+                </div>
+            }
+            else if (b.Kind == BlockKind.Diagram)
+            {
+                <div class="gd-diagram">
+                    @for (int n = 0; n < b.Items.Length; n++)
+                    {
+                        var parts = b.Items[n].Split('¦');
+                        <div class="gd-node" style="--i:@n">
+                            <div class="gd-node-title">@parts[0]</div>
+                            <div class="gd-node-sub">@(parts.Length > 1 ? parts[1] : "")</div>
+                            <div class="gd-node-chips">
+                                @foreach (var chip in parts.Skip(2))
+                                {
+                                    <span>@chip</span>
+                                }
+                            </div>
+                        </div>
+                        @if (n < b.Items.Length - 1)
+                        {
+                            <div class="gd-arrow"><span>@(n < b.Headers.Length ? b.Headers[n] : "")</span><i></i></div>
+                        }
+                    }
+                </div>
+            }
+            else if (b.Kind == BlockKind.Faq)
+            {
+                <div class="gd-faq">
+                    @foreach (var raw in b.Items)
+                    {
+                        var qa = raw.Split('|', 2);
+                        <details>
+                            <summary>@qa[0]</summary>
+                            <div>@Md.Inline(qa[1])</div>
+                        </details>
+                    }
+                </div>
+            }
+            else if (b.Kind == BlockKind.Roadmap)
+            {
+                <section class="gd-road">
+                    <div class="gd-road-top">
+                        <div class="gd-ring big" style="--p:@DocLibrary.RoadmapPercent"><span>@DocLibrary.RoadmapPercent<small>%</small></span></div>
+                        <div class="gd-road-sum">
+                            <div class="gd-road-num">@DocLibrary.RoadmapDone <small>/ @DocLibrary.RoadmapTotal phases</small></div>
+                            <div class="gd-bar lg"><i style="width:@DocLibrary.RoadmapPercent%"></i></div>
+                            <div class="gd-road-sub">Shipped phases glow. Everything else is waiting in a lane.</div>
+                        </div>
+                    </div>
+
+                    <div class="gd-road-tools">
+                        <div class="gd-seg">
+                            @foreach (var (val, label) in new[] { ("all", "All"), ("done", "Shipped"), ("todo", "Planned") })
+                            {
+                                var v = val;
+                                <button class="@(_roadView == v ? "on" : "")" @onclick="() => _roadView = v">@label</button>
+                            }
+                        </div>
+                        <input type="text" placeholder="Search phases…" @bind="_roadQuery" @bind:event="oninput" />
+                    </div>
+
+                    @foreach (var g in DocLibrary.Roadmap)
+                    {
+                        var items = g.Items.Where(RoadVisible).ToArray();
+                        if (items.Length == 0) { continue; }
+                        <details class="gd-lane" open="@(g.Done < g.Items.Length || _roadView != "all" || _roadQuery.Length > 0)">
+                            <summary>
+                                <span class="gd-lane-ico">@g.Icon</span>
+                                <span class="gd-lane-title">@g.Title</span>
+                                <span class="gd-lane-count">@g.Done / @g.Items.Length</span>
+                                <span class="gd-bar sm"><i style="width:@(g.Items.Length == 0 ? 0 : g.Done * 100 / g.Items.Length)%"></i></span>
+                            </summary>
+                            <ul>
+                                @foreach (var it in items)
+                                {
+                                    <li class="@(it.Done ? "done" : "")">
+                                        <span class="gd-tick">@(it.Done ? "✓" : "○")</span>
+                                        <span class="gd-phase">@(it.Phase == "-" || it.Phase == "Err" ? it.Phase.Replace("-", "·") : "P" + it.Phase)</span>
+                                        <span class="gd-it">@it.Title</span>
+                                    </li>
+                                }
+                            </ul>
+                        </details>
+                    }
+                </section>
+            }
+        }
+    </article>
+
+    @* feedback + prev / next *@
+    <footer class="gd-foot">
+        <div class="gd-vote">
+            @if (_vote is null)
+            {
+                <span>Was this page helpful?</span>
+                <button @onclick='() => _vote = "up"'>👍 Yes</button>
+                <button @onclick='() => _vote = "down"'>👎 No</button>
+            }
+            else
+            {
+                <span class="thx">@(_vote == "up" ? "Glad it helped! 👻" : "Noted. Add it to the roadmap. 🛠️")</span>
+            }
+            <a class="gd-edit" href="https://github.com/robert-robot2" target="_blank" rel="noopener">✎ Edit on GitHub</a>
+        </div>
+
+        <div class="gd-pn">
+            @if (Prev is not null)
+            {
+                <a class="gd-pn-card prev" href="ghostdocs/@Prev.Id">
+                    <small>← Previous</small><b>@Prev.Icon @Prev.Title</b>
+                </a>
+            }
+            else
+            {
+
+                <span></span>
+            }
+            @if (Next is not null)
+            {
+                <a class="gd-pn-card next" href="ghostdocs/@Next.Id">
+                    <small>Next →</small><b>@Next.Icon @Next.Title</b>
+                </a>
+            }
+        </div>
+    </footer>
+</main>
+
+@* ═══════════════ ON THIS PAGE ═══════════════ *@
+<aside class="gd-toc">
+    <div class="gd-toc-title">ON THIS PAGE</div>
+    @{
+        var heads = Current.Blocks.Where(b => b.Kind == BlockKind.H2).ToArray();
+    }
+    @if (heads.Length == 0)
+    {
+        <div class="gd-toc-empty">Single-topic page</div>
+    }
+    @foreach (var h in heads)
+    {
+        var id = h.Id;
+        <a href="@TocHref(id)" @onclick="() => ScrollToAsync(id)" @onclick:preventDefault>@h.Text</a>
+    }
+    <button class="gd-top" @onclick="ScrollTopAsync">↑ Back to top</button>
+
+    <div class="gd-toc-card">
+        <div>🧭 <b>@CategoryOf(Current).Title</b></div>
+        @foreach (var s in DocLibrary.Sections.Where(s => s.Category == Current.Category))
+        {
+            <a class="@(s.Id == Current.Id ? "on" : "")" href="ghostdocs/@s.Id">@s.Title</a>
+        }
+    </div>
+</aside>
+</div>
+
+@code {
+    [Parameter] public string? SectionId { get; set; }
+
+    DocSection Current = DocLibrary.Sections[0];
+    string _filter = "";
+    string _version = "x";
+    bool _sideOpen;
+    bool _scrollPending;
+    string? _copied;
+    string? _vote;
+    string _roadView = "all";
+    string _roadQuery = "";
+
+    readonly HashSet<string> _collapsed = new();
+    readonly Dictionary<string, int> _tabs = new();
+    readonly Dictionary<string, bool> _checks = new();
+    readonly Dictionary<string, string> _tableFilter = new();
+
+    // ── routing ─────────────────────────────────────────────
+    protected override void OnParametersSet()
+    {
+        var found = DocLibrary.Find(SectionId) ?? DocLibrary.Sections[0];
+        if (found.Id != Current.Id)
+        {
+            _scrollPending = true;
+            _vote = null;
+        }
+        Current = found;
+        _sideOpen = false;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_scrollPending) return;
+        _scrollPending = false;
+        await ScrollTopAsync();
+    }
+
+    // ── navigation helpers ──────────────────────────────────
+    bool Filtering => !string.IsNullOrWhiteSpace(_filter);
+
+    IEnumerable<DocSection> Matches =>
+        DocLibrary.Sections.Where(s =>
+            s.Title.Contains(_filter, StringComparison.OrdinalIgnoreCase) ||
+            s.Summary.Contains(_filter, StringComparison.OrdinalIgnoreCase) ||
+            s.Tags.Any(t => t.Contains(_filter, StringComparison.OrdinalIgnoreCase)));
+
+    static Category CategoryOf(DocSection s) => DocLibrary.Categories.First(c => c.Id == s.Category);
+
+    int Index => Array.FindIndex(DocLibrary.Sections, s => s.Id == Current.Id);
+    DocSection? Prev => Index > 0 ? DocLibrary.Sections[Index - 1] : null;
+    DocSection? Next => Index < DocLibrary.Sections.Length - 1 ? DocLibrary.Sections[Index + 1] : null;
+
+    void ToggleCat(string id)
+    {
+        if (!_collapsed.Add(id)) _collapsed.Remove(id);
+    }
+
+    string TocHref(string id) => Nav.ToAbsoluteUri($"ghostdocs/{Current.Id}").ToString() + "#" + id;
+
+    // ── scrolling (no JS file needed) ───────────────────────
+    async Task ScrollTopAsync()
+    {
+        try { await JS.InvokeVoidAsync("window.scrollTo", 0, 0); } catch { /* prerender or no JS */ }
+    }
+
+    async Task ScrollToAsync(string id)
+    {
+        // ids come from the static library, never from user input
+        try
+        {
+            await JS.InvokeVoidAsync("eval",
+                $"document.getElementById('{id}')?.scrollIntoView({{behavior:'smooth',block:'start'}})");
+        }
+        catch { }
+    }
+
+    // ── code blocks ─────────────────────────────────────────
+    int ActiveTab(string key, int count) => Math.Min(_tabs.GetValueOrDefault(key, 0), count - 1);
+    void SetTab(string key, int index) => _tabs[key] = index;
+
+    async Task CopyAsync(string key, string code)
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("navigator.clipboard.writeText", code);
+            _copied = key;
+            StateHasChanged();
+            await Task.Delay(1600);
+            if (_copied == key) _copied = null;
+        }
+        catch { }
+    }
+
+    static string LangBadge(string lang) => lang.ToLowerInvariant() switch
+    {
+        "csharp" => "C#",
+        "java" => "JV",
+        "cpp" => "C++",
+        "hlsl" => "HL",
+        "json" => "{}",
+        "js" => "JS",
+        "razor" or "html" => "</>",
+        "bash" or "sh" => "$",
+        _ => "TXT"
+    };
+
+    // ── checklists / tables / roadmap ───────────────────────
+    bool IsChecked(string key, string raw) => _checks.TryGetValue(key, out var v) ? v : raw.StartsWith("x|");
+    void ToggleCheck(string key, string raw) => _checks[key] = !IsChecked(key, raw);
+    void SetTableFilter(string key, string? value) => _tableFilter[key] = value ?? "";
+
+    bool RoadVisible(RoadmapItem it) =>
+        (_roadView == "all" || (_roadView == "done") == it.Done) &&
+        (_roadQuery.Length == 0 ||
+         it.Title.Contains(_roadQuery, StringComparison.OrdinalIgnoreCase) ||
+         it.Phase.Contains(_roadQuery, StringComparison.OrdinalIgnoreCase));
+
+    static string ToneIcon(string tone) => tone switch
+    {
+        "tip" => "💡",
+        "warn" => "⚠️",
+        "danger" => "⛔",
+        "placeholder" => "🧪",
+        "easter" => "🥚",
+        _ => "ℹ️"
+    };
+}
