@@ -1202,7 +1202,9 @@ SOFTWARE.
             D("41", "Timed elevators/Animations: Mario/Luigi flag slide down, death, transform, shell stomp, shell hurt"),
             D("40", "Transition audio effects"),
             D("20.S", "Patch: Camera for Underground, Dual Toggle Front/SideView On Camera Focus Trigger"),
-                  D("20.T", "Patch: Tutorial Level"),
+            D("20.T", "Patch: Tutorial Level"),
+            D("20.U", "Patch: Build Tutorial Level"),
+            D("20.R", "Patch: Flying Turtle Duck Anim Reset, 2 Player Update, Mario Sprint Jump Height"),
         ]),
         new("Active Core", "🔥",
         [       
@@ -1211,8 +1213,7 @@ SOFTWARE.
        
         ]),
         new("Active Replicant Core", "🧪",
-        [
-            T("20.R", "Patch: Flying Turtle Duck Anim Reset, 2 Player Update, Mario Sprint Jump Height"),     
+        [                
             T("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),                
             T("42", "Thicc editor upgrade part Quattro: resolutions"),
               
