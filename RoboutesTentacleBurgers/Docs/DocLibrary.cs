@@ -1205,6 +1205,10 @@ SOFTWARE.
             D("20.T", "Patch: Tutorial Level"),
             D("20.U", "Patch: Build Tutorial Level"),
             D("20.R", "Patch: Flying Turtle Duck Anim Reset, 2 Player Update, Mario Sprint Jump Height"),
+            D("42", "Thicc editor upgrade part Quattro: resolutions"),
+            D("20.V", "UI Editor Upgrade : Custom Fonts"),
+            D("20.X", "Animation Polish"),
+            D("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),
         ]),
         new("Active Core", "🔥",
         [       
@@ -1214,9 +1218,10 @@ SOFTWARE.
         ]),
         new("Active Replicant Core", "🧪",
         [                
-            T("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),                
-            T("42", "Thicc editor upgrade part Quattro: resolutions"),
-              
+       
+            T("34", "UI FINAL FORM 2: Finish UI Tie Ins"),
+            T("20.W", "FINAL FORM"),
+
         ]),
         new("Active SubCore", "🛰️",
         [       
