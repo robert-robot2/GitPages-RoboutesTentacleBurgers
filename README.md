@@ -1,6 +1,8 @@
 ---
 # ***Super Mario Infinitus has Been Released to the World, Download now through the interweeb and play*.**
 # **https://robert-robot2.github.io/GitPages-RoboutesTentacleBurgers/SuperMarioInfinitus**
+# SuperMarioInfinitus Click to Download Zip No install required just launch MyGame.exe!!
+# Copy contents Of Folder to New Created Folder /SuperMarioInfinitus anywhere on your hard drive!
 ---
 
 ## **Blazor WASM Netcore 10/ ASPNetCore NetCore 10 Web API Backend/ Custom Webgl/Webgl2/WebGPU Renderer Engine**
