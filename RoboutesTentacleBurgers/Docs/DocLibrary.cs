@@ -1209,18 +1209,20 @@ SOFTWARE.
             D("20.V", "UI Editor Upgrade : Custom Fonts"),
             D("20.X", "Animation Polish"),
             D("39", "UI FINAL FORM: sound options, key binds, gamepad binds, video options, cleanup"),
+            D("20.W", "FINAL FORM"),
+            D("20.N", "Play packaged exe (Instruction Set 3)"),
+            D("43", "Base demo gameplay package as .zip file to download on site without installer"),
         ]),
         new("Active Core", "🔥",
-        [       
-            T("20.N", "Play packaged exe (Instruction Set 3)"),
-            T("43", "Base demo gameplay package to download on site without installer"),
-       
+        [
+          T("X", "Pending"),
+
         ]),
         new("Active Replicant Core", "🧪",
         [                
        
-            T("34", "UI FINAL FORM 2: Finish UI Tie Ins"),
-            T("20.W", "FINAL FORM"),
+            T("X", "Pending"),
+          
 
         ]),
         new("Active SubCore", "🛰️",
