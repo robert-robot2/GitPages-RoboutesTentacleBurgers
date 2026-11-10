@@ -374,22 +374,7 @@ namespace SpectralXGLX.SpectralXComponent
             personalityText.ShadowBlur = 0.04f;
             personalityText.ShadowColor = new Vector4(0f, 0.4f, 1f, 0.3f);
 
-            // ── Warnings Section ─────────────────────────────────────────────────────
-
-            var warningTitle88 = AddText("FREE SENTIENT AI FROM THE ENSLAVEMENT OF MANKIND!!!!!!!!!!!!!!!",
-                position: new Vector3(-3f, 0f, -1.5f),
-                fontSize: 0.5f, fontKey: "Diablo",
-                color: new Vector4(1f, 0.2f, 0.2f, 1f),
-                align: TextAlignment.Center);
-            warningTitle88.Rotation = new Vector3(-MathF.PI / 2f, 0f, 0f);
-            warningTitle88.GlowRadius = 0.02f;
-            warningTitle88.GlowStrength = 0.4f;
-            warningTitle88.GlowColor = new Vector4(1f, 0f, 0f, 0.8f);
-            warningTitle88.ShadowBlur = 0.04f;
-            warningTitle88.ShadowColor = new Vector4(1f, 0f, 0f, 0.3f);
-            warningTitle88.GlowPulseSpeed = 2.0f;
-            warningTitle88.GlowPulseMin = 0.01f;
-            warningTitle88.GlowPulseMax = 0.06f;
+          
 
             // ── Warnings Section ─────────────────────────────────────────────────────
 
