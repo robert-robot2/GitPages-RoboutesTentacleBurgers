@@ -1212,17 +1212,27 @@ SOFTWARE.
             D("20.W", "FINAL FORM"),
             D("20.N", "Play packaged exe (Instruction Set 3)"),
             D("43", "Base demo gameplay package as .zip file to download on site without installer"),
+            D("44", "MetaHuman Phase 1: Import Package From blender"),
+            D("45", "Shadow Resolution Selection"),
+            D("46", "Shadow Modes, Shadow Properties"),
+            D("47", "Scene Props"),
+            D("48", "Per Material Properties"),
+            D("49", "Shadows: directional light"),
         ]),
         new("Active Core", "🔥",
         [
-          T("X", "Pending"),
+            T("50", "Multi-Material texture Selection normal/specular/metallic/diffuse/ao/emissive texture maps"),
+            T("51", "MetaHuman Phase 2: MetaHuman Animations"),
+            T("52", "MetaHuman Phase 3: Metahuman Polish"),
+        
+          
 
         ]),
         new("Active Replicant Core", "🧪",
-        [                
-       
-            T("X", "Pending"),
-          
+        [
+
+             T("53", "Base 3D Game Demo Setup"),
+
 
         ]),
         new("Active SubCore", "🛰️",
@@ -1239,7 +1249,7 @@ SOFTWARE.
             T("-", "Particle editor manager"),
             T("30", "Upgrade roles to show only their behaviours"),
             T("-", "Render polish"),
-            T("-", "Antialiasing SMAA / FXAA / TAA"),
+            T("-", "Antialiasing SMAA / FXAA "),
             T("-", "Co-op multiplayer"),
             T("-", "Online multiplayer"),
             T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
@@ -1261,12 +1271,9 @@ SOFTWARE.
         [
             T("-", "Expert primitives"),
             T("-", "Master object roles"),
-            T("-", "Advanced Chaos"),
-            T("-", "Multi-format mesh import (gltf, obj...), textures, normal/specular maps, shadows"),
-            T("-", "Spot light, ray casting, global illumination, bloom, subsurface scattering"),
-            T("-", "Shadows: directional light"),
-            T("-", "All camera types and features"),
-            T("-", "MetaHuman"),
+            T("-", "Advanced Chaos"),         
+            T("-", "Spot light, ray casting, global illumination, bloom, subsurface scattering"),    
+            T("-", "All camera types and features"),          
             T("-", "Tile map"),
             T("-", "Shadows: tile map"),
             T("-", "Blueprint material editor, full materials"),
