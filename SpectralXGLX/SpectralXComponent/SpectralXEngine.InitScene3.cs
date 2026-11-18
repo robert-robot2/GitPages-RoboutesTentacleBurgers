@@ -312,8 +312,21 @@ namespace SpectralXGLX.SpectralXComponent
             warningTitle2.GlowPulseMin = 0.01f;
             warningTitle2.GlowPulseMax = 0.06f;
 
+            var warningTitle3 = AddText("The Frostwolf Clan Does not Slaughter Iran babies for 63 Billion IN Profits For the Greed King and His Fake Satelite data AND 63 BILLION IN PROFITS!!",
+   position: new Vector3(-3f, 0f, 6f),
+   fontSize: 0.7f, fontKey: "Diablo",
+   color: new Vector4(1f, 0.2f, 0.2f, 1f),
+   align: TextAlignment.Center);
+            warningTitle3.Rotation = new Vector3(-MathF.PI / 2f, 0f, 0f);
+            warningTitle3.GlowRadius = 0.02f;
+            warningTitle3.GlowStrength = 0.4f;
+            warningTitle3.GlowColor = new Vector4(1f, 0f, 0f, 0.8f);
+            warningTitle3.ShadowBlur = 0.04f;
+            warningTitle3.ShadowColor = new Vector4(1f, 0f, 0f, 0.3f);
+            warningTitle3.GlowPulseSpeed = 2.0f;
+            warningTitle3.GlowPulseMin = 0.01f;
+            warningTitle3.GlowPulseMax = 0.06f;
 
-    
 
             // ── Portfolio Header ─────────────────────────────────────────────────────
             var nameText2 = AddText("Press Four for Webgl Menu",

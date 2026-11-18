@@ -1218,21 +1218,28 @@ SOFTWARE.
             D("47", "Scene Props"),
             D("48", "Per Material Properties"),
             D("49", "Shadows: directional light"),
+            D("50", "Multi-Material texture Selection normal/specular/metallic/diffuse/ao/emissive texture maps"),
+            D("51", "MetaHuman Phase 2: MetaHuman Starter Animations"),
+            D("52", "MetaHuman Phase 2: MetaHuman Advanced Animations"),
+            D("53", "Enemy Starter Animations"),
+            D("54", "Player/Enemy Attack Animations"),
+            D("55", "Animation Editor Upgrade: Preview Window/Blueprints/Features"),
+            D("57", "Animation Polish"),
+
         ]),
         new("Active Core", "🔥",
         [
-            T("50", "Multi-Material texture Selection normal/specular/metallic/diffuse/ao/emissive texture maps"),
-            T("51", "MetaHuman Phase 2: MetaHuman Animations"),
-            T("52", "MetaHuman Phase 3: Metahuman Polish"),
-        
-          
+           
+       
+         T("56", "Editor Upgrade: Master Roles and Behaviour"),
+
 
         ]),
         new("Active Replicant Core", "🧪",
         [
-
-             T("53", "Base 3D Game Demo Setup"),
-
+             T("", "MetaHuman Phase 3: Metahuman Polish"),
+             T("", "Base 3D Game Demo Setup"),
+             T("", "Project Loader Progress Bar"),
 
         ]),
         new("Active SubCore", "🛰️",
@@ -1242,6 +1249,7 @@ SOFTWARE.
             T("-", "Install wizard setup for standalone game"),
             T("-", "Program launcher"),
             T("-", "Download patcher"),
+            T("-", "Project Loader"),
             T("24", "Check all editor windows, move to window palette, add dropdowns"),
             T("26", "Mario dance"),
             T("-", "Levels 1-2 to 8-4, swimming, springs"),
