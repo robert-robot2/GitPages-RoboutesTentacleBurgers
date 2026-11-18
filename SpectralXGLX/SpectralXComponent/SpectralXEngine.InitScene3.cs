@@ -312,9 +312,9 @@ namespace SpectralXGLX.SpectralXComponent
             warningTitle2.GlowPulseMin = 0.01f;
             warningTitle2.GlowPulseMax = 0.06f;
 
-            var warningTitle3 = AddText("The Frostwolf Clan Does not Slaughter Iran babies for 63 Billion IN Profits For the Greed King and His Fake Satelite data AND 63 BILLION IN PROFITS!!",
+            var warningTitle3 = AddText("The Frostwolf Clan Does not Slaughter Iran babies For the Greed King and His Fake Satelite data AND 63 BILLION IN PROFITS!!",
    position: new Vector3(-3f, 0f, 6f),
-   fontSize: 0.7f, fontKey: "Diablo",
+   fontSize: 0.5f, fontKey: "Diablo",
    color: new Vector4(1f, 0.2f, 0.2f, 1f),
    align: TextAlignment.Center);
             warningTitle3.Rotation = new Vector3(-MathF.PI / 2f, 0f, 0f);
