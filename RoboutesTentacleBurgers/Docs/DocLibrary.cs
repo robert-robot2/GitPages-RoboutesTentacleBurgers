@@ -1225,21 +1225,32 @@ SOFTWARE.
             D("54", "Player/Enemy Attack Animations"),
             D("55", "Animation Editor Upgrade: Preview Window/Blueprints/Features"),
             D("57", "Animation Polish"),
+            D("56", "Editor Upgrade: Master Roles and Behaviour Part 1"),
+            D("Err", "Sprite Sheet Editor needs adjustment"),
+            D("Err", "Docking suite debug needs reset / delete xml layout"),
+            D("58", "Editor Upgrade: Master Roles and Behavior Part 2"),
 
         ]),
         new("Active Core", "🔥",
         [
-           
-       
-         T("56", "Editor Upgrade: Master Roles and Behaviour"),
 
+        T("-", "Tile map/Shadows"),        
+        T("-", "Particle editor manager"),
+        T("-", "Visuals: ray casting, global illumination, subsurface scattering"),
+        T("-", "Spot light, Lighting rotation, bloom, Volumetric Fog, Sphere Reflection Capture"),
+
+         T("-", "All camera types and features"),       
+         T("-", "AutoCAD mesh integration, .step import"),
+         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
+         T("18", "Player controls editor"), 
+         T("-", "Project Loader Progress Bar"),
 
         ]),
         new("Active Replicant Core", "🧪",
         [
              T("", "MetaHuman Phase 3: Metahuman Polish"),
              T("", "Base 3D Game Demo Setup"),
-             T("", "Project Loader Progress Bar"),
+         
 
         ]),
         new("Active SubCore", "🛰️",
@@ -1251,23 +1262,17 @@ SOFTWARE.
             T("-", "Download patcher"),
             T("-", "Project Loader"),
             T("24", "Check all editor windows, move to window palette, add dropdowns"),
-            T("26", "Mario dance"),
-            T("-", "Levels 1-2 to 8-4, swimming, springs"),
-            T("27", "Editor upgrade to quaternion camera"),
-            T("-", "Particle editor manager"),
-            T("30", "Upgrade roles to show only their behaviours"),
-            T("-", "Render polish"),
-            T("-", "Antialiasing SMAA / FXAA "),
+            T("27", "Editor upgrade to quaternion camera"),            
+            T("-", "Antialiasing SMAA / FXAA/ Render polish"),
             T("-", "Co-op multiplayer"),
             T("-", "Online multiplayer"),
-            T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
-            T("18", "Player controls editor"),
+        
         ]),
         new("Debug / Errors", "🐞",
         [
-            T("Err", "Docking suite debug needs reset / delete xml layout, but why?"),
+          
             T("Err", "AnyCPU cannot find DLL in Debug"),
-            T("Err", "Sprite Sheet Editor needs adjustment"),
+          
         ]),
         new("Publish / Release", "📡",
         [
@@ -1278,15 +1283,10 @@ SOFTWARE.
         new("Pending", "🌌",
         [
             T("-", "Expert primitives"),
-            T("-", "Master object roles"),
-            T("-", "Advanced Chaos"),         
-            T("-", "Spot light, ray casting, global illumination, bloom, subsurface scattering"),    
-            T("-", "All camera types and features"),          
-            T("-", "Tile map"),
-            T("-", "Shadows: tile map"),
+            T("-", "Grand Master object roles"),
+            T("-", "Advanced Chaos"),        
             T("-", "Blueprint material editor, full materials"),
-            T("-", "AutoCAD mesh integration, .step import"),
-            T("-", "Animation editor, bone hierarchy editor"),
+            T("-", "Bone hierarchy editor"),
             T("-", "Full mesh editor: sculpting, animation, texture painting"),
             T("-", "Multiple RHI backends mods"),
             T("-", "Interactive Blazor WASM Ghost UI documentation / download / store / mod / updates"),
@@ -1297,6 +1297,8 @@ SOFTWARE.
         new("Wildcard", "❓",
         [
             T("-", "Vertical Sync?"),
+            T("26", "Mario dance"),
+            T("-", "Levels 1-2 to 8-4, swimming, springs"),
         ]),
     ];
 }
