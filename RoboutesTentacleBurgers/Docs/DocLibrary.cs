@@ -1229,27 +1229,41 @@ SOFTWARE.
             D("Err", "Sprite Sheet Editor needs adjustment"),
             D("Err", "Docking suite debug needs reset / delete xml layout"),
             D("58", "Editor Upgrade: Master Roles and Behavior Part 2"),
+            D("59", "Tile map/Shadows/GPU Splat Maps/Painting/Topography Sculpting/Paint Tools"),
 
         ]),
         new("Active Core", "🔥",
         [
+               T("24", "Check all editor windows, move to window palette, add dropdowns"),
+         T("-", "Particle editor manager"),
 
-        T("-", "Tile map/Shadows"),        
-        T("-", "Particle editor manager"),
-        T("-", "Visuals: ray casting, global illumination, subsurface scattering"),
-        T("-", "Spot light, Lighting rotation, bloom, Volumetric Fog, Sphere Reflection Capture"),
+ 
+                T("-", "Grand Master object roles"),
+                T("-", "HUD Creation"),
 
-         T("-", "All camera types and features"),       
-         T("-", "AutoCAD mesh integration, .step import"),
-         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
-         T("18", "Player controls editor"), 
-         T("-", "Project Loader Progress Bar"),
+      T("", "Base 3D Game Demo Setup"),
+                  T("-", "Global illumination, subsurface scattering"),
+    T("-", "Spot light, Lighting rotation, Volumetric Fog, Sphere Reflection Capture"),
+    T("-", "Volumetric Lighting	God rays, Ray-Casting, ray-march fragment shader, uses shadow maps"),
+    T("-", "Bloom Emissive bleed post-pass, threshold + blur chain"),
+    T("-", "SSAO Screen-space ambient occlusion, contact shadow crevices"),
+    T("-", "Tone Mapping / HDR	ACES / Reinhard, prevents washed bright scenes	"),
+    T("-", "SSR	Screen-space reflections, depth buffer ray trace"),
+    T("-", "SSGI Screen-space global illumination, bounce light"),
+
 
         ]),
         new("Active Replicant Core", "🧪",
         [
              T("", "MetaHuman Phase 3: Metahuman Polish"),
-             T("", "Base 3D Game Demo Setup"),
+             T("-", "Expert primitives"),      
+             T("-", "Advanced Chaos"),          
+                     T("-", "All camera types and features"),
+         T("-", "AutoCAD mesh integration, .step import"),
+         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
+         T("18", "Player controls editor"),
+         T("-", "Project Loader Progress Bar"),
+       
          
 
         ]),
@@ -1260,8 +1274,7 @@ SOFTWARE.
             T("-", "Install wizard setup for standalone game"),
             T("-", "Program launcher"),
             T("-", "Download patcher"),
-            T("-", "Project Loader"),
-            T("24", "Check all editor windows, move to window palette, add dropdowns"),
+            T("-", "Project Loader"),     
             T("27", "Editor upgrade to quaternion camera"),            
             T("-", "Antialiasing SMAA / FXAA/ Render polish"),
             T("-", "Co-op multiplayer"),
@@ -1272,7 +1285,8 @@ SOFTWARE.
         [
           
             T("Err", "AnyCPU cannot find DLL in Debug"),
-          
+            T("Err", "Fix Viewport Kets is interfering with Other panel entrance"),
+
         ]),
         new("Publish / Release", "📡",
         [
@@ -1281,11 +1295,8 @@ SOFTWARE.
             T("-", "RHI Vulkan backend"),
         ]),
         new("Pending", "🌌",
-        [
-            T("-", "Expert primitives"),
-            T("-", "Grand Master object roles"),
-            T("-", "Advanced Chaos"),        
-            T("-", "Blueprint material editor, full materials"),
+        [             
+            T("-", "Blueprint material editor"),
             T("-", "Bone hierarchy editor"),
             T("-", "Full mesh editor: sculpting, animation, texture painting"),
             T("-", "Multiple RHI backends mods"),
