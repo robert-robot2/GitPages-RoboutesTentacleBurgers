@@ -1247,36 +1247,59 @@ D("60.G", "Project Loader Progress Bar"),
                  D("62", "Tone Mapping / HDR	ACES / Reinhard, prevents washed bright scenes"),
               D("62.A", "Volumetric Fog, Sphere Reflection Capture"),
               D("61.A", "Particle editor manager Phase 2"),
+            D("-", "Particle Editor Manager Phase 2"),
+D("60.G", "Project Loader Progress Bar Phase 2"),
 
+D("-", "Sun Heat Texture and Sun Glare Brightness (When Looking at the Sun, Its Light Is So Bright It Looks Cut Off, Like the Moon)"),
+D("-", "Moon  Glare and Circular Eclipse Cutoff Texture (Placeholder for Now Until Day/Month Selection Is Added)"),
+
+D("-", "Selection Panel: Add Hide Sun and Hide Moon Options at Designated Times (Below Set Axis Value)"),
+
+D("-", "Volumetric Light Scattering – Light Traveling Through the Sun's Body, Creating Depth and Layers"),
+D("-", "Refractive Distortion – Light Bending and Warping Inside the Sun"),
+D("-", "Solar Plasma Turbulence – Swirling, Fluid-Like Movement Within the Sun"),
+D("-", "Caustics – Beautiful Concentrated Patterns of Light That Move and Distort"),
+D("-", "Subsurface Scattering – Light Appearing to Penetrate a Surface and Glow From Within"),
+
+D("-", "Selection Panel: Point Light Enhancement – Flicker, Telephone Pattern, Brightness of Flicker, Add Flicker Layer, Pick Flicker Color/Texture, and Set Flicker PBR Properties"),
+
+D("-", "New Drop-Down in Palette: Utilities"),
+D("-", "Each Utility Can Be Dragged and Dropped Into the Scene, With Adjustable Volumetric Size in the Selection Panel"),
+
+D("-", "Tone Mapping / HDR – ACES / Reinhard, Prevents Washed-Out Bright Scenes"),
+D("-", "Bloom – Emissive Bleed Post-Pass, Threshold + Blur Chain"),
+D("-", "Volumetric Fog – Sphere Reflection Capture"),
+D("-", "Volumetric Lighting – God Rays, Ray-Casting, Ray-March Fragment Shader, Uses Shadow Maps"),
+              D("-", "Particle Editor Manager Phase 3"),
         ]),
         new("Active Core", "🔥",
         [
 
-             T("60.M", "Project Loader Progress Bar /ignore files outside of project in gameshell"),
+
+
+   T("-", "New Foliage Editor:"),
+
+     T("-", "Expert primitives"),
+     T("-", "Grand Master object roles"),
+     T("-", "Advanced Chaos"),
 
 
 
 
-    T("61.A", "Particle editor manager Phase 3"),
-                T("-", "Grand Master object roles"),
                 T("-", "HUD Creation"),
 
       T("", "Base 3D Game Demo Setup"),
-           
 
-    T("-", "Volumetric Lighting	God rays, Ray-Casting, ray-march fragment shader, uses shadow maps"),
-    T("-", "Bloom Emissive bleed post-pass, threshold + blur chain"),
     T("-", "SSAO Screen-space ambient occlusion, contact shadow crevices,subsurface scattering"),
     T("-", "SSR	Screen-space reflections, depth buffer ray trace"),
     T("-", "SSGI Screen-space global illumination, bounce light"),
+T("", "MetaHuman Phase 3: Metahuman Polish"),
 
 
         ]),
         new("Active Replicant Core", "🧪",
         [
-             T("", "MetaHuman Phase 3: Metahuman Polish"),
-             T("-", "Expert primitives"),      
-             T("-", "Advanced Chaos"),          
+                 
                      T("-", "All camera types and features"),
          T("-", "AutoCAD mesh integration, .step import"),
          T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
@@ -1292,8 +1315,7 @@ D("60.G", "Project Loader Progress Bar"),
             T("-", "Install Shield Wizard / packaged install for download"),
             T("-", "Install wizard setup for standalone game"),
             T("-", "Program launcher"),
-            T("-", "Download patcher"),
-            T("-", "Project Loader"),     
+            T("-", "Download patcher"),           
             T("27", "Editor upgrade to quaternion camera"),            
             T("-", "Antialiasing SMAA / FXAA/ Render polish"),
             T("-", "Co-op multiplayer"),
