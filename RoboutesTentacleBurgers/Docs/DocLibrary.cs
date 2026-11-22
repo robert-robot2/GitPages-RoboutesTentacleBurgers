@@ -1230,24 +1230,43 @@ SOFTWARE.
             D("Err", "Docking suite debug needs reset / delete xml layout"),
             D("58", "Editor Upgrade: Master Roles and Behavior Part 2"),
             D("59", "Tile map/Shadows/GPU Splat Maps/Painting/Topography Sculpting/Paint Tools"),
+            D("24", "Editor Windows: Each editor window should be able to go windowed fullscreen"),
+D("60.A", "Landscape Collision: Auto adjust for topography, currently raises to max height of topography."),
+D("60.B", "Landscape Collision: Tile vertex raise"),
+D("60.C", "Controls: Fix H and collision of viewport controls with editor controls."),
+D("60.D", "Controls: Some key toggles in viewport, mainly H for collision, are causing issues with other windows typing, specifically link ID hierarchy name changes."),
+D("60.E", "Controls: Guard viewport controls so they are only active when the viewport is clicked and active."),
+            D("60.H", "SkySphere / Directional Light: Moonglow, sun and moon textures."),
+D("60.I", "SkySphere / Directional Light: Auto Ambience Fade toggle by hour. At hour 12 it is 0.2 and fades to 0.05 at hour 24, with settings for each hour."),
+D("60.J", "SkySphere / Directional Light: Cloud settings, translucency, movement on U/V, translucency Change on movement, and blend with nighttime stars toggle."),
+D("60.K", "Lighting: Spot light."),
+D("60.L", "Lighting: Lighting rotation."),
+             D("61", "Particle editor manager Phase 1"),
+                        D("60.F", "Collision add to game shell"),
+D("60.G", "Project Loader Progress Bar"),
+                 D("62", "Tone Mapping / HDR	ACES / Reinhard, prevents washed bright scenes"),
+              D("62.A", "Volumetric Fog, Sphere Reflection Capture"),
+              D("61.A", "Particle editor manager Phase 2"),
 
         ]),
         new("Active Core", "🔥",
         [
-               T("24", "Check all editor windows, move to window palette, add dropdowns"),
-         T("-", "Particle editor manager"),
 
- 
+             T("60.M", "Project Loader Progress Bar /ignore files outside of project in gameshell"),
+
+
+
+
+    T("61.A", "Particle editor manager Phase 3"),
                 T("-", "Grand Master object roles"),
                 T("-", "HUD Creation"),
 
       T("", "Base 3D Game Demo Setup"),
-                  T("-", "Global illumination, subsurface scattering"),
-    T("-", "Spot light, Lighting rotation, Volumetric Fog, Sphere Reflection Capture"),
+           
+
     T("-", "Volumetric Lighting	God rays, Ray-Casting, ray-march fragment shader, uses shadow maps"),
     T("-", "Bloom Emissive bleed post-pass, threshold + blur chain"),
-    T("-", "SSAO Screen-space ambient occlusion, contact shadow crevices"),
-    T("-", "Tone Mapping / HDR	ACES / Reinhard, prevents washed bright scenes	"),
+    T("-", "SSAO Screen-space ambient occlusion, contact shadow crevices,subsurface scattering"),
     T("-", "SSR	Screen-space reflections, depth buffer ray trace"),
     T("-", "SSGI Screen-space global illumination, bounce light"),
 
@@ -1262,7 +1281,7 @@ SOFTWARE.
          T("-", "AutoCAD mesh integration, .step import"),
          T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
          T("18", "Player controls editor"),
-         T("-", "Project Loader Progress Bar"),
+        
        
          
 
@@ -1284,8 +1303,7 @@ SOFTWARE.
         new("Debug / Errors", "🐞",
         [
           
-            T("Err", "AnyCPU cannot find DLL in Debug"),
-            T("Err", "Fix Viewport Kets is interfering with Other panel entrance"),
+            T("Err", "AnyCPU cannot find DLL in Debug"),        
 
         ]),
         new("Publish / Release", "📡",
