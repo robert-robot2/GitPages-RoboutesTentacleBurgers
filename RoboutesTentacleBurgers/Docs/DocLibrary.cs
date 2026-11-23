@@ -1271,41 +1271,43 @@ D("-", "Bloom – Emissive Bleed Post-Pass, Threshold + Blur Chain"),
 D("-", "Volumetric Fog – Sphere Reflection Capture"),
 D("-", "Volumetric Lighting – God Rays, Ray-Casting, Ray-March Fragment Shader, Uses Shadow Maps"),
               D("-", "Particle Editor Manager Phase 3"),
+             D("-", "SSAO Screen-space ambient occlusion, contact shadow crevices,subsurface scattering"),
         ]),
         new("Active Core", "🔥",
         [
 
 
 
-   T("-", "New Foliage Editor:"),
+   
+  T("-", "New Foliage Editor:"),
 
      T("-", "Expert primitives"),
      T("-", "Grand Master object roles"),
      T("-", "Advanced Chaos"),
 
 
-
-
                 T("-", "HUD Creation"),
-
       T("", "Base 3D Game Demo Setup"),
 
-    T("-", "SSAO Screen-space ambient occlusion, contact shadow crevices,subsurface scattering"),
     T("-", "SSR	Screen-space reflections, depth buffer ray trace"),
     T("-", "SSGI Screen-space global illumination, bounce light"),
+T("-", "a single Post Process Volume utility (box or sphere with priority and blend weight) that overrides the scene's post settings locally."),
+
+
 T("", "MetaHuman Phase 3: Metahuman Polish"),
+
+   T("-", "All camera types and features"),
+         T("-", "AutoCAD mesh integration, .step import"),
+         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
+         T("18", "Player controls editor"),
 
 
         ]),
         new("Active Replicant Core", "🧪",
         [
                  
-                     T("-", "All camera types and features"),
-         T("-", "AutoCAD mesh integration, .step import"),
-         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
-         T("18", "Player controls editor"),
-        
-       
+                     T("-", "?????????????????"),
+     
          
 
         ]),
