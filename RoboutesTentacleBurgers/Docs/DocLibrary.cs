@@ -1246,23 +1246,17 @@ D("60.L", "Lighting: Lighting rotation."),
 D("60.G", "Project Loader Progress Bar"),
                  D("62", "Tone Mapping / HDR	ACES / Reinhard, prevents washed bright scenes"),
               D("62.A", "Volumetric Fog, Sphere Reflection Capture"),
-              D("61.A", "Particle editor manager Phase 2"),
-            D("-", "Particle Editor Manager Phase 2"),
+              D("61.A", "Particle editor manager Phase 2"),    
 D("60.G", "Project Loader Progress Bar Phase 2"),
-
 D("-", "Sun Heat Texture and Sun Glare Brightness (When Looking at the Sun, Its Light Is So Bright It Looks Cut Off, Like the Moon)"),
 D("-", "Moon  Glare and Circular Eclipse Cutoff Texture (Placeholder for Now Until Day/Month Selection Is Added)"),
-
 D("-", "Selection Panel: Add Hide Sun and Hide Moon Options at Designated Times (Below Set Axis Value)"),
-
 D("-", "Volumetric Light Scattering – Light Traveling Through the Sun's Body, Creating Depth and Layers"),
 D("-", "Refractive Distortion – Light Bending and Warping Inside the Sun"),
 D("-", "Solar Plasma Turbulence – Swirling, Fluid-Like Movement Within the Sun"),
 D("-", "Caustics – Beautiful Concentrated Patterns of Light That Move and Distort"),
 D("-", "Subsurface Scattering – Light Appearing to Penetrate a Surface and Glow From Within"),
-
 D("-", "Selection Panel: Point Light Enhancement – Flicker, Telephone Pattern, Brightness of Flicker, Add Flicker Layer, Pick Flicker Color/Texture, and Set Flicker PBR Properties"),
-
 D("-", "New Drop-Down in Palette: Utilities"),
 D("-", "Each Utility Can Be Dragged and Dropped Into the Scene, With Adjustable Volumetric Size in the Selection Panel"),
 
@@ -1272,34 +1266,45 @@ D("-", "Volumetric Fog – Sphere Reflection Capture"),
 D("-", "Volumetric Lighting – God Rays, Ray-Casting, Ray-March Fragment Shader, Uses Shadow Maps"),
               D("-", "Particle Editor Manager Phase 3"),
              D("-", "SSAO Screen-space ambient occlusion, contact shadow crevices,subsurface scattering"),
+    D("-", "New Foliage Paint Selection Panel Editor"),
+D("-", "subsurface scattering in pbr for objects"),
+         D("-", "Click And Drag Select"),
+D("-", "a single Post Process Volume utility (box or sphere with priority and blend weight) that overrides the scene's post settings locally."),
+      D("-", "Antialiasing SMAA / FXAA"),
+  D("-", "Tile map optimizations"),
+  D("-", "Open World Instancing"),
         ]),
         new("Active Core", "🔥",
         [
 
 
 
-   
-  T("-", "New Foliage Editor:"),
 
-     T("-", "Expert primitives"),
-     T("-", "Grand Master object roles"),
-     T("-", "Advanced Chaos"),
+  T("-", "film grain filter effects, camera sun effect"),
 
 
-                T("-", "HUD Creation"),
+
+  T("18", "Player controls editor"),
+
+
+    T("-", "Program loader"),
+
+       T("27", "Editor upgrade to quaternion camera"),
+            T("-", "All camera types and features"),
+
+  T("-", "AutoCAD mesh integration, .step import"),
+         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
+
+
+
       T("", "Base 3D Game Demo Setup"),
 
-    T("-", "SSR	Screen-space reflections, depth buffer ray trace"),
-    T("-", "SSGI Screen-space global illumination, bounce light"),
-T("-", "a single Post Process Volume utility (box or sphere with priority and blend weight) that overrides the scene's post settings locally."),
+               T("-", "HUD Creation"),
+ T("-", "Advanced Chaos"),
+    T("-", "Expert primitives"),
+     T("-", "Grand Master object roles"),
+           T("", "MetaHuman Phase 3: Metahuman Polish"),
 
-
-T("", "MetaHuman Phase 3: Metahuman Polish"),
-
-   T("-", "All camera types and features"),
-         T("-", "AutoCAD mesh integration, .step import"),
-         T("13.D", "CAD-style annotation tools on top of the blueprint grid"),
-         T("18", "Player controls editor"),
 
 
         ]),
