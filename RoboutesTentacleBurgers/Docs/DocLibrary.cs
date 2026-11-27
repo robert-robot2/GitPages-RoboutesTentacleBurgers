@@ -1273,6 +1273,7 @@ D("-", "a single Post Process Volume utility (box or sphere with priority and bl
       D("-", "Antialiasing SMAA / FXAA"),
   D("-", "Tile map optimizations"),
   D("-", "Open World Instancing"),
+                D("-", "Landscape/Vertex Optimization/Skirt toggle/flat/smooth shading/shadow distance LOD"),
         ]),
         new("Active Core", "🔥",
         [
